@@ -1,0 +1,29 @@
+# Default values for windmill.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+# Postgres is included for demo purposes ONLY, no storage volumes are created 
+# data is ephemeral
+postgres:
+  enabled: true
+  dbName: windmill
+  password: changeme
+
+#Update databaseUrl to match your Postgres endpoint if not using included container
+
+windmill:
+  #maximum replicas in deployment
+  maxReplicas: 3
+  databaseUrl: postgres://postgres:changeme@postgres/windmill?sslmode=disable
+  baseUrl: http://localhost
+  baseInternalUrl: http://localhost:8000
+  rustLog: info
+  numWorkers: 1
+  rustBacktrace: 1
+  disableNuser: false
+  denoPath: /usr/bin/deno
+  pythonPath: /usr/local/bin/python3
+  nsjailPath: nsjail
+

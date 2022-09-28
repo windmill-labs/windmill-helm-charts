@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: windmill-configmap
+  labels:
+    app: windmill
+data:
+{{- (.Files.Glob "files/*").AsConfig | nindent 2 }}

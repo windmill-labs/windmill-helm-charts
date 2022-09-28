@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: windmill
+spec:
+  replicas: {{ .Values.windmill.maxReplicas }}
+  selector:
+    matchLabels:
+      app: windmill
+  template:
+    metadata:
+      labels: 
+        app: windmill
+        container: windmill
+    spec:
+      containers:
+      - name: windmill
+        image: ghcr.io/windmill-labs/windmill:main
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        - name: "DATABASE_URL"
+          value: "{{ .Values.windmill.databaseUrl }}"
+        - name: "BASE_URL"
+          value: "{{ .Values.windmill.baseUrl }}"
+        - name: "BASE_INTERNAL_URL"
+          value: "{{ .Values.windmill.baseInternalUrl }}"
+        - name: "RUST_LOG"
+          value: "{{ .Values.windmill.rustLog }}"
+        - name: "NUM_WORKERS"
+          value: "{{ .Values.windmill.numWorkers }}"
+        - name: "RUST_BACKTRACE"
+          value: "{{ .Values.windmill.rustBacktrace }}"
+        - name: "DISABLE_NUSER"
+          value: "{{ .Values.windmill.disableNuser }}"
+        - name: "DENO_PATH"
+          value: "{{ .Values.windmill.denoPath }}"
+        - name: "PYTHON_PATH"
+          value: "{{ .Values.windmill.pythonPath }}"
+        - name: "NSJAIL_PATH"
+          value: "{{ .Values.windmill.nsjailPath }}"
+      securityContext:
+        runAsUser: 0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: windmill
+spec:
+  clusterIP: None
+  ports:
+  - port: 8000
+    protocol: TCP
+  selector:
+    app: windmill
+    container: windmill
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: windmill
+# spec:
+#   externalTrafficPolicy: Cluster
+#   ports:
+#   - port: 80
+#     name: http
+#     protocol: TCP
+#     targetPort: 8000
+#     nodePort: 30080
+#   # - port: 443
+#   #   name: https
+#   #   protocol: TCP
+#   #   targetPort: 443
+#   #   nodePort: 30081
+#   selector:
+#     app: windmill
+#     container: caddy
+#   sessionAffinity: None
+#   type: NodePort
+# status:
+#   loadBalancer: {}
