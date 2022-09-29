@@ -19,8 +19,7 @@ Tested with minikube on WSL2 in Windows 10.
 * Run ```helm install windmill-chart windmill/ --values windmill/values.yaml --namespace=windmill --create-namespace```
 * Wait for pods to come up running, takes a couple minutes to pull images and launch ```watch kubectl get pods -n windmill``` 
 * After pods launch, run ```minikube service nginx --url```
-* Visit the URL from the console output in browser to see the Windmill login default admin@windmill.dev / changeme
-* Open previous URL in browser and log into Windmill with default admin/pass
+* Windmill should be available at the URL from the console output. Default credentials: admin@windmill.dev / changeme
 * To destroy ```helm delete windmill-chart --namespace=windmill```
 
 ## Deploying on k8s
@@ -31,7 +30,6 @@ Tested with minikube on WSL2 in Windows 10.
 * For ingress enable the addon ```minikube addons enable ingress```
 * Run ```helm install windmill-chart windmill/ --values windmill/values.yaml --namespace=windmill --create-namespace```
 * Wait for pods to come up running, takes a couple minutes to pull images and launch ```watch kubectl get pods -n windmill``` 
-* Visit the URL from the console output in browser to see the Windmill login default admin@windmill.dev / changeme
-* Open previous URL in browser and log into Windmill with default admin/pass
+* Windmill should be available at the URL from the console output. Default credentials: admin@windmill.dev / changeme
 * To destroy ```helm delete windmill-chart --namespace=windmill```
 
