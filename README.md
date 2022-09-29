@@ -12,7 +12,7 @@ Caveats:
 
 Tested with minikube on WSL2 in Windows 10.
 
-* Clone repo locally
+* Clone repo locally, navigate to the charts directory
 * Have Helm 3 installed, this chart was created with v3.94 - https://helm.sh/docs/intro/install/ . Depending on your K8s version you may need Helm 3.8 or below.
 * Start minikube - ```minikube start```
 * For ingress enable the addon ```minikube addons enable ingress```
@@ -26,7 +26,7 @@ Tested with minikube on WSL2 in Windows 10.
 ## Deploying on k8s
 
 
-* Clone repo locally
+* Clone repo locally, navigate to the charts directory
 * Have Helm 3 installed, this chart was created with v3.94 - https://helm.sh/docs/intro/install/ . Depending on your K8s version you may need Helm 3.8 or below.
 * For ingress enable the addon ```minikube addons enable ingress```
 * Run ```helm install windmill-chart windmill/ --values windmill/values.yaml --namespace=windmill --create-namespace```
