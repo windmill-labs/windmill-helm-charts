@@ -21,13 +21,31 @@ spec:
         - containerPort: 3001
       securityContext:
         runAsUser: 0
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: lsp
+# spec:
+#   clusterIP: None
+#   ports:
+#   - port: 3001
+#     protocol: TCP
+#     targetPort: 3001
+#   selector:
+#     app: windmill
+#     container: lsp
+#   sessionAffinity: None
+#   type: ClusterIP
+# status:
+#   loadBalancer: {}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: lsp
+  name: windmill-lsp
 spec:
-  clusterIP: None
+  externalTrafficPolicy: Cluster
   ports:
   - port: 3001
     protocol: TCP
@@ -35,7 +53,7 @@ spec:
   selector:
     app: windmill
     container: lsp
-  sessionAffinity: None
-  type: ClusterIP
+  sessionAffinity: ClientIP
+  type: NodePort
 status:
   loadBalancer: {}

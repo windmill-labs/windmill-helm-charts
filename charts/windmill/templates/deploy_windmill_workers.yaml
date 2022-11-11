@@ -1,25 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: windmill
+  name: windmill-workers
 spec:
-  replicas: {{ .Values.windmill.maxReplicas }}
+  replicas: {{ .Values.windmill.workerReplicas }}
   selector:
     matchLabels:
-      app: windmill-app
+      app: windmill-worker
   template:
     metadata:
       labels: 
-        app: windmill-app
-        container: windmill-app
+        app: windmill-worker
+        container: windmill-worker
     spec:
       containers:
-      - name: windmill
-        image: ghcr.io/windmill-labs/windmill:main
+      - name: windmill-worker
+        securityContext:
+          privileged: true
+        #because nsjail requires privileged access
+        image: {{ .Values.windmill.imageName }}
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
+        - containerPort: 8001
         env:
+        - name : "METRICS_ADDR"
+          value: "true"
         - name: "DATABASE_URL"
           value: "{{ .Values.windmill.databaseUrl }}"
         - name: "BASE_URL"
@@ -30,6 +36,8 @@ spec:
           value: "{{ .Values.windmill.rustLog }}"
         - name: "NUM_WORKERS"
           value: "{{ .Values.windmill.numWorkers }}"
+        - name: "DISABLE_SERVER"
+          value: "true"
         - name: "RUST_BACKTRACE"
           value: "{{ .Values.windmill.rustBacktrace }}"
         - name: "DISABLE_NUSER"
@@ -40,13 +48,17 @@ spec:
           value: "{{ .Values.windmill.pythonPath }}"
         - name: "NSJAIL_PATH"
           value: "{{ .Values.windmill.nsjailPath }}"
+        - name: "DISABLE_NSJAIL"
+          value: "{{ .Values.windmill.disableNsjail }}"
+        - name: "JSON_FMT"
+          value: "true"
       securityContext:
         runAsUser: 0
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: windmill-app
+  name: windmill-workers
 spec:
   externalTrafficPolicy: Cluster
   ports:
@@ -54,8 +66,8 @@ spec:
     protocol: TCP
     targetPort: 8000
   selector:
-    app: windmill-app
-    container: windmill-app
+    app: windmill-worker
+    container: windmill-worker
   sessionAffinity: None
   type: NodePort
 status:
@@ -64,9 +76,7 @@ status:
 apiVersion: v1
 kind: Service
 metadata:
-  name: windmill-app-metrics
-  labels:
-    operated-prometheus: "true"
+  name: windmill-worker-metrics
 spec:
   clusterIP: None
   ports:
@@ -74,8 +84,8 @@ spec:
     name: metrics
     protocol: TCP
   selector:
-    app: windmill-app
-    container: windmill-app
+    app: windmill-worker
+    container: windmill-worker
   sessionAffinity: None
   type: ClusterIP
 status:

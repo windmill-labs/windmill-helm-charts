@@ -13,12 +13,12 @@ postgres:
 
 #Update databaseUrl to match your Postgres endpoint if not using included container
 
+
 windmill:
-  #maximum replicas in deployment
-  maxReplicas: 3
   databaseUrl: postgres://postgres:changeme@postgres/windmill?sslmode=disable
   baseUrl: http://localhost
-  baseInternalUrl: http://localhost:8000
+  baseInternalUrl: http://windmill-app:8000
+  baseDomain: localhost
   rustLog: info
   numWorkers: 1
   rustBacktrace: 1
@@ -26,4 +26,14 @@ windmill:
   denoPath: /usr/bin/deno
   pythonPath: /usr/local/bin/python3
   nsjailPath: nsjail
+  imageName: ghcr.io/windmill-labs/windmill:main
+  frontendReplicas: 1
+  enableOauth: false
+  oauthConfig: |
+      {
+        "github": {
+            "id": "asdfasdf",
+            "secret": "asdfasdfasdf"
+        }
+       }
 
