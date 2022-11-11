@@ -2,8 +2,6 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
-
 # Postgres is included for demo purposes ONLY, no storage volumes are created 
 # data is ephemeral
 postgres:
@@ -28,6 +26,7 @@ windmill:
   nsjailPath: nsjail
   imageName: ghcr.io/windmill-labs/windmill:main
   frontendReplicas: 1
+  workerReplicas: 1
   enableOauth: false
   oauthConfig: |
       {

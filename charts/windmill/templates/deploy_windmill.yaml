@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: windmill
 spec:
-  replicas: {{ .Values.windmill.maxReplicas }}
+  replicas: {{ .Values.windmill.frontendReplicas }}
   selector:
     matchLabels:
       app: windmill-app
