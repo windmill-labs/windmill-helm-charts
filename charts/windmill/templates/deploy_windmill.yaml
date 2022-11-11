@@ -40,6 +40,8 @@ spec:
           value: "{{ .Values.windmill.pythonPath }}"
         - name: "NSJAIL_PATH"
           value: "{{ .Values.windmill.nsjailPath }}"
+        - name: "dummy"
+          value: "variable"
       securityContext:
         runAsUser: 0
 ---
