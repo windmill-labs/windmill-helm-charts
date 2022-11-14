@@ -26,7 +26,7 @@ windmill:
   nsjailPath: nsjail
   imageName: ghcr.io/windmill-labs/windmill:main
   frontendReplicas: 1
-  workerReplicas: 1
+  workerReplicas: 3
   enableOauth: false
   oauthConfig: |
       {
