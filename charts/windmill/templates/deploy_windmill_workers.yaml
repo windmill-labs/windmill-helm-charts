@@ -18,7 +18,11 @@ spec:
         securityContext:
           privileged: true
         #because nsjail requires privileged access
-        image: {{ .Values.windmill.imageName }}
+        {{ if .Values.windmill.enterpriseEnabled }}
+        image: ghcr.io/windmill-labs/windmill-ee
+        {{ else }}
+        image: ghcr.io/windmill-labs/windmill:main
+        {{ end }}
         imagePullPolicy: Always
         ports:
         - containerPort: 8000

@@ -24,7 +24,6 @@ windmill:
   denoPath: /usr/bin/deno
   pythonPath: /usr/local/bin/python3
   nsjailPath: nsjail
-  imageName: ghcr.io/windmill-labs/windmill:main
   frontendReplicas: 1
   workerReplicas: 3
 ###only for enterprise deployment
