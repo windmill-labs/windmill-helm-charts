@@ -52,6 +52,12 @@ spec:
           value: "{{ .Values.windmill.disableNsjail }}"
         - name: "JSON_FMT"
           value: "true"
+        {{ if .Values.windmill.enterpriseEnabled }}
+        - name: "S3_CACHE_BUCKET"
+          value: "{{ .Values.windmill.S3_CACHE_BUCKET }}"
+        - name: "LICENSE_KEY"
+          value: "{{ .Values.windmill.licenseKey }}"
+        {{ end }}
       securityContext:
         runAsUser: 0
 ---

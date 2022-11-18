@@ -23,3 +23,13 @@ Tested with minikube on WSL2 in Windows 10.
 
 Alter the values and inputs to suit your environment. The services included are Nodeports for ease of testing on Minikub.
 
+### Enterprise features
+
+Enterprise users can use S3 storage for dependency caching for performance.  Cache is two way synced at regular intervals (10 minutes).  To use it, the worker deployment requires access to an S3 bucket.  There are several ways to do this:
+
+* On AWS (and EKS) , you can use a service account with IAM roles attached. See [AWS docs](https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html) - once you have a policy , you can create an account via eksctl for instance ```eksctl create iamserviceaccount --name serviceaccountname --namespace production --cluster windmill-cluster --role-name "iamrolename" \
+    --attach-policy-arn arn:aws:iam::976079455550:policy/bucketpolicy --approve```
+* Mount/attach a credentials file in /root/.aws/credentials of the worker deployment
+* Add environment variables for the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, via kube secrets.  
+
+The sync relies on rclone and uses its methods of authentication to s3 per [Rclone documentation](https://rclone.org/s3/#authentication)

@@ -26,6 +26,8 @@ spec:
           value: "{{ .Values.windmill.baseUrl }}"
         - name: "BASE_INTERNAL_URL"
           value: "{{ .Values.windmill.baseInternalUrl }}"
+        - name: "COOKIE_DOMAIN"
+          value: "{{ .Values.windmill.baseUrl }}"
         - name: "RUST_LOG"
           value: "{{ .Values.windmill.rustLog }}"
         - name: "NUM_WORKERS"
