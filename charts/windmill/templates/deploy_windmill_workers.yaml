@@ -61,6 +61,8 @@ spec:
           value: "{{ .Values.windmill.S3_CACHE_BUCKET }}"
         - name: "LICENSE_KEY"
           value: "{{ .Values.windmill.licenseKey }}"
+        - name: "RCLONE_S3_PROVIDER"
+          value: "AWS"
         {{ end }}
       securityContext:
         runAsUser: 0
