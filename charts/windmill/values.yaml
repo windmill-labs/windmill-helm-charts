@@ -24,7 +24,7 @@ windmill:
   denoPath: /usr/bin/deno
   pythonPath: /usr/local/bin/python3
   nsjailPath: nsjail
-  frontendReplicas: 1
+  frontendReplicas: 2
   workerReplicas: 3
 ###only for enterprise deployment
   enterpriseEnabled: false
