@@ -15,6 +15,12 @@ spec:
     spec:
       containers:
       - name: windmill
+      {{ if .Values.windmill.enableOauth }}
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/src/app/oauth.json
+          subPath: oauth.json
+       {{ end }}
         {{ if .Values.windmill.enterpriseEnabled }}
         image: ghcr.io/windmill-labs/windmill-ee
         {{ else }}
@@ -44,8 +50,14 @@ spec:
           value: "{{ .Values.windmill.pythonPath }}"
         - name: "NSJAIL_PATH"
           value: "{{ .Values.windmill.nsjailPath }}"
-        - name: "dummy"
-          value: "variable"
+{{ if .Values.windmill.enableOauth }}
+      volumes:
+      - name: config-volume
+        configMap:
+          # Provide the name of the ConfigMap containing the files you want
+          # to add to the container
+          name: windmill-configmap
+{{ end }}
       securityContext:
         runAsUser: 0
 ---
