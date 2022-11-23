@@ -8,13 +8,13 @@ spec:
   strategy: 
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 1
+      maxSurge: 3
       maxUnavailable: 0
   selector:
     matchLabels:
       app: windmill-app
   template:
-    terminationGracePeriodSeconds: 30
+
     metadata:
       annotations:
         timestamp: {{ now | quote }}
@@ -22,6 +22,7 @@ spec:
         app: windmill-app
         container: windmill-app
     spec:
+      terminationGracePeriodSeconds: 40
       containers:
       - name: windmill
         lifecycle:
