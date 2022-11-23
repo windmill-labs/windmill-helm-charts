@@ -3,7 +3,12 @@ kind: Deployment
 metadata:
   name: lsp
 spec:
-  replicas: 1
+  replicas: 2
+  strategy: 
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 3
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: windmill
