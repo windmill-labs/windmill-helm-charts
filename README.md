@@ -23,6 +23,48 @@ Tested with minikube on WSL2 in Windows 10.
 
 Alter the values and inputs to suit your environment. The services included are Nodeports for ease of testing on Minikub.
 
+## Kubernetes hosting tips
+
+The included helm chart does not have any ingress configured.  The default services are nodeports you can point a load balancer to, or alter the chart to suit. For example, on AWS you might use the AWS ALB controller and configure an ingress like this:
+
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: windmill-ingress
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/tags: Environment=dev,Team=test
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=600,stickiness.type=app_cookie,stickiness.app_cookie.cookie_name=token,stickiness.app_cookie.duration_seconds=86400
+    alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=600
+    alb.ingress.kubernetes.io/group.name: windmill
+    alb.ingress.kubernetes.io/group.order: '10'
+    alb.ingress.kubernetes.io/certificate-arn: certificatearn
+spec:
+  ingressClassName: alb
+  rules:
+    - host:  {{ .Values.windmill.baseDomain }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: windmill-app
+                port:
+                  number: 8000
+```
+
+Again, there are many ways to expose an app and it will depend on the requirements of your environment. Overall, you want the following endpoints accessible included in the chart:
+
+* windmill frontend on port 8000
+* lsp application on port 3001
+* metrics endpoints on port 8001 for the frontend/app and workers
+
+If you are using Prometheus, you can scrape the windmill-app-metrics service on port 8001 at /metrics endpoint to gather stats about the Windmill application.
+
+
 ### Enterprise features
 
 Enterprise users can use S3 storage for dependency caching for performance.  Cache is two way synced at regular intervals (10 minutes).  To use it, the worker deployment requires access to an S3 bucket.  There are several ways to do this:
