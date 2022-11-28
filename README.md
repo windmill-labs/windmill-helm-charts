@@ -33,3 +33,5 @@ Tested with minikube on WSL2 in Windows 10.
 * Windmill should be available at the URL from the console output. Default credentials: admin@windmill.dev / changeme
 * To destroy ```helm delete windmill-chart --namespace=windmill```
 
+# Values
+
