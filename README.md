@@ -70,7 +70,7 @@ If you are using Prometheus, you can scrape the windmill-app-metrics service on 
 Enterprise users can use S3 storage for dependency caching for performance.  Cache is two way synced at regular intervals (10 minutes).  To use it, the worker deployment requires access to an S3 bucket.  There are several ways to do this:
 
 * On AWS (and EKS) , you can use a service account with IAM roles attached. See [AWS docs](https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html) - once you have a policy , you can create an account via eksctl for instance ```eksctl create iamserviceaccount --name serviceaccountname --namespace production --cluster windmill-cluster --role-name "iamrolename" \
-    --attach-policy-arn arn:aws:iam::976079455550:policy/bucketpolicy --approve```
+    --attach-policy-arn arn:aws:iam::12312315:policy/bucketpolicy --approve```
 * Mount/attach a credentials file in /root/.aws/credentials of the worker deployment
 * Add environment variables for the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, via kube secrets.  
 
