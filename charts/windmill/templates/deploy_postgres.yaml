@@ -1,10 +1,9 @@
 {{- if .Values.postgres.enabled }}
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: postgres
 spec:
-  serviceName: postgres
   replicas: 1
   selector:
     matchLabels:
@@ -26,18 +25,6 @@ spec:
           value: "{{ .Values.postgres.password }}"
         - name: "POSTGRES_DB"
           value: "{{ .Values.postgres.dbName }}"
-        volumeMounts:
-          - mountPath: "/var/lib/postgresql"
-            name: task-pv-storage
-  volumeClaimTemplates:
-  - metadata:
-      name: task-pv-storage
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 10G
-
 ---
 apiVersion: v1
 kind: Service

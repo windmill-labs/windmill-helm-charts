@@ -33,3 +33,31 @@ Enterprise users can use S3 storage for dependency caching for performance.  Cac
 * Add environment variables for the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, via kube secrets.  
 
 The sync relies on rclone and uses its methods of authentication to s3 per [Rclone documentation](https://rclone.org/s3/#authentication)
+
+
+# Values
+
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| enterprise.enabled | bool | `false` | enable Windmill Enterprise , requires license key |
+| enterprise.licenseKey | string | `"123456F"` | Windmill provided Enterprise license key |
+| enterprise.s3CacheBucket | string | `"mybucketname"` | S3 bucket to use for dependency cache |
+| postgres.dbName | string | `"windmill"` | database name for postgres demo container |
+| postgres.enabled | bool | `true` | enabled included Postgres container for demo purposes only |
+| postgres.password | string | `"changeme"` | password for postgres demo container |
+| windmill.baseInternalUrl | string | `"http://windmill-app:8000"` | used internally by the app, should match the service for the frontend deployment |
+| windmill.baseUrl | string | `"http://localhost"` | domain as shown in browser, change to https etc based on your endpoint/ingress configuration |
+| windmill.databaseUrl | string | `"postgres://postgres:changeme@postgres/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable |
+| windmill.denoPath | string | `"/usr/bin/deno"` | deno binary built into Windmill image, should not be changed  |
+| windmill.disableNsjail | bool | `true` | enables/disables nsjail which provide isolation in untrusted environment is disabled by default.  |
+| windmill.disableNuser | bool | `true` | nsjail user |
+| windmill.frontendReplicas | int | `3` | replica for the application frontend  |
+| windmill.lspReplicas | int | `2` | replicas for the lsp containers used by the frontend |
+| windmill.nsjailPath | string | `"nsjail"` | nsjail binary |
+| windmill.numWorkers | int | `1` | workers per worker container, default and recommended is 1 to isolate one process per container |
+| windmill.oauthConfig | string | `"{\n  \"github\": {\n      \"id\": \"asdfasdf\",\n      \"secret\": \"asdfasdfasdf\"\n  }\n }\n"` | Oauth configuration for logins etc |
+| windmill.pythonPath | string | `"/usr/local/bin/python3"` | python binary built into Windmill image, should not be changed  |
+| windmill.rustBacktrace | int | `1` | rust back trace information enabled |
+| windmill.rustLog | string | `"info"` | rust log level, set to debug for more information etc |
+| windmill.workerReplicas | int | `3` | replicas for the workers, jobs are executed on the workers |

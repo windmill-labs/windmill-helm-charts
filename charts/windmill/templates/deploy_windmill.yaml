@@ -35,7 +35,7 @@ spec:
           mountPath: /usr/src/app/oauth.json
           subPath: oauth.json
        {{ end }}
-        {{ if .Values.windmill.enterpriseEnabled }}
+        {{ if .Values.enterprise.enabled }}
         image: ghcr.io/windmill-labs/windmill-ee
         {{ else }}
         image: ghcr.io/windmill-labs/windmill:main
@@ -43,6 +43,7 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
+        - containerPort: 8001
         readinessProbe:
           initialDelaySeconds: 1
           periodSeconds: 2
@@ -60,6 +61,8 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 5
         env:
+        - name : "METRICS_ADDR"
+          value: "true"
         - name: "DATABASE_URL"
           value: "{{ .Values.windmill.databaseUrl }}"
         - name: "BASE_URL"

@@ -20,10 +20,12 @@ spec:
     spec:
       containers:
       - name: windmill-worker
+       {{ if  not .Values.windmill.disableNsJail }}
+       #because nsjail requires privileged access
         securityContext:
           privileged: true
-        #because nsjail requires privileged access
-        {{ if .Values.windmill.enterpriseEnabled }}
+        {{end}}
+        {{ if .Values.enterprise.enabled }}
         image: ghcr.io/windmill-labs/windmill-ee
         {{ else }}
         image: ghcr.io/windmill-labs/windmill:main
@@ -63,9 +65,9 @@ spec:
           value: "true"
         {{ if .Values.windmill.enterpriseEnabled }}
         - name: "S3_CACHE_BUCKET"
-          value: "{{ .Values.windmill.S3_CACHE_BUCKET }}"
+          value: "{{ .Values.enterprise.s3CacheBucket }}"
         - name: "LICENSE_KEY"
-          value: "{{ .Values.windmill.licenseKey }}"
+          value: "{{ .Values.enterprise.licenseKey }}"
         - name: "RCLONE_S3_PROVIDER"
           value: "AWS"
         {{ end }}
