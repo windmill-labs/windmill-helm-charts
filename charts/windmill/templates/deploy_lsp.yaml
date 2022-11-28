@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: lsp
 spec:
-  replicas: 1
+  replicas: {{ .Values.windmill.lspReplicas }}
   selector:
     matchLabels:
       app: windmill

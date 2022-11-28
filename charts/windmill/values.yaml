@@ -1,29 +1,45 @@
-# Default values for windmill.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
-replicaCount: 1
-
-# Postgres is included for demo purposes ONLY, no storage volumes are created 
-# data is ephemeral
 postgres:
+  # -- enabled included Postgres container for demo purposes only
   enabled: true
+  # -- database name for postgres demo container
   dbName: windmill
+  # -- password for postgres demo container
   password: changeme
 
-#Update databaseUrl to match your Postgres endpoint if not using included container
-
 windmill:
-  #maximum replicas in deployment
-  maxReplicas: 3
+  # -- replica for the application frontend 
+  frontendReplicas: 3
+  # -- replicas for the workers, jobs are executed on the workers
+  workerReplicas: 3
+  # -- replicas for the lsp containers used by the frontend
+  lspReplicas: 2
+  # -- Postgres URI, pods will crashloop if database is unreachable
   databaseUrl: postgres://postgres:changeme@postgres/windmill?sslmode=disable
+  # -- domain as shown in browser, change to https etc based on your endpoint/ingress configuration
   baseUrl: http://localhost
-  baseInternalUrl: http://localhost:8000
+  # -- used internally by the app, should match the service for the frontend deployment
+  baseInternalUrl: http://windmill-app:8000
+  # -- rust log level, set to debug for more information etc
   rustLog: info
+  # -- workers per worker container, default and recommended is 1 to isolate one process per container
   numWorkers: 1
+  # -- rust back trace information enabled
   rustBacktrace: 1
-  disableNuser: false
+  # -- deno binary built into Windmill image, should not be changed 
   denoPath: /usr/bin/deno
+  # -- python binary built into Windmill image, should not be changed 
   pythonPath: /usr/local/bin/python3
+  # -- enables/disables nsjail which provide isolation in untrusted environment is disabled by default. 
+  disableNsjail: true
+  # -- nsjail user
+  disableNuser: true
+  # -- nsjail binary
   nsjailPath: nsjail
 
+enterprise:
+  # -- enable Windmill Enterprise , requires license key
+  enabled: false
+  # -- S3 bucket to use for dependency cache
+  s3CacheBucket: mybucketname
+  # -- Windmill provided Enterprise license key
+  licenseKey: 123456F
