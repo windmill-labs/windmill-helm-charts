@@ -1,6 +1,8 @@
 
 - [Windmill Helm Chart](#windmill-helm-chart)
   - [Deploying demo on minikube](#deploying-demo-on-minikube)
+    - [Deploy via Helm repo](#deploy-via-helm-repo)
+    - [Direct from cloned repo](#direct-from-cloned-repo)
   - [Kubernetes hosting tips](#kubernetes-hosting-tips)
     - [Enterprise features](#enterprise-features)
 - [Values](#values)
@@ -19,10 +21,28 @@ Caveats:
 
 Tested with minikube on WSL2 in Windows 10.
 
+### Deploy via Helm repo
+
+* Have Helm 3 installed, this chart was created with v3.94 - https://helm.sh/docs/intro/install/ . Depending on your K8s version you may need Helm 3.8 or below.
+* Start minikube / make sure your cluster is running - ```minikube start```
+* Add the Helm repo ```helm repo add windmill https://windmill-labs.github.io/windmill-helm-charts/```
+* Run ```helm install mywindmill windmill/windmill -n windmill --create-namespace```
+* Wait for pods to come up running, takes a couple minutes to pull images and launch ```watch kubectl get pods -n windmill``` 
+* After pods launch, run ```minikube service windmill-app```
+* Windmill should be available at the URL from the console output. Default credentials: admin@windmill.dev / changeme
+* To destroy ```helm delete windmill```
+
+Alter the values and inputs to suit your environment. The services included are Nodeports for ease of testing on Minikub.
+
+### Direct from cloned repo
+
+You can install from a copy of this repository directly. Helpful if you plan to fork it/copy it for updating in your own environment. 
+
 * Clone repo locally, navigate to the charts directory
+* Copy the values.yaml file somewhere else and update defaults if desired
 * Have Helm 3 installed, this chart was created with v3.94 - https://helm.sh/docs/intro/install/ . Depending on your K8s version you may need Helm 3.8 or below.
 * Start minikube - ```minikube start```
-* Run ```helm install windmill windmill/```
+* Run ```helm install windmill windmill/ -f myvalues_file.yaml -n windmill --create-namespace```
 * Wait for pods to come up running, takes a couple minutes to pull images and launch ```watch kubectl get pods -n windmill``` 
 * After pods launch, run ```minikube service windmill-app```
 * Windmill should be available at the URL from the console output. Default credentials: admin@windmill.dev / changeme
