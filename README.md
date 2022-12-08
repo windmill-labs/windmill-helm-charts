@@ -21,7 +21,7 @@ Caveats:
 
 Tested with minikube on WSL2 in Windows 10.
 
-### Deploy via Helm repo
+### Deploy via Helm repo (preferred)
 
 * Have Helm 3 installed, this chart was created with v3.94 - https://helm.sh/docs/intro/install/ . Depending on your K8s version you may need Helm 3.8 or below.
 * Start minikube / make sure your cluster is running - ```minikube start```
