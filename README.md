@@ -28,7 +28,7 @@ Tested with minikube on WSL2 in Windows 10.
 * Add the Helm repo ```helm repo add windmill https://windmill-labs.github.io/windmill-helm-charts/```
 * Run ```helm install mywindmill windmill/windmill -n windmill --create-namespace```
 * Wait for pods to come up running, takes a couple minutes to pull images and launch ```watch kubectl get pods -n windmill``` 
-* After pods launch, run ```minikube service windmill-app```
+* After pods launch, run ```minikube service windmill-app -n=windmill```
 * Windmill should be available at the URL from the console output. Default credentials: admin@windmill.dev / changeme
 * To destroy ```helm delete windmill```
 
