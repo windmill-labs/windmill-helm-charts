@@ -45,8 +45,6 @@ spec:
         - containerPort: 8000
         - containerPort: 8001
         readinessProbe:
-          initialDelaySeconds: 1
-          periodSeconds: 2
           timeoutSeconds: 1
           successThreshold: 1
           failureThreshold: 1
