@@ -8,9 +8,9 @@ postgres:
 
 windmill:
   # -- replica for the application frontend 
-  frontendReplicas: 3
+  frontendReplicas: 2
   # -- replicas for the workers, jobs are executed on the workers
-  workerReplicas: 3
+  workerReplicas: 4
   # -- replicas for the lsp containers used by the frontend
   lspReplicas: 2
   # -- Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in frontend and worker container
@@ -35,15 +35,13 @@ windmill:
   disableNuser: true
   # -- nsjail binary. Sets NSJAIL_PATH environment variable in worker container
   nsjailPath: nsjail
-  # -- Oauth configuration for logins etc
+  # -- Oauth configuration for logins and connections. e.g of values
+  #   "github": {
+  #     "id": "asdfasdf",
+  #     "secret": "asdfasdfasdf"
+  #    }
   oauthConfig: |
-      {
-        "github": {
-            "id": "asdfasdf",
-            "secret": "asdfasdfasdf"
-        }
-       }
-
+      {}
 
 enterprise:
   # -- enable Windmill Enterprise , requires license key. 

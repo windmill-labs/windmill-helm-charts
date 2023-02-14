@@ -1,7 +1,7 @@
 
 - [Windmill Helm Chart](#windmill-helm-chart)
   - [Deploying demo on minikube](#deploying-demo-on-minikube)
-    - [Deploy via Helm repo](#deploy-via-helm-repo)
+    - [Deploy via Helm repo (preferred)](#deploy-via-helm-repo-preferred)
     - [Direct from cloned repo](#direct-from-cloned-repo)
   - [Kubernetes hosting tips](#kubernetes-hosting-tips)
     - [Enterprise features](#enterprise-features)
@@ -24,15 +24,70 @@ Tested with minikube on WSL2 in Windows 10.
 ### Deploy via Helm repo (preferred)
 
 * Have Helm 3 installed, this chart was created with v3.94 - https://helm.sh/docs/intro/install/ . Depending on your K8s version you may need Helm 3.8 or below.
-* Start minikube / make sure your cluster is running - ```minikube start```
-* Add the Helm repo ```helm repo add windmill https://windmill-labs.github.io/windmill-helm-charts/```
-* Run ```helm install mywindmill windmill/windmill -n windmill --create-namespace```
-* Wait for pods to come up running, takes a couple minutes to pull images and launch ```watch kubectl get pods -n windmill``` 
-* After pods launch, run ```minikube service windmill-app -n=windmill```
-* Windmill should be available at the URL from the console output. Default credentials: admin@windmill.dev / changeme
-* To destroy ```helm delete windmill```
+```
+minikube start
+helm repo add windmill https://windmill-labs.github.io/windmill-helm-charts/
+helm install mywindmill windmill/windmill -n windmill --create-namespace
+```
 
-Alter the values and inputs to suit your environment. The services included are Nodeports for ease of testing on Minikub.
+Wait for pods to come up running, takes a couple minutes to pull images and launch:
+```
+watch kubectl get pods -n windmill
+``` 
+
+After pods launch, run:
+
+```
+minikube service windmill-app -n=windmill
+```
+
+Windmill should be available at the URL from the console output. Default credentials: admin@windmill.dev / changeme
+
+To destroy:
+```
+helm delete windmill
+```
+
+Alter the values and inputs to suit your environment. The services included are Nodeports for ease of testing on Minikube.
+
+You will want to update the baseUrl to point to your ingress or load balancer.  The default is set to localhost which is unlikely to be the case.
+
+Update it with a values.yml file like this:
+
+```
+postgres:
+  enabled: true
+  dbName: windmill
+  password: changeme
+
+windmill:
+  baseUrl: http://localhost
+  baseInternalUrl: http://windmill-app:8000
+  frontendReplicas: 2
+  workerReplicas: 4
+  lspReplicas: 2
+  databaseUrl: postgres://postgres:changeme@postgres/windmill?sslmode=disable
+  # -- Oauth configuration for logins and connections. e.g of values
+  #   "github": {
+  #     "id": "asdfasdf",
+  #     "secret": "asdfasdfasdf"
+  #    }
+  oauthConfig: |
+      {}
+
+enterprise:
+  enabled: false
+  # -- S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container
+  s3CacheBucket: mybucketname
+  # -- Windmill provided Enterprise license key. Sets LICENSE_KEY environment variable in frontend and worker container.
+  licenseKey: 123456F
+```
+
+Apply it:
+```
+helm upgrade -i mywindmill windmill/windmill -n windmill --create-namespace -f values.yml
+```
+
 
 ### Direct from cloned repo
 
@@ -41,12 +96,22 @@ You can install from a copy of this repository directly. Helpful if you plan to 
 * Clone repo locally, navigate to the charts directory
 * Copy the values.yaml file somewhere else and update defaults if desired
 * Have Helm 3 installed, this chart was created with v3.94 - https://helm.sh/docs/intro/install/ . Depending on your K8s version you may need Helm 3.8 or below.
-* Start minikube - ```minikube start```
-* Run ```helm install windmill windmill/ -f myvalues_file.yaml -n windmill --create-namespace```
-* Wait for pods to come up running, takes a couple minutes to pull images and launch ```watch kubectl get pods -n windmill``` 
-* After pods launch, run ```minikube service windmill-app```
-* Windmill should be available at the URL from the console output. Default credentials: admin@windmill.dev / changeme
-* To destroy ```helm delete windmill```
+ ```
+ minikube start
+ helm install windmill windmill/ -f myvalues_file.yaml -n windmill --create-namespace
+ ```
+Wait for pods to come up running, takes a couple minutes to pull images and launch:
+```
+watch kubectl get pods -n windmill
+``` 
+After pods launch: 
+```minikube service windmill-app```
+Windmill should be available at the URL from the console output. Default credentials: admin@windmill.dev / changeme
+
+To destroy:
+```
+helm delete windmill
+```
 
 Alter the values and inputs to suit your environment. The services included are Nodeports for ease of testing on Minikub.
 
@@ -106,29 +171,24 @@ The sync relies on rclone and uses its methods of authentication to s3 per [Rclo
 
 # Values
 
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| enterprise.enabled | bool | `false` | enable Windmill Enterprise , requires license key.  |
-| enterprise.licenseKey | string | `"123456F"` | Windmill provided Enterprise license key. Sets LICENSE_KEY environment variable in frontend and worker container. |
-| enterprise.s3CacheBucket | string | `"mybucketname"` | S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container |
-| postgres.dbName | string | `"windmill"` | database name for postgres demo container |
-| postgres.enabled | bool | `true` | enabled included Postgres container for demo purposes only |
-| postgres.password | string | `"changeme"` | password for postgres demo container |
-| windmill.baseInternalUrl | string | `"http://windmill-app:8000"` | used internally by the app, should match the service for the frontend deployment, sets BASE_INTERNAL_URL environment variable in frontend and worker container |
-| windmill.baseUrl | string | `"http://localhost"` | domain as shown in browser, change to https etc based on your endpoint/ingress configuration, sets BASE_URL environment variable in frontend and worker container |
-| windmill.databaseUrl | string | `"postgres://postgres:changeme@postgres/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in frontend and worker container |
-| windmill.denoPath | string | `"/usr/bin/deno"` | deno binary built into Windmill image, should not be changed. Sets DENO_PATH environment variable in frontend and worker container |
-| windmill.disableNsjail | bool | `true` | enables/disables nsjail which provide isolation in untrusted environment is disabled by default. Sets DISABLE_NJSAIL environment variable in worker container |
-| windmill.disableNuser | bool | `true` | nsjail user . Sets DISABLE_NUSER environment variable in worker container |
-| windmill.frontendReplicas | int | `3` | replica for the application frontend  |
-| windmill.lspReplicas | int | `2` | replicas for the lsp containers used by the frontend |
-| windmill.nsjailPath | string | `"nsjail"` | nsjail binary. Sets NSJAIL_PATH environment variable in worker container |
-| windmill.numWorkers | int | `1` | workers per worker container, default and recommended is 1 to isolate one process per container, sets NUM_WORKER environment variable for worker container.  Frontend container has 0 NUM_WORKERS by default |
-| windmill.oauthConfig | string | `"{\n  \"github\": {\n      \"id\": \"asdfasdf\",\n      \"secret\": \"asdfasdfasdf\"\n  }\n }\n"` | Oauth configuration for logins etc |
-| windmill.pythonPath | string | `"/usr/local/bin/python3"` | python binary built into Windmill image, should not be changed. Sets PYTHON_PATH environment variable in frontend and worker container |
-| windmill.rustBacktrace | int | `1` | rust back trace information enabled, sets RUST_BACKTRACE environment variable in frontend and worker container |
-| windmill.rustLog | string | `"info"` | rust log level, set to debug for more information etc, sets RUST_LOG environment variable in frontend and worker container |
-| windmill.workerReplicas | int | `3` | replicas for the workers, jobs are executed on the workers |
+| Key                       | Type   | Default                                                                                            | Description                                                                                                                                                                                                  |
+| ------------------------- | ------ | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| enterprise.enabled        | bool   | `false`                                                                                            | enable Windmill Enterprise , requires license key.                                                                                                                                                           |
+| enterprise.licenseKey     | string | `"123456F"`                                                                                        | Windmill provided Enterprise license key. Sets LICENSE_KEY environment variable in frontend and worker container.                                                                                            |
+| enterprise.s3CacheBucket  | string | `"mybucketname"`                                                                                   | S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container                                                                                                         |
+| postgres.dbName           | string | `"windmill"`                                                                                       | database name for postgres demo container                                                                                                                                                                    |
+| postgres.enabled          | bool   | `true`                                                                                             | enabled included Postgres container for demo purposes only                                                                                                                                                   |
+| postgres.password         | string | `"changeme"`                                                                                       | password for postgres demo container                                                                                                                                                                         |
+| windmill.baseInternalUrl  | string | `"http://windmill-app:8000"`                                                                       | used internally by the app, should match the service for the frontend deployment, sets BASE_INTERNAL_URL environment variable in frontend and worker container                                               |
+| windmill.baseUrl          | string | `"http://localhost"`                                                                               | domain as shown in browser, change to https etc based on your endpoint/ingress configuration, sets BASE_URL environment variable in frontend and worker container                                            |
+| windmill.databaseUrl      | string | `"postgres://postgres:changeme@postgres/windmill?sslmode=disable"`                                 | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in frontend and worker container                                                                        |  |
+| windmill.frontendReplicas | int    | `2`                                                                                                | replica for the application frontend                                                                                                                                                                         |
+| windmill.lspReplicas      | int    | `2`                                                                                                | replicas for the lsp containers used by the frontend                                                                                                                                                         |
+| windmill.numWorkers       | int    | `1`                                                                                                | workers per worker container, default and recommended is 1 to isolate one process per container, sets NUM_WORKER environment variable for worker container.  Frontend container has 0 NUM_WORKERS by default |
+| windmill.oauthConfig      | string | `"{\n  \"github\": {\n      \"id\": \"asdfasdf\",\n      \"secret\": \"asdfasdfasdf\"\n  }\n }\n"` | Oauth configuration for logins etc                                                                                                                                                                           |
+| windmill.rustBacktrace    | int    | `1`                                                                                                | rust back trace information enabled, sets RUST_BACKTRACE environment variable in frontend and worker container                                                                                               |
+| windmill.rustLog          | string | `"info"`                                                                                           | rust log level, set to debug for more information etc, sets RUST_LOG environment variable in frontend and worker container                                                                                   |
+| windmill.workerReplicas   | int    | `4`                                                                                                | replicas for the workers, jobs are executed on the workers                                                                                                                                                   |
 
 ----------------------------------------------
 

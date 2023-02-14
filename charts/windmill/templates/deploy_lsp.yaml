@@ -21,7 +21,7 @@ spec:
       containers:
       - name: lsp
         image: ghcr.io/windmill-labs/windmill-lsp:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         ports:
         - containerPort: 3001
       securityContext:
