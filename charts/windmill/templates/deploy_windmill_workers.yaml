@@ -26,9 +26,9 @@ spec:
           privileged: true
         {{end}}
         {{ if .Values.enterprise.enabled }}
-        image: ghcr.io/windmill-labs/windmill-ee
+        image: ghcr.io/windmill-labs/windmill-ee:{{ .Values.windmill.image }}
         {{ else }}
-        image: ghcr.io/windmill-labs/windmill:{{ .Values.windmill.image.tag }}
+        image: ghcr.io/windmill-labs/windmill:{{ .Values.windmill.image }}
         {{ end }}
         imagePullPolicy: Always
         ports:

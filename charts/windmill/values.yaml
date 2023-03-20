@@ -7,9 +7,8 @@ postgres:
   password: changeme
 
 windmill:
-  image:
-    tag: "1.76.0"
-  # -- replica for the application frontend 
+  image: "main"
+  # -- replica for the application frontend
   frontendReplicas: 2
   # -- replicas for the workers, jobs are executed on the workers
   workerReplicas: 4
@@ -43,17 +42,14 @@ windmill:
   #     "secret": "asdfasdfasdf"
   #    }
   oauthConfig: |
-      {}
+    {}
 
-lsp:
-  image:
-    tag: "1.76.0"
+lsp: "main"
 
 enterprise:
-  # -- enable Windmill Enterprise , requires license key. 
+  # -- enable Windmill Enterprise , requires license key.
   enabled: false
   # -- S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container
   s3CacheBucket: mybucketname
   # -- Windmill provided Enterprise license key. Sets LICENSE_KEY environment variable in frontend and worker container.
   licenseKey: 123456F
-
