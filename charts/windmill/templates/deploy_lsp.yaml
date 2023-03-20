@@ -4,7 +4,7 @@ metadata:
   name: lsp
 spec:
   replicas: 2
-  strategy: 
+  strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 3
@@ -14,16 +14,16 @@ spec:
       app: windmill
   template:
     metadata:
-      labels: 
+      labels:
         app: windmill
         container: lsp
     spec:
       containers:
-      - name: lsp
-        image: ghcr.io/windmill-labs/windmill-lsp:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 3001
+        - name: lsp
+          image: ghcr.io/windmill-labs/windmill-lsp:{{ .Values.lsp.image }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3001
       securityContext:
         runAsUser: 0
 # ---
@@ -52,9 +52,9 @@ metadata:
 spec:
   externalTrafficPolicy: Cluster
   ports:
-  - port: 3001
-    protocol: TCP
-    targetPort: 3001
+    - port: 3001
+      protocol: TCP
+      targetPort: 3001
   selector:
     app: windmill
     container: lsp
