@@ -7,6 +7,8 @@ postgres:
   password: changeme
 
 windmill:
+  image:
+    tag: "1.76.0"
   # -- replica for the application frontend 
   frontendReplicas: 2
   # -- replicas for the workers, jobs are executed on the workers
@@ -42,6 +44,10 @@ windmill:
   #    }
   oauthConfig: |
       {}
+
+lsp:
+  image:
+    tag: "1.76.0"
 
 enterprise:
   # -- enable Windmill Enterprise , requires license key. 

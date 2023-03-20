@@ -28,7 +28,7 @@ spec:
         {{ if .Values.enterprise.enabled }}
         image: ghcr.io/windmill-labs/windmill-ee
         {{ else }}
-        image: ghcr.io/windmill-labs/windmill:main
+        image: ghcr.io/windmill-labs/windmill:{{ .Values.windmill.image.tag }}
         {{ end }}
         imagePullPolicy: Always
         ports:
