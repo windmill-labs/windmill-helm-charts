@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   windmill:
   - apiVersion: v2
+    appVersion: 1.84.0
+    created: "2023-04-01T01:04:45.102652577Z"
+    description: A Helm chart for Kubernetes
+    digest: 7adee35c133db27b22f22bcf06b7927500f062e35bb218e45a2bc2c6a82d214d
+    name: windmill
+    type: application
+    urls:
+    - https://github.com/windmill-labs/windmill-helm-charts/releases/download/windmill-1.1.0/windmill-1.1.0.tgz
+    version: 1.1.0
+  - apiVersion: v2
     appVersion: 1.62.0
     created: "2023-02-13T09:52:04.215933399Z"
     description: A Helm chart for Kubernetes
@@ -41,4 +51,4 @@ entries:
     urls:
     - https://github.com/windmill-labs/windmill-helm-charts/releases/download/windmill-0.1.0/windmill-0.1.0.tgz
     version: 0.1.0
-generated: "2023-02-13T09:52:04.215954499Z"
+generated: "2023-04-01T01:04:45.102675377Z"
