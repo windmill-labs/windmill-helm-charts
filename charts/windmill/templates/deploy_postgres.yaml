@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres
+  name: {{ .Release.Name }}-postgres
 spec:
   replicas: 1
   selector:
@@ -10,7 +10,7 @@ spec:
       app: windmill
   template:
     metadata:
-      labels: 
+      labels:
         app: windmill
         container: postgres
     spec:

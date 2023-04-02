@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: lsp
+  name: {{ .Release.Name }}-lsp
 spec:
   replicas: 2
   strategy:

@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: windmill-workers
+  name: {{ .Release.Name }}-workers
 spec:
   replicas: {{ .Values.windmill.workerReplicas }}
-  strategy: 
+  strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 3
@@ -14,7 +14,7 @@ spec:
       app: windmill-worker
   template:
     metadata:
-      labels: 
+      labels:
         app: windmill-worker
         container: windmill-worker
     spec:
