@@ -10,7 +10,7 @@ spec:
       app: windmill
   template:
     metadata:
-      labels:
+      labels: 
         app: windmill
         container: postgres
     spec:
