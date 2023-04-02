@@ -48,7 +48,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: windmill-lsp
+  name: {{ .Release.Name }}-lsp
 spec:
   externalTrafficPolicy: Cluster
   ports:

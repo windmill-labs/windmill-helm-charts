@@ -29,7 +29,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres
+  name: {{ .Release.Name }}-postgres
 spec:
   clusterIP: None
   ports:
