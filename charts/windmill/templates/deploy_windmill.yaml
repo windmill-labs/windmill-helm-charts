@@ -1,10 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}
+  name: windmill
+
 spec:
   replicas: {{ .Values.windmill.frontendReplicas }}
-  strategy:
+  strategy: 
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 3
@@ -17,7 +18,7 @@ spec:
     metadata:
       annotations:
         timestamp: {{ now | quote }}
-      labels:
+      labels: 
         app: windmill-app
         container: windmill-app
     spec:
@@ -94,7 +95,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-app
+  name: windmill-app
 spec:
   externalTrafficPolicy: Cluster
   ports:
