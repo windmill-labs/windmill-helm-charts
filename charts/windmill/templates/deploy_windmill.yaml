@@ -29,12 +29,10 @@ spec:
           preStop:
             exec:
               command: ["/bin/sh", "-c", "sleep 30"]
-      {{ if .Values.windmill.enableOauth }}
         volumeMounts:
         - name: config-volume
           mountPath: /usr/src/app/oauth.json
           subPath: oauth.json
-       {{ end }}
         {{ if .Values.enterprise.enabled }}
         image: ghcr.io/windmill-labs/windmill-ee
         {{ else }}
@@ -81,14 +79,12 @@ spec:
           value: "{{ .Values.windmill.pythonPath }}"
         - name: "NSJAIL_PATH"
           value: "{{ .Values.windmill.nsjailPath }}"
-{{ if .Values.windmill.enableOauth }}
       volumes:
       - name: config-volume
         configMap:
           # Provide the name of the ConfigMap containing the files you want
           # to add to the container
           name: windmill-configmap
-{{ end }}
       securityContext:
         runAsUser: 0
 ---

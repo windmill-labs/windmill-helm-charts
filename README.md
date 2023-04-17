@@ -69,8 +69,8 @@ windmill:
   databaseUrl: postgres://postgres:changeme@postgres/windmill?sslmode=disable
   # -- Oauth configuration for logins and connections. e.g of values
   #   "github": {
-  #     "id": "asdfasdf",
-  #     "secret": "asdfasdfasdf"
+  #     "id": "clientid",
+  #     "secret": "clientsecret",
   #    }
   oauthConfig: |
       {}
