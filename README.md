@@ -6,17 +6,15 @@
   - [Kubernetes hosting tips](#kubernetes-hosting-tips)
     - [Enterprise features](#enterprise-features)
   - [Values](#values)
-  - [| windmill.workers | object | `{"affinity":{},"annotations":{},"nodeSelector":{},"resources":{},"tolerations":[]}` | workers configuration |](#-windmillworkers--object--affinityannotationsnodeselectorresourcestolerations--workers-configuration-)
 
 # Windmill Helm Chart
 
 Example chart for deploying Windmill and testing it on Kubernetes or Minikube.
 
-
 Caveats:
 
-* Postgres is included for demo purposes, it is a stateful set with a small 10GB volume claim applied.  If you want to host postgres in k8s, there are better ways, or offload it outside your k8s cluster.  Postgres can be disabled entirely in the values.yaml file.
-* The postgres user/pass is currently not a secret/encrypted
+- Postgres is included for demo purposes, it is a stateful set with a small 10GB volume claim applied.  If you want to host postgres in k8s, there are better ways, or offload it outside your k8s cluster.  Postgres can be disabled entirely in the values.yaml file.
+- The postgres user/pass is currently not a secret/encrypted
 
 ## Deploying demo on minikube
 
@@ -24,7 +22,8 @@ Tested with minikube on WSL2 in Windows 10.
 
 ### Deploy via Helm repo (preferred)
 
-* Have Helm 3 installed, this chart was created with v3.94 - https://helm.sh/docs/intro/install/ . Depending on your K8s version you may need Helm 3.8 or below.
+- Have Helm 3 installed, this chart was created with v3.94 - <https://helm.sh/docs/intro/install/> . Depending on your K8s version you may need Helm 3.8 or below.
+
 ```
 minikube start
 helm repo add windmill https://windmill-labs.github.io/windmill-helm-charts/
@@ -32,9 +31,10 @@ helm install mywindmill windmill/windmill -n windmill --create-namespace
 ```
 
 Wait for pods to come up running, takes a couple minutes to pull images and launch:
+
 ```
 watch kubectl get pods -n windmill
-``` 
+```
 
 After pods launch, run:
 
@@ -45,6 +45,7 @@ minikube service windmill-app -n=windmill
 Windmill should be available at the URL from the console output. Default credentials: admin@windmill.dev / changeme
 
 To destroy:
+
 ```
 helm delete windmill
 ```
@@ -85,31 +86,36 @@ enterprise:
 ```
 
 Apply it:
+
 ```
 helm upgrade -i mywindmill windmill/windmill -n windmill --create-namespace -f values.yml
 ```
 
-
 ### Direct from cloned repo
 
-You can install from a copy of this repository directly. Helpful if you plan to fork it/copy it for updating in your own environment. 
+You can install from a copy of this repository directly. Helpful if you plan to fork it/copy it for updating in your own environment.
 
-* Clone repo locally, navigate to the charts directory
-* Copy the values.yaml file somewhere else and update defaults if desired
-* Have Helm 3 installed, this chart was created with v3.94 - https://helm.sh/docs/intro/install/ . Depending on your K8s version you may need Helm 3.8 or below.
+- Clone repo locally, navigate to the charts directory
+- Copy the values.yaml file somewhere else and update defaults if desired
+- Have Helm 3 installed, this chart was created with v3.94 - <https://helm.sh/docs/intro/install/> . Depending on your K8s version you may need Helm 3.8 or below.
+
  ```
  minikube start
  helm install windmill windmill/ -f myvalues_file.yaml -n windmill --create-namespace
  ```
+
 Wait for pods to come up running, takes a couple minutes to pull images and launch:
+
 ```
 watch kubectl get pods -n windmill
-``` 
-After pods launch: 
+```
+
+After pods launch:
 ```minikube service windmill-app```
 Windmill should be available at the URL from the console output. Default credentials: admin@windmill.dev / changeme
 
 To destroy:
+
 ```
 helm delete windmill
 ```
@@ -151,24 +157,22 @@ spec:
 
 Again, there are many ways to expose an app and it will depend on the requirements of your environment. Overall, you want the following endpoints accessible included in the chart:
 
-* windmill frontend on port 8000
-* lsp application on port 3001
-* metrics endpoints on port 8001 for the frontend/app and workers
+- windmill frontend on port 8000
+- lsp application on port 3001
+- metrics endpoints on port 8001 for the frontend/app and workers
 
 If you are using Prometheus, you can scrape the windmill-app-metrics service on port 8001 at /metrics endpoint to gather stats about the Windmill application.
-
 
 ### Enterprise features
 
 Enterprise users can use S3 storage for dependency caching for performance.  Cache is two way synced at regular intervals (10 minutes).  To use it, the worker deployment requires access to an S3 bucket.  There are several ways to do this:
 
-* On AWS (and EKS) , you can use a service account with IAM roles attached. See [AWS docs](https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html) - once you have a policy , you can create an account via eksctl for instance ```eksctl create iamserviceaccount --name serviceaccountname --namespace production --cluster windmill-cluster --role-name "iamrolename" \
+- On AWS (and EKS) , you can use a service account with IAM roles attached. See [AWS docs](https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html) - once you have a policy , you can create an account via eksctl for instance ```eksctl create iamserviceaccount --name serviceaccountname --namespace production --cluster windmill-cluster --role-name "iamrolename" \
     --attach-policy-arn arn:aws:iam::12312315:policy/bucketpolicy --approve```
-* Mount/attach a credentials file in /root/.aws/credentials of the worker deployment
-* Add environment variables for the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, via kube secrets.  
+- Mount/attach a credentials file in /root/.aws/credentials of the worker deployment
+- Add environment variables for the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, via kube secrets.  
 
 The sync relies on rclone and uses its methods of authentication to s3 per [Rclone documentation](https://rclone.org/s3/#authentication)
-
 
 ## Values
 
@@ -188,9 +192,19 @@ The sync relies on rclone and uses its methods of authentication to s3 per [Rclo
 | windmill.disableNsjail | bool | `true` | enables/disables nsjail which provide isolation in untrusted environment is disabled by default. Sets DISABLE_NJSAIL environment variable in worker container |
 | windmill.disableNuser | bool | `true` | nsjail user . Sets DISABLE_NUSER environment variable in worker container |
 | windmill.frontend | object | `{"affinity":{},"annotations":{},"nodeSelector":{},"resources":{},"tolerations":[]}` | frontend configuration |
+| windmill.frontend.affinity | object | `{}` | Affinity rules to apply to the pods |
+| windmill.frontend.annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.frontend.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
+| windmill.frontend.resources | object | `{}` | Resource limits and requests for the pods |
+| windmill.frontend.tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.frontendReplicas | int | `2` | replica for the application frontend |
 | windmill.image | string | `"main"` |  |
 | windmill.lsp | object | `{"affinity":{},"annotations":{},"nodeSelector":{},"resources":{},"tolerations":[]}` | lsp configuration |
+| windmill.lsp.affinity | object | `{}` | Affinity rules to apply to the pods |
+| windmill.lsp.annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.lsp.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
+| windmill.lsp.resources | object | `{}` | Resource limits and requests for the pods |
+| windmill.lsp.tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.lspReplicas | int | `2` | replicas for the lsp containers used by the frontend |
 | windmill.nsjailPath | string | `"nsjail"` | nsjail binary. Sets NSJAIL_PATH environment variable in worker container |
 | windmill.numWorkers | int | `1` | workers per worker container, default and recommended is 1 to isolate one process per container, sets NUM_WORKER environment variable for worker container.  Frontend container has 0 NUM_WORKERS by default |
@@ -200,5 +214,5 @@ The sync relies on rclone and uses its methods of authentication to s3 per [Rclo
 | windmill.rustLog | string | `"info"` | rust log level, set to debug for more information etc, sets RUST_LOG environment variable in frontend and worker container |
 | windmill.workerReplicas | int | `4` | replicas for the workers, jobs are executed on the workers |
 | windmill.workers | object | `{"affinity":{},"annotations":{},"nodeSelector":{},"resources":{},"tolerations":[]}` | workers configuration |
-----------------------------------------------
 
+----------------------------------------------
