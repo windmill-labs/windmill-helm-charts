@@ -2,13 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: lsp
-  labels:
-    app: lsp
-    chart: {{ template "windmill.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}    
 spec:
-  replicas: {{ .Values.windmill.lspReplicas }}
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -29,20 +24,6 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 3001
-        resources:
-{{ toYaml .Values.windmill.lsp.resources | indent 12 }}
-    {{- with .Values.windmill.lsp.nodeSelector }}
-      nodeSelector:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.windmill.lsp.affinity }}
-      affinity:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.windmill.lsp.tolerations }}
-      tolerations:
-{{ toYaml . | indent 8 }}
-    {{- end }}                
       securityContext:
         runAsUser: 0
 # ---
