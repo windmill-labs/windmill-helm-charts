@@ -2,7 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: windmill
-
+  labels:
+    app: windmill
+    chart: {{ template "windmill.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.windmill.frontendReplicas }}
   strategy: 
@@ -14,13 +18,14 @@ spec:
     matchLabels:
       app: windmill-app
   template:
-
     metadata:
-      annotations:
-        timestamp: {{ now | quote }}
-      labels: 
+      labels:
         app: windmill-app
-        container: windmill-app
+        release: {{ .Release.Name }}
+{{- with .Values.server.annotations }}
+      annotations:
+{{ toYaml . | indent 8 }}       
+{{- end }}        
     spec:
       terminationGracePeriodSeconds: 40
       containers:
@@ -79,6 +84,20 @@ spec:
           value: "{{ .Values.windmill.pythonPath }}"
         - name: "NSJAIL_PATH"
           value: "{{ .Values.windmill.nsjailPath }}"
+        resources:
+{{ toYaml .Values.windmill.frontend.resources | indent 12 }}
+    {{- with .Values.windmill.frontend.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.frontend.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.frontend.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}          
       volumes:
       - name: config-volume
         configMap:
