@@ -62,36 +62,37 @@ windmill:
 
   # -- frontend configuration
   frontend:
-    # Annotations to apply to the pods
+    # -- Annotations to apply to the pods
     annotations: {}
 
-    # Node selector to use for scheduling the pods
+    # -- Node selector to use for scheduling the pods
     nodeSelector: {}
 
-    # Tolerations to apply to the pods
+    # -- Tolerations to apply to the pods
     tolerations: []
 
-    # Affinity rules to apply to the pods
+    # -- Affinity rules to apply to the pods
     affinity: {}
 
-    # Resource limits and requests for the pods
+    # -- Resource limits and requests for the pods
     resources: {}
+
 
   # -- lsp configuration
   lsp:
-    # Annotations to apply to the pods
+    # -- Annotations to apply to the pods
     annotations: {}
 
-    # Node selector to use for scheduling the pods
+    # -- Node selector to use for scheduling the pods
     nodeSelector: {}
 
-    # Tolerations to apply to the pods
+    # -- Tolerations to apply to the pods
     tolerations: []
 
-    # Affinity rules to apply to the pods
+    # -- Affinity rules to apply to the pods
     affinity: {}
 
-    # Resource limits and requests for the pods
+    # -- Resource limits and requests for the pods
     resources: {}
 
 lsp: "latest"
