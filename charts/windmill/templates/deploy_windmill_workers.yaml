@@ -19,9 +19,13 @@ spec:
       app: windmill-worker
   template:
     metadata:
-      labels: 
+      labels:
         app: windmill-worker
-        container: windmill-worker
+        release: {{ .Release.Name }}
+{{- with .Values.windmill.workers.annotations }}
+      annotations:
+{{ toYaml . | indent 8 }}       
+{{- end }}   
     spec:
       containers:
       - name: windmill-worker

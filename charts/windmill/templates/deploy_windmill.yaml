@@ -22,7 +22,7 @@ spec:
       labels:
         app: windmill-app
         release: {{ .Release.Name }}
-{{- with .Values.server.annotations }}
+{{- with .Values.windmill.frontend.annotations }}
       annotations:
 {{ toYaml . | indent 8 }}       
 {{- end }}        
