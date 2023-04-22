@@ -24,11 +24,11 @@ spec:
         container: lsp
     spec:
       containers:
-        - name: lsp
-          image: ghcr.io/windmill-labs/windmill-lsp:{{ .Values.lsp }}
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 3001
+      - name: lsp
+        image: ghcr.io/windmill-labs/windmill-lsp:{{ .Values.lsp }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3001
         resources:
 {{ toYaml .Values.windmill.lsp.resources | indent 12 }}
     {{- with .Values.windmill.lsp.nodeSelector }}
