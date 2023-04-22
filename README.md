@@ -181,20 +181,20 @@ The sync relies on rclone and uses its methods of authentication to s3 per [Rclo
 | enterprise.enabled | bool | `false` | enable Windmill Enterprise , requires license key. |
 | enterprise.licenseKey | string | `"123456F"` | Windmill provided Enterprise license key. Sets LICENSE_KEY environment variable in frontend and worker container. |
 | enterprise.s3CacheBucket | string | `"mybucketname"` | S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container |
-| lsp | string | `"latest"` |  |
-| postgres.dbName | string | `"windmill"` | database name for postgres demo container |
-| postgres.enabled | bool | `true` | enabled included Postgres container for demo purposes only |
-| postgres.password | string | `"changeme"` | password for postgres demo container |
+| lsp | string | `"latest"` | lsp image tag |
+| postgresql.auth.database | string | `"windmill"` |  |
+| postgresql.auth.postgresPassword | string | `"windmill"` |  |
+| postgresql.auth.username | string | `"postgres"` |  |
+| postgresql.enabled | bool | `true` | enabled included Postgres container for demo purposes only using bitnami |
+| postgresql.primary.persistence.enabled | bool | `true` |  |
 | windmill.baseInternalUrl | string | `"http://windmill-app:8000"` | used internally by the app, should match the service for the frontend deployment, sets BASE_INTERNAL_URL environment variable in frontend and worker container |
 | windmill.baseUrl | string | `"http://localhost"` | domain as shown in browser, change to https etc based on your endpoint/ingress configuration, sets BASE_URL environment variable in frontend and worker container |
 | windmill.databaseUrl | string | `"postgres://postgres:changeme@postgres/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in frontend and worker container |
 | windmill.denoPath | string | `"/usr/bin/deno"` | deno binary built into Windmill image, should not be changed. Sets DENO_PATH environment variable in frontend and worker container |
 | windmill.disableNsjail | bool | `true` | enables/disables nsjail which provide isolation in untrusted environment is disabled by default. Sets DISABLE_NJSAIL environment variable in worker container |
 | windmill.disableNuser | bool | `true` | nsjail user . Sets DISABLE_NUSER environment variable in worker container |
-| windmill.frontend | object | `{"affinity":{},"annotations":{},"autoscaling":{"enabled":true,"maxReplicas":10,"targetCPUUtilizationPercentage":80},"nodeSelector":{},"resources":{},"tolerations":[]}` | frontend configuration |
 | windmill.frontend.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.frontend.annotations | object | `{}` | Annotations to apply to the pods |
-| windmill.frontend.autoscaling | object | `{"enabled":true,"maxReplicas":10,"targetCPUUtilizationPercentage":80}` | frontend autoscaling configuration |
 | windmill.frontend.autoscaling.enabled | bool | `true` | enable or disable autoscaling |
 | windmill.frontend.autoscaling.maxReplicas | int | `10` | maximum autoscaler replicas |
 | windmill.frontend.autoscaling.targetCPUUtilizationPercentage | int | `80` | target CPU utilization |
@@ -202,11 +202,9 @@ The sync relies on rclone and uses its methods of authentication to s3 per [Rclo
 | windmill.frontend.resources | object | `{}` | Resource limits and requests for the pods |
 | windmill.frontend.tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.frontendReplicas | int | `2` | replica for the application frontend |
-| windmill.image | string | `"main"` |  |
-| windmill.lsp | object | `{"affinity":{},"annotations":{},"autoscaling":{"enabled":true,"maxReplicas":10,"targetCPUUtilizationPercentage":80},"nodeSelector":{},"resources":{},"tolerations":[]}` | lsp configuration |
+| windmill.image | string | `"main"` | windmill app image tag |
 | windmill.lsp.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.lsp.annotations | object | `{}` | Annotations to apply to the pods |
-| windmill.lsp.autoscaling | object | `{"enabled":true,"maxReplicas":10,"targetCPUUtilizationPercentage":80}` | lsp autoscaling configuration |
 | windmill.lsp.autoscaling.enabled | bool | `true` | enable or disable autoscaling |
 | windmill.lsp.autoscaling.maxReplicas | int | `10` | maximum autoscaler replicas |
 | windmill.lsp.autoscaling.targetCPUUtilizationPercentage | int | `80` | target CPU utilization |
@@ -221,10 +219,13 @@ The sync relies on rclone and uses its methods of authentication to s3 per [Rclo
 | windmill.rustBacktrace | int | `1` | rust back trace information enabled, sets RUST_BACKTRACE environment variable in frontend and worker container |
 | windmill.rustLog | string | `"info"` | rust log level, set to debug for more information etc, sets RUST_LOG environment variable in frontend and worker container |
 | windmill.workerReplicas | int | `4` | replicas for the workers, jobs are executed on the workers |
-| windmill.workers | object | `{"affinity":{},"annotations":{},"autoscaling":{"enabled":true,"maxReplicas":10,"targetCPUUtilizationPercentage":80},"nodeSelector":{},"resources":{},"tolerations":[]}` | workers configuration |
-| windmill.workers.autoscaling | object | `{"enabled":true,"maxReplicas":10,"targetCPUUtilizationPercentage":80}` | workers autoscaling configuration |
+| windmill.workers.affinity | object | `{}` | Affinity rules to apply to the pods |
+| windmill.workers.annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.workers.autoscaling.enabled | bool | `true` | enable or disable autoscaling |
 | windmill.workers.autoscaling.maxReplicas | int | `10` | maximum autoscaler replicas |
 | windmill.workers.autoscaling.targetCPUUtilizationPercentage | int | `80` | target CPU utilization |
+| windmill.workers.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
+| windmill.workers.resources | object | `{}` | Resource limits and requests for the pods |
+| windmill.workers.tolerations | list | `[]` | Tolerations to apply to the pods |
 
 ----------------------------------------------
