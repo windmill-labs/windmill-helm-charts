@@ -60,6 +60,15 @@ windmill:
     # Resource limits and requests for the pods
     resources: {}
 
+    # -- workers autoscaling configuration
+    autoscaling:
+      # -- enable or disable autoscaling
+      enabled: true
+      # -- maximum autoscaler replicas
+      maxReplicas: 10
+      # -- target CPU utilization
+      targetCPUUtilizationPercentage: 80
+
   # -- frontend configuration
   frontend:
     # -- Annotations to apply to the pods
@@ -77,6 +86,14 @@ windmill:
     # -- Resource limits and requests for the pods
     resources: {}
 
+    # -- frontend autoscaling configuration
+    autoscaling:
+      # -- enable or disable autoscaling
+      enabled: true
+      # -- maximum autoscaler replicas
+      maxReplicas: 10
+      # -- target CPU utilization
+      targetCPUUtilizationPercentage: 80
 
   # -- lsp configuration
   lsp:
@@ -94,6 +111,15 @@ windmill:
 
     # -- Resource limits and requests for the pods
     resources: {}
+
+    # -- lsp autoscaling configuration
+    autoscaling:
+      # -- enable or disable autoscaling
+      enabled: true
+      # -- maximum autoscaler replicas
+      maxReplicas: 10
+      # -- target CPU utilization
+      targetCPUUtilizationPercentage: 80
 
 lsp: "latest"
 

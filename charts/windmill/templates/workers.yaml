@@ -16,11 +16,11 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: windmill-worker
+      app: windmill-workers
   template:
     metadata:
       labels:
-        app: windmill-worker
+        app: windmill-workers
         release: {{ .Release.Name }}
 {{- with .Values.windmill.workers.annotations }}
       annotations:
@@ -126,7 +126,7 @@ spec:
     name: metrics
     protocol: TCP
   selector:
-    app: windmill-worker
+    app: windmill-workers
     container: windmill-worker
   sessionAffinity: None
   type: ClusterIP

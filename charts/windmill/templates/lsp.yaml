@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: lsp
+  name: windmill-lsp
   labels:
-    app: lsp
+    app: windmill-lsp
     chart: {{ template "windmill.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}    
@@ -16,15 +16,15 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: lsp
+      app: windmill-lsp
   template:
     metadata:
       labels:
-        app: lsp
-        container: lsp
+        app: windmill-lsp
+        container: windmill-lsp
     spec:
       containers:
-      - name: lsp
+      - name: windmill-lsp
         image: ghcr.io/windmill-labs/windmill-lsp:{{ .Values.lsp }}
         imagePullPolicy: Always
         ports:
@@ -75,8 +75,8 @@ spec:
       protocol: TCP
       targetPort: 3001
   selector:
-    app: lsp
-    container: lsp
+    app: windmill-lsp
+    container: windmill-lsp
   sessionAffinity: ClientIP
   type: NodePort
 status:

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: windmill
   labels:
-    app: windmill
+    app: windmill-app
     chart: {{ template "windmill.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
