@@ -2,7 +2,19 @@
 
 ![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.87.2](https://img.shields.io/badge/AppVersion-1.87.2-informational?style=flat-square)
 
-A Helm chart for Kubernetes
+Windmill - Turn scripts into workflows and UIs in minutes
+
+**Homepage:** <https://www.windmill.dev/>
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| windmill | <ruben@windmill.dev> | <https://www.windmill.dev/> |
+
+## Source Code
+
+* <https://github.com/windmill-labs/windmill-helm-charts.git>
 
 ## Requirements
 
@@ -25,7 +37,7 @@ A Helm chart for Kubernetes
 | postgresql.primary.persistence.enabled | bool | `true` |  |
 | windmill.baseInternalUrl | string | `"http://windmill-app:8000"` | used internally by the app, should match the service for the frontend deployment, sets BASE_INTERNAL_URL environment variable in frontend and worker container |
 | windmill.baseUrl | string | `"http://localhost"` | domain as shown in browser, change to https etc based on your endpoint/ingress configuration, sets BASE_URL environment variable in frontend and worker container |
-| windmill.databaseUrl | string | `"postgres://postgres:changeme@postgres/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in frontend and worker container |
+| windmill.databaseUrl | string | `"postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in frontend and worker container |
 | windmill.denoPath | string | `"/usr/bin/deno"` | deno binary built into Windmill image, should not be changed. Sets DENO_PATH environment variable in frontend and worker container |
 | windmill.disableNsjail | bool | `true` | enables/disables nsjail which provide isolation in untrusted environment is disabled by default. Sets DISABLE_NJSAIL environment variable in worker container |
 | windmill.disableNuser | bool | `true` | nsjail user . Sets DISABLE_NUSER environment variable in worker container |
