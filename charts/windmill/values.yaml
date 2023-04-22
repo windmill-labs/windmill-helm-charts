@@ -1,7 +1,6 @@
-postgres:
+postgresql:
   # -- enabled included Postgres container for demo purposes only using bitnami
   enabled: true
-  nameOverride: postgres
   primary:
     persistence:
       enabled: true
