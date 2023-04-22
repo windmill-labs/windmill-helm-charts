@@ -1,12 +1,16 @@
 postgres:
-  # -- enabled included Postgres container for demo purposes only
+  # -- enabled included Postgres container for demo purposes only using bitnami
   enabled: true
-  # -- database name for postgres demo container
-  dbName: windmill
-  # -- password for postgres demo container
-  password: changeme
+  primary:
+    persistence:
+      enabled: true
+  auth:
+    username: postgres
+    postgresPassword: windmill
+    database: windmill
 
 windmill:
+  # -- windmill app image tag
   image: "main"
   # -- replica for the application frontend
   frontendReplicas: 2
@@ -43,24 +47,24 @@ windmill:
   #    }
   oauthConfig: |
     {}
-  # -- workers configuration
+  # workers configuration
   workers:
-    # Annotations to apply to the pods
+    # -- Annotations to apply to the pods
     annotations: {}
 
-    # Node selector to use for scheduling the pods
+    # -- Node selector to use for scheduling the pods
     nodeSelector: {}
 
-    # Tolerations to apply to the pods
+    # -- Tolerations to apply to the pods
     tolerations: []
 
-    # Affinity rules to apply to the pods
+    # -- Affinity rules to apply to the pods
     affinity: {}
 
-    # Resource limits and requests for the pods
+    # -- Resource limits and requests for the pods
     resources: {}
 
-    # -- workers autoscaling configuration
+    # workers autoscaling configuration
     autoscaling:
       # -- enable or disable autoscaling
       enabled: true
@@ -69,7 +73,7 @@ windmill:
       # -- target CPU utilization
       targetCPUUtilizationPercentage: 80
 
-  # -- frontend configuration
+  # frontend configuration
   frontend:
     # -- Annotations to apply to the pods
     annotations: {}
@@ -86,7 +90,7 @@ windmill:
     # -- Resource limits and requests for the pods
     resources: {}
 
-    # -- frontend autoscaling configuration
+    # frontend autoscaling configuration
     autoscaling:
       # -- enable or disable autoscaling
       enabled: true
@@ -95,7 +99,7 @@ windmill:
       # -- target CPU utilization
       targetCPUUtilizationPercentage: 80
 
-  # -- lsp configuration
+  # lsp configuration
   lsp:
     # -- Annotations to apply to the pods
     annotations: {}
@@ -112,7 +116,7 @@ windmill:
     # -- Resource limits and requests for the pods
     resources: {}
 
-    # -- lsp autoscaling configuration
+    # lsp autoscaling configuration
     autoscaling:
       # -- enable or disable autoscaling
       enabled: true
@@ -121,6 +125,7 @@ windmill:
       # -- target CPU utilization
       targetCPUUtilizationPercentage: 80
 
+# -- lsp image tag
 lsp: "latest"
 
 enterprise:
