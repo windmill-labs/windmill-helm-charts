@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: windmill
+  name: windmill-app
   labels:
     app: windmill-app
     chart: {{ template "windmill.chart" . }}
