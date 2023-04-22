@@ -19,7 +19,6 @@ spec:
     matchLabels:
       app: windmill-app
   template:
-
     metadata:
       labels:
         app: windmill-app
@@ -27,10 +26,8 @@ spec:
         release: {{ .Release.Name }}
 {{- with .Values.windmill.frontend.annotations }}
       annotations:
-        timestamp: {{ now | quote }}
-      labels: 
-        app: windmill-app
-        container: windmill-app
+{{ toYaml . | indent 8 }}       
+{{- end }}  
     spec:
       terminationGracePeriodSeconds: 40
       containers:
@@ -128,28 +125,3 @@ spec:
     app.kubernetes.io/name: windmill-app
   sessionAffinity: None
   type: ClusterIP
-# ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: windmill
-# spec:
-#   externalTrafficPolicy: Cluster
-#   ports:
-#   - port: 80
-#     name: http
-#     protocol: TCP
-#     targetPort: 8000
-#     nodePort: 30080
-#   # - port: 443
-#   #   name: https
-#   #   protocol: TCP
-#   #   targetPort: 443
-#   #   nodePort: 30081
-#   selector:
-#     app: windmill
-#     container: caddy
-#   sessionAffinity: None
-#   type: NodePort
-# status:
-#   loadBalancer: {}
