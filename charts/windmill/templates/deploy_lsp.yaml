@@ -16,11 +16,11 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: windmill
+      app: lsp
   template:
     metadata:
       labels:
-        app: windmill
+        app: lsp
         container: lsp
     spec:
       containers:
@@ -75,7 +75,7 @@ spec:
       protocol: TCP
       targetPort: 3001
   selector:
-    app: windmill
+    app: lsp
     container: lsp
   sessionAffinity: ClientIP
   type: NodePort

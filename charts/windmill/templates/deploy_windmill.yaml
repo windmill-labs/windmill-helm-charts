@@ -29,7 +29,7 @@ spec:
     spec:
       terminationGracePeriodSeconds: 40
       containers:
-      - name: windmill
+      - name: windmill-app
         lifecycle:
           preStop:
             exec:
