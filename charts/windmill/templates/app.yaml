@@ -22,6 +22,7 @@ spec:
     metadata:
       labels:
         app: windmill-app
+        app.kubernetes.io/name: windmill-app
         release: {{ .Release.Name }}
 {{- with .Values.windmill.frontend.annotations }}
       annotations:

@@ -22,6 +22,7 @@ spec:
     metadata:
       labels:
         app: windmill-lsp
+        app.kubernetes.io/name: windmill-lsp
         container: windmill-lsp
     spec:
       containers:
