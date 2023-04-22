@@ -74,7 +74,6 @@ spec:
       protocol: TCP
       targetPort: 3001
   selector:
-    app: windmill-lsp
-    container: windmill-lsp
+    app.kubernetes.io/name: windmill-lsp
   sessionAffinity: ClientIP
   type: ClusterIP

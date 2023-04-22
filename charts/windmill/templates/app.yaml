@@ -117,8 +117,7 @@ spec:
     protocol: TCP
     targetPort: 8000
   selector:
-    app: windmill-app
-    container: windmill-app
+    app.kubernetes.io/name: windmill-app
   sessionAffinity: None
   type: ClusterIP
 ---
@@ -135,8 +134,7 @@ spec:
     name: metrics
     protocol: TCP
   selector:
-    app: windmill-app
-    container: windmill-app
+    app.kubernetes.io/name: windmill-app
   sessionAffinity: None
   type: ClusterIP
 # ---

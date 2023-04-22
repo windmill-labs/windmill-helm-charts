@@ -107,8 +107,7 @@ spec:
     protocol: TCP
     targetPort: 8000
   selector:
-    app: windmill-worker
-    container: windmill-worker
+    app.kubernetes.io/name: windmill-workers
   sessionAffinity: None
   type: ClusterIP
 ---
@@ -117,14 +116,12 @@ kind: Service
 metadata:
   name: windmill-worker-metrics
 spec:
-  clusterIP: None
   ports:
   - port: 8001
     name: metrics
     protocol: TCP
   selector:
-    app: windmill-workers
-    container: windmill-worker
+    app.kubernetes.io/name: windmill-workers
   sessionAffinity: None
   type: ClusterIP
 # ---
