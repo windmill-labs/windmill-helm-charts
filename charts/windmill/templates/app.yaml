@@ -112,7 +112,6 @@ kind: Service
 metadata:
   name: windmill-app
 spec:
-  externalTrafficPolicy: Cluster
   ports:
   - port: 8000
     protocol: TCP
