@@ -4,6 +4,7 @@ metadata:
   name: windmill-lsp
   labels:
     app: windmill-lsp
+    app.kubernetes.io/name: windmill-lsp
     chart: {{ template "windmill.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}    

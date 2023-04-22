@@ -4,6 +4,7 @@ metadata:
   name: windmill-app
   labels:
     app: windmill-app
+    app.kubernetes.io/name: windmill-app
     chart: {{ template "windmill.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
