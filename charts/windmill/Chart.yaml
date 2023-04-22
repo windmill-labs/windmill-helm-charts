@@ -27,4 +27,4 @@ dependencies:
     condition: postgres.enabled
     name: postgresql
     repository: https://charts.bitnami.com/bitnami
-    version: 12.2.7
+    version: 12.3.1
