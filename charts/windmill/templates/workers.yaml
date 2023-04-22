@@ -102,7 +102,6 @@ kind: Service
 metadata:
   name: windmill-workers
 spec:
-  externalTrafficPolicy: Cluster
   ports:
   - port: 8000
     protocol: TCP
@@ -111,9 +110,7 @@ spec:
     app: windmill-worker
     container: windmill-worker
   sessionAffinity: None
-  type: NodePort
-status:
-  loadBalancer: {}
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -130,8 +127,6 @@ spec:
     container: windmill-worker
   sessionAffinity: None
   type: ClusterIP
-status:
-  loadBalancer: {}
 # ---
 # apiVersion: v1
 # kind: Service

@@ -69,7 +69,6 @@ kind: Service
 metadata:
   name: windmill-lsp
 spec:
-  externalTrafficPolicy: Cluster
   ports:
     - port: 3001
       protocol: TCP
@@ -78,6 +77,4 @@ spec:
     app: windmill-lsp
     container: windmill-lsp
   sessionAffinity: ClientIP
-  type: NodePort
-status:
-  loadBalancer: {}
+  type: ClusterIP

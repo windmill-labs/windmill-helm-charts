@@ -121,9 +121,7 @@ spec:
     app: windmill-app
     container: windmill-app
   sessionAffinity: None
-  type: NodePort
-status:
-  loadBalancer: {}
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -142,8 +140,6 @@ spec:
     container: windmill-app
   sessionAffinity: None
   type: ClusterIP
-status:
-  loadBalancer: {}
 # ---
 # apiVersion: v1
 # kind: Service
