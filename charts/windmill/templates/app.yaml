@@ -19,6 +19,7 @@ spec:
     matchLabels:
       app: windmill-app
   template:
+
     metadata:
       labels:
         app: windmill-app
@@ -26,8 +27,10 @@ spec:
         release: {{ .Release.Name }}
 {{- with .Values.windmill.frontend.annotations }}
       annotations:
-{{ toYaml . | indent 8 }}       
-{{- end }}        
+        timestamp: {{ now | quote }}
+      labels: 
+        app: windmill-app
+        container: windmill-app
     spec:
       terminationGracePeriodSeconds: 40
       containers:
@@ -86,20 +89,6 @@ spec:
           value: "{{ .Values.windmill.pythonPath }}"
         - name: "NSJAIL_PATH"
           value: "{{ .Values.windmill.nsjailPath }}"
-        resources:
-{{ toYaml .Values.windmill.frontend.resources | indent 12 }}
-    {{- with .Values.windmill.frontend.nodeSelector }}
-      nodeSelector:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.windmill.frontend.affinity }}
-      affinity:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.windmill.frontend.tolerations }}
-      tolerations:
-{{ toYaml . | indent 8 }}
-    {{- end }}          
       volumes:
       - name: config-volume
         configMap:

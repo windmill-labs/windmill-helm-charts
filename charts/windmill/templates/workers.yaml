@@ -82,20 +82,6 @@ spec:
         - name: "RCLONE_S3_PROVIDER"
           value: "AWS"
         {{ end }}
-        resources:
-{{ toYaml .Values.windmill.workers.resources | indent 12 }}
-    {{- with .Values.windmill.workers.nodeSelector }}
-      nodeSelector:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.windmill.workers.affinity }}
-      affinity:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.windmill.workers.tolerations }}
-      tolerations:
-{{ toYaml . | indent 8 }}
-    {{- end }}               
       securityContext:
         runAsUser: 0
 ---
