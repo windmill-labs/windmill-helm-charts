@@ -2,6 +2,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: windmill-workers
+  labels:
+    app: windmill-workers
+    app.kubernetes.io/name: windmill-workers
+    chart: {{ template "windmill.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}  
 spec:
   replicas: {{ .Values.windmill.workerReplicas }}
   strategy: 
@@ -11,12 +17,17 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: windmill-worker
+      app: windmill-workers
   template:
     metadata:
-      labels: 
-        app: windmill-worker
-        container: windmill-worker
+      labels:
+        app: windmill-workers
+        app.kubernetes.io/name: windmill-workers
+        release: {{ .Release.Name }}
+{{- with .Values.windmill.workers.annotations }}
+      annotations:
+{{ toYaml . | indent 8 }}       
+{{- end }}   
     spec:
       containers:
       - name: windmill-worker
@@ -79,36 +90,28 @@ kind: Service
 metadata:
   name: windmill-workers
 spec:
-  externalTrafficPolicy: Cluster
   ports:
   - port: 8000
     protocol: TCP
     targetPort: 8000
   selector:
-    app: windmill-worker
-    container: windmill-worker
+    app.kubernetes.io/name: windmill-workers
   sessionAffinity: None
-  type: NodePort
-status:
-  loadBalancer: {}
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: windmill-worker-metrics
 spec:
-  clusterIP: None
   ports:
   - port: 8001
     name: metrics
     protocol: TCP
   selector:
-    app: windmill-worker
-    container: windmill-worker
+    app.kubernetes.io/name: windmill-workers
   sessionAffinity: None
   type: ClusterIP
-status:
-  loadBalancer: {}
 # ---
 # apiVersion: v1
 # kind: Service

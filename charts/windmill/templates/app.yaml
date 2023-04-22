@@ -1,8 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: windmill
-
+  name: windmill-app
+  labels:
+    app: windmill-app
+    app.kubernetes.io/name: windmill-app
+    chart: {{ template "windmill.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.windmill.frontendReplicas }}
   strategy: 
@@ -14,17 +19,19 @@ spec:
     matchLabels:
       app: windmill-app
   template:
-
     metadata:
-      annotations:
-        timestamp: {{ now | quote }}
-      labels: 
+      labels:
         app: windmill-app
-        container: windmill-app
+        app.kubernetes.io/name: windmill-app
+        release: {{ .Release.Name }}
+{{- with .Values.windmill.frontend.annotations }}
+      annotations:
+{{ toYaml . | indent 8 }}       
+{{- end }}  
     spec:
       terminationGracePeriodSeconds: 40
       containers:
-      - name: windmill
+      - name: windmill-app
         lifecycle:
           preStop:
             exec:
@@ -93,18 +100,14 @@ kind: Service
 metadata:
   name: windmill-app
 spec:
-  externalTrafficPolicy: Cluster
   ports:
   - port: 8000
     protocol: TCP
     targetPort: 8000
   selector:
-    app: windmill-app
-    container: windmill-app
+    app.kubernetes.io/name: windmill-app
   sessionAffinity: None
-  type: NodePort
-status:
-  loadBalancer: {}
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -119,34 +122,6 @@ spec:
     name: metrics
     protocol: TCP
   selector:
-    app: windmill-app
-    container: windmill-app
+    app.kubernetes.io/name: windmill-app
   sessionAffinity: None
   type: ClusterIP
-status:
-  loadBalancer: {}
-# ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: windmill
-# spec:
-#   externalTrafficPolicy: Cluster
-#   ports:
-#   - port: 80
-#     name: http
-#     protocol: TCP
-#     targetPort: 8000
-#     nodePort: 30080
-#   # - port: 443
-#   #   name: https
-#   #   protocol: TCP
-#   #   targetPort: 443
-#   #   nodePort: 30081
-#   selector:
-#     app: windmill
-#     container: caddy
-#   sessionAffinity: None
-#   type: NodePort
-# status:
-#   loadBalancer: {}
