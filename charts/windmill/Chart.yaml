@@ -22,7 +22,7 @@ keywords:
   - open-source
 maintainers:
   - email: ruben@windmill.dev
-    name: Windmill Team
+    name: windmill
     url: https://www.windmill.dev/
 sources:
   - https://github.com/windmill-labs/windmill-helm-charts.git
