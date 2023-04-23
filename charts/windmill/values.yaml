@@ -45,6 +45,8 @@ windmill:
   #     "id": "asdfasdf",
   #     "secret": "asdfasdfasdf"
   #    }
+  enableOauth: false
+  oauthSecretName: ""
   oauthConfig: |
     {}
   # workers configuration

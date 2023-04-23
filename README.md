@@ -167,6 +167,7 @@ Enterprise users can use S3 storage for dependency caching for performance.  Cac
 
 The sync relies on rclone and uses its methods of authentication to s3 per [Rclone documentation](https://rclone.org/s3/#authentication)
 
+## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
@@ -185,6 +186,7 @@ The sync relies on rclone and uses its methods of authentication to s3 per [Rclo
 | windmill.denoPath | string | `"/usr/bin/deno"` | deno binary built into Windmill image, should not be changed. Sets DENO_PATH environment variable in frontend and worker container |
 | windmill.disableNsjail | bool | `true` | enables/disables nsjail which provide isolation in untrusted environment is disabled by default. Sets DISABLE_NJSAIL environment variable in worker container |
 | windmill.disableNuser | bool | `true` | nsjail user . Sets DISABLE_NUSER environment variable in worker container |
+| windmill.enableOauth | bool | `false` | Enable Oauth configuration. Needs OAuth secret, either as `windmill.oauthConfig` or `windmill.oauthSecretName` |
 | windmill.frontend.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.frontend.annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.frontend.autoscaling.enabled | bool | `true` | enable or disable autoscaling |
@@ -206,7 +208,8 @@ The sync relies on rclone and uses its methods of authentication to s3 per [Rclo
 | windmill.lspReplicas | int | `2` | replicas for the lsp containers used by the frontend |
 | windmill.nsjailPath | string | `"nsjail"` | nsjail binary. Sets NSJAIL_PATH environment variable in worker container |
 | windmill.numWorkers | int | `1` | workers per worker container, default and recommended is 1 to isolate one process per container, sets NUM_WORKER environment variable for worker container.  Frontend container has 0 NUM_WORKERS by default |
-| windmill.oauthConfig | string | `"{}\n"` | Oauth configuration for logins and connections. e.g of values   "github": {     "id": "asdfasdf",     "secret": "asdfasdfasdf"    } |
+| windmill.oauthConfig | string | `"{}\n"` | Oauth configuration for logins and connections. e.g of values   `{ "github": {     "id": "asdfasdf",     "secret": "asdfasdfasdf" } }`. Define either this or `windmill.oauthSecretName`. |
+| windmill.oauthSecretName | string | `""` | Name of an externally managed & provisioned K8s Secret which contains a key named `oauth.json` with a value just like a `windmill.oauthConfig` value. Define either this or `windmill.oauthConfig`. |
 | windmill.pythonPath | string | `"/usr/local/bin/python3"` | python binary built into Windmill image, should not be changed. Sets PYTHON_PATH environment variable in frontend and worker container |
 | windmill.rustBacktrace | int | `1` | rust back trace information enabled, sets RUST_BACKTRACE environment variable in frontend and worker container |
 | windmill.rustLog | string | `"info"` | rust log level, set to debug for more information etc, sets RUST_LOG environment variable in frontend and worker container |
