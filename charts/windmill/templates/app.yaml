@@ -37,9 +37,10 @@ spec:
             exec:
               command: ["/bin/sh", "-c", "sleep 30"]
         volumeMounts:
-        - name: config-volume
+        - name: oauth-volume
           mountPath: /usr/src/app/oauth.json
           subPath: oauth.json
+          readOnly: true
         {{ if .Values.enterprise.enabled }}
         image: ghcr.io/windmill-labs/windmill-ee
         {{ else }}
@@ -87,11 +88,10 @@ spec:
         - name: "NSJAIL_PATH"
           value: "{{ .Values.windmill.nsjailPath }}"
       volumes:
-      - name: config-volume
-        configMap:
-          # Provide the name of the ConfigMap containing the files you want
-          # to add to the container
-          name: windmill-configmap
+      - name: oauth-volume
+        secret:
+          secretName: {{ if .Values.windmill.oauthSecretName }}{{ .Values.windmill.oauthSecretName }}{{ else }} {{ .Release.Name }}-oauth-secret {{- end }}
+
       securityContext:
         runAsUser: 0
 ---
