@@ -186,7 +186,6 @@ The sync relies on rclone and uses its methods of authentication to s3 per [Rclo
 | windmill.denoPath | string | `"/usr/bin/deno"` | deno binary built into Windmill image, should not be changed. Sets DENO_PATH environment variable in frontend and worker container |
 | windmill.disableNsjail | bool | `true` | enables/disables nsjail which provide isolation in untrusted environment is disabled by default. Sets DISABLE_NJSAIL environment variable in worker container |
 | windmill.disableNuser | bool | `true` | nsjail user . Sets DISABLE_NUSER environment variable in worker container |
-| windmill.enableOauth | bool | `false` | Enable Oauth configuration. Needs OAuth secret, either as `windmill.oauthConfig` or `windmill.oauthSecretName` |
 | windmill.frontend.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.frontend.annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.frontend.autoscaling.enabled | bool | `true` | enable or disable autoscaling |
