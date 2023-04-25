@@ -75,6 +75,8 @@ spec:
           value: "{{ .Values.windmill.rustLog }}"
         - name: "NUM_WORKERS"
           value: "0"
+        - name: "JSON_FMT"
+          value: "true"
         {{ if .Values.windmill.enterprise.enabled }}
         - name: "LICENSE_KEY"
           value: "{{ .Values.enterprise.licenseKey }}"
