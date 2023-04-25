@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
       - name: windmill-worker
-       {{ if  .Values.windmill.enterprise.nsjail }}
+       {{ if  .Values.enterprise.nsjail }}
        #because nsjail requires privileged access
         securityContext:
           privileged: true
@@ -62,14 +62,14 @@ spec:
           value: "true"
         - name: "JSON_FMT"
           value: "true"
-        {{ if .Values.windmill.enterprise.enabled }}
+        {{ if .Values.enterprise.enabled }}
         - name: "S3_CACHE_BUCKET"
           value: "{{ .Values.enterprise.s3CacheBucket }}"
         - name: "LICENSE_KEY"
           value: "{{ .Values.enterprise.licenseKey }}"
         - name: "RCLONE_S3_PROVIDER"
           value: "AWS"
-        {{ if .Values.windmill.enterprise.nsjail }}
+        {{ if .Values.enterprise.nsjail }}
         - name: "DISABLE_NSJAIL"
           value: "false"
         {{ end }}

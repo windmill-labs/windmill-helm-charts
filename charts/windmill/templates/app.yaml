@@ -77,7 +77,7 @@ spec:
           value: "0"
         - name: "JSON_FMT"
           value: "true"
-        {{ if .Values.windmill.enterprise.enabled }}
+        {{ if .Values.enterprise.enabled }}
         - name: "LICENSE_KEY"
           value: "{{ .Values.enterprise.licenseKey }}"
         {{ end }}
