@@ -5,7 +5,6 @@ postgresql:
     persistence:
       enabled: true
   auth:
-    username: postgres
     postgresPassword: windmill
     database: windmill
 
