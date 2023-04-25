@@ -64,12 +64,11 @@ Windmill - Turn scripts into workflows and UIs in minutes
 | windmill.numWorkers | int | `1` | workers per worker container, default and recommended is 1 to isolate one process per container, sets NUM_WORKER environment variable for worker container.  Frontend container has 0 NUM_WORKERS by default |
 | windmill.oauthConfig | string | `"{}\n"` | Oauth configuration for logins and connections. e.g of values   "github": {     "id": "asdfasdf",     "secret": "asdfasdfasdf"    } |
 | windmill.pythonPath | string | `"/usr/local/bin/python3"` | python binary built into Windmill image, should not be changed. Sets PYTHON_PATH environment variable in frontend and worker container |
-| windmill.rustBacktrace | int | `1` | rust back trace information enabled, sets RUST_BACKTRACE environment variable in frontend and worker container |
 | windmill.rustLog | string | `"info"` | rust log level, set to debug for more information etc, sets RUST_LOG environment variable in frontend and worker container |
 | windmill.workerReplicas | int | `4` | replicas for the workers, jobs are executed on the workers |
 | windmill.workers.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workers.annotations | object | `{}` | Annotations to apply to the pods |
-| windmill.workers.autoscaling.enabled | bool | `true` | enable or disable autoscaling |
+| windmill.workers.autoscaling.enabled | bool | `false` | enable or disable autoscaling |
 | windmill.workers.autoscaling.maxReplicas | int | `10` | maximum autoscaler replicas |
 | windmill.workers.autoscaling.targetCPUUtilizationPercentage | int | `80` | target CPU utilization |
 | windmill.workers.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |

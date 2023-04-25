@@ -210,7 +210,6 @@ The sync relies on rclone and uses its methods of authentication to s3 per [Rclo
 | windmill.oauthConfig | string | `"{}\n"` | Oauth configuration for logins and connections. e.g of values   `{ "github": {     "id": "asdfasdf",     "secret": "asdfasdfasdf" } }`. Define either this or `windmill.oauthSecretName`. |
 | windmill.oauthSecretName | string | `""` | Name of an externally managed & provisioned K8s Secret which contains a key named `oauth.json` with a value just like a `windmill.oauthConfig` value. Define either this or `windmill.oauthConfig`. |
 | windmill.pythonPath | string | `"/usr/local/bin/python3"` | python binary built into Windmill image, should not be changed. Sets PYTHON_PATH environment variable in frontend and worker container |
-| windmill.rustBacktrace | int | `1` | rust back trace information enabled, sets RUST_BACKTRACE environment variable in frontend and worker container |
 | windmill.rustLog | string | `"info"` | rust log level, set to debug for more information etc, sets RUST_LOG environment variable in frontend and worker container |
 | windmill.workerReplicas | int | `4` | replicas for the workers, jobs are executed on the workers |
 | windmill.workers.affinity | object | `{}` | Affinity rules to apply to the pods |

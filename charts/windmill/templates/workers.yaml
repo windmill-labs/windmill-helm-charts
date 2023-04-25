@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
       - name: windmill-worker
-       {{ if  not .Values.windmill.disableNsJail }}
+       {{ if  .Values.windmill.enterprise.nsjail }}
        #because nsjail requires privileged access
         securityContext:
           privileged: true
@@ -53,34 +53,34 @@ spec:
         - name: "BASE_URL"
           value: "{{ .Values.windmill.baseUrl }}"
         - name: "BASE_INTERNAL_URL"
-          value: "{{ .Values.windmill.baseInternalUrl }}"
+          value: "http://windmill-app:8000"
         - name: "RUST_LOG"
           value: "{{ .Values.windmill.rustLog }}"
         - name: "NUM_WORKERS"
           value: "{{ .Values.windmill.numWorkers }}"
         - name: "DISABLE_SERVER"
           value: "true"
-        - name: "RUST_BACKTRACE"
-          value: "{{ .Values.windmill.rustBacktrace }}"
         - name: "DISABLE_NUSER"
           value: "{{ .Values.windmill.disableNuser }}"
         - name: "DENO_PATH"
           value: "{{ .Values.windmill.denoPath }}"
         - name: "PYTHON_PATH"
           value: "{{ .Values.windmill.pythonPath }}"
-        - name: "NSJAIL_PATH"
-          value: "{{ .Values.windmill.nsjailPath }}"
-        - name: "DISABLE_NSJAIL"
-          value: "{{ .Values.windmill.disableNsjail }}"
         - name: "JSON_FMT"
           value: "true"
-        {{ if .Values.windmill.enterpriseEnabled }}
+        {{ if .Values.windmill.enterprise.enabled }}
         - name: "S3_CACHE_BUCKET"
           value: "{{ .Values.enterprise.s3CacheBucket }}"
         - name: "LICENSE_KEY"
           value: "{{ .Values.enterprise.licenseKey }}"
         - name: "RCLONE_S3_PROVIDER"
           value: "AWS"
+        {{ if .Values.windmill.enterprise.nsjail }}
+        - name: "NSJAIL_PATH"
+          value: "nsjail"
+        - name: "DISABLE_NSJAIL"
+          value: "false"
+        {{ end }}
         {{ end }}
       securityContext:
         runAsUser: 0
@@ -112,6 +112,21 @@ spec:
     app.kubernetes.io/name: windmill-workers
   sessionAffinity: None
   type: ClusterIP
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: windmill-worker
+  labels:
+    instance: primary
+spec:
+  selector:
+    matchLabels:
+      app: windmill-worker-metrics
+  endpoints:
+  - port: metrics
+    interval: 30s
+    path: /metrics
 # ---
 # apiVersion: v1
 # kind: Service
