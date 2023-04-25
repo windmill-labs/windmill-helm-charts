@@ -76,7 +76,7 @@ windmill:
     # frontend autoscaling configuration
     autoscaling:
       # -- enable or disable autoscaling
-      enabled: true
+      enabled: false
       # -- maximum autoscaler replicas
       maxReplicas: 10
       # -- target CPU utilization
@@ -102,7 +102,7 @@ windmill:
     # lsp autoscaling configuration
     autoscaling:
       # -- enable or disable autoscaling
-      enabled: true
+      enabled: false
       # -- maximum autoscaler replicas
       maxReplicas: 10
       # -- target CPU utilization

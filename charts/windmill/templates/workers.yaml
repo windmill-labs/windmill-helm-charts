@@ -104,21 +104,21 @@ spec:
     app.kubernetes.io/name: windmill-workers
   sessionAffinity: None
   type: ClusterIP
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: windmill-worker
-  labels:
-    instance: primary
-spec:
-  selector:
-    matchLabels:
-      app: windmill-worker-metrics
-  endpoints:
-  - port: metrics
-    interval: 30s
-    path: /metrics
+# ---
+# apiVersion: monitoring.coreos.com/v1
+# kind: ServiceMonitor
+# metadata:
+#   name: windmill-worker
+#   labels:
+#     instance: primary
+# spec:
+#   selector:
+#     matchLabels:
+#       app: windmill-worker-metrics
+#   endpoints:
+#   - port: metrics
+#     interval: 30s
+#     path: /metrics
 # ---
 # apiVersion: v1
 # kind: Service
