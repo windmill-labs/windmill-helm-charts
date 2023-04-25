@@ -60,12 +60,6 @@ spec:
           value: "{{ .Values.windmill.numWorkers }}"
         - name: "DISABLE_SERVER"
           value: "true"
-        - name: "DISABLE_NUSER"
-          value: "{{ .Values.windmill.disableNuser }}"
-        - name: "DENO_PATH"
-          value: "{{ .Values.windmill.denoPath }}"
-        - name: "PYTHON_PATH"
-          value: "{{ .Values.windmill.pythonPath }}"
         - name: "JSON_FMT"
           value: "true"
         {{ if .Values.windmill.enterprise.enabled }}
@@ -76,8 +70,6 @@ spec:
         - name: "RCLONE_S3_PROVIDER"
           value: "AWS"
         {{ if .Values.windmill.enterprise.nsjail }}
-        - name: "NSJAIL_PATH"
-          value: "nsjail"
         - name: "DISABLE_NSJAIL"
           value: "false"
         {{ end }}
