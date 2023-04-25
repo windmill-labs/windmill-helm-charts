@@ -1,6 +1,7 @@
 postgresql:
   # -- enabled included Postgres container for demo purposes only using bitnami
   enabled: true
+  fullnameOverride: windmill-postgresql
   primary:
     persistence:
       enabled: true
