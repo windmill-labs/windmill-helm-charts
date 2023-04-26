@@ -3,7 +3,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: windmill
-{{- with .Values.ingress.lspAnnotations }}
+{{- with .Values.ingress.annotations }}
   annotations:
 {{ toYaml . | indent 8 }}       
 {{- end }}   
