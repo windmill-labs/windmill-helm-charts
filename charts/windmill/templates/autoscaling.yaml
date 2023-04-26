@@ -1,5 +1,5 @@
 {{- range $comp, $values := .Values.windmill -}}
-{{- if typeIs "map[string]interface {}" $values | ternary (hasKey $values "autoscaling") false }} }}
+{{- if typeIs "map[string]interface {}" $values | ternary (hasKey $values "autoscaling") false }}
 {{- if $values.autoscaling.enabled }}
 ---
 apiVersion: autoscaling/v1
