@@ -9,7 +9,7 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
-  replicas: {{ .Values.windmill.frontendReplicas }}
+  replicas: {{ .Values.windmill.appReplicas }}
   strategy: 
     type: RollingUpdate
     rollingUpdate:
@@ -24,7 +24,7 @@ spec:
         app: windmill-app
         app.kubernetes.io/name: windmill-app
         release: {{ .Release.Name }}
-{{- with .Values.windmill.frontend.annotations }}
+{{- with .Values.windmill.app.annotations }}
       annotations:
 {{ toYaml . | indent 8 }}       
 {{- end }}  
@@ -88,20 +88,20 @@ spec:
         - name: "CUSTOM_TAGS"
           value: "{{- range $v := .Values.windmill.workerGroups }}{{ $v.name }},{{ end}}"
         resources:
-  {{ toYaml .Values.windmill.frontend.resources | indent 12 }}
+  {{ toYaml .Values.windmill.app.resources | indent 12 }}
       volumes:
       - name: oauth-volume
         secret:
           secretName: {{ if .Values.windmill.oauthSecretName }}{{ .Values.windmill.oauthSecretName }}{{ else }} {{ .Release.Name }}-oauth-secret {{- end }}
-    {{- with .Values.windmill.frontend.nodeSelector }}
+    {{- with .Values.windmill.app.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
     {{- end }}
-    {{- with .Values.windmill.frontend.affinity }}
+    {{- with .Values.windmill.app.affinity }}
       affinity:
 {{ toYaml . | indent 8 }}
     {{- end }}
-    {{- with .Values.windmill.frontend.tolerations }}
+    {{- with .Values.windmill.app.tolerations }}
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}

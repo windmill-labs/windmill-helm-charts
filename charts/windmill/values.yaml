@@ -12,21 +12,21 @@ postgresql:
 windmill:
   # -- windmill app image tag
   image: "main"
-  # -- replica for the application frontend
-  frontendReplicas: 2
+  # -- replica for the application app
+  appReplicas: 2
   # -- replicas for the workers, jobs are executed on the workers
   workerReplicas: 2
-  # -- replicas for the lsp containers used by the frontend
+  # -- replicas for the lsp containers used by the app
   lspReplicas: 2
-  # -- Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in frontend and worker container
+  # -- Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container
   databaseUrl: postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable
-  # -- domain as shown in browser, change to https etc based on your endpoint/ingress configuration, sets BASE_URL environment variable in frontend and worker container
+  # -- domain as shown in browser, change to https etc based on your endpoint/ingress configuration, sets BASE_URL environment variable in app and worker container
   baseUrl: http://localhost
   # -- domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance
   cookieDomain: ""
-  # -- rust log level, set to debug for more information etc, sets RUST_LOG environment variable in frontend and worker container
+  # -- rust log level, set to debug for more information etc, sets RUST_LOG environment variable in app and worker container
   rustLog: info
-  # -- workers per worker container, default and recommended is 1 to isolate one process per container, sets NUM_WORKER environment variable for worker container.  Frontend container has 0 NUM_WORKERS by default
+  # -- workers per worker container, default and recommended is 1 to isolate one process per container, sets NUM_WORKER environment variable for worker container.  app container has 0 NUM_WORKERS by default
   numWorkers: 1
   # -- name of the secret storing the oauthConfig. See https://docs.windmill.dev/docs/misc/setup_oauth
   oauthSecretName: ""
@@ -93,8 +93,8 @@ windmill:
       # -- target CPU utilization
       targetCPUUtilizationPercentage: 80
 
-  # frontend configuration
-  frontend:
+  # app configuration
+  app:
     # -- Annotations to apply to the pods
     annotations: {}
 
@@ -110,7 +110,7 @@ windmill:
     # -- Resource limits and requests for the pods
     resources: {}
 
-    # frontend autoscaling configuration
+    # app autoscaling configuration
     autoscaling:
       # -- enable or disable autoscaling
       enabled: false
@@ -157,7 +157,7 @@ enterprise:
   enabled: false
   # -- S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container
   s3CacheBucket: mybucketname
-  # -- Windmill provided Enterprise license key. Sets LICENSE_KEY environment variable in frontend and worker container.
+  # -- Windmill provided Enterprise license key. Sets LICENSE_KEY environment variable in app and worker container.
   licenseKey: 123456F
   # -- use nsjail for sandboxing
   nsjail: false
