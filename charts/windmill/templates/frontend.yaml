@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: windmill-frontend
+  name: windmill-app
   labels:
-    app: windmill-frontend
-    app.kubernetes.io/name: windmill-frontend
+    app: windmill-app
+    app.kubernetes.io/name: windmill-app
     chart: {{ template "windmill.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -17,12 +17,12 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: windmill-frontend
+      app: windmill-app
   template:
     metadata:
       labels:
-        app: windmill-frontend
-        app.kubernetes.io/name: windmill-frontend
+        app: windmill-app
+        app.kubernetes.io/name: windmill-app
         release: {{ .Release.Name }}
 {{- with .Values.windmill.frontend.annotations }}
       annotations:
@@ -31,7 +31,7 @@ spec:
     spec:
       terminationGracePeriodSeconds: 40
       containers:
-      - name: windmill-frontend
+      - name: windmill-app
         lifecycle:
           preStop:
             exec:
@@ -111,21 +111,21 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: windmill-frontend
+  name: windmill-app
 spec:
   ports:
   - port: 8000
     protocol: TCP
     targetPort: 8000
   selector:
-    app.kubernetes.io/name: windmill-frontend
+    app.kubernetes.io/name: windmill-app
   sessionAffinity: ClientIP
   type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: windmill-frontend-metrics
+  name: windmill-app-metrics
   labels:
     operated-prometheus: "true"
 spec:
@@ -135,20 +135,20 @@ spec:
     name: metrics
     protocol: TCP
   selector:
-    app.kubernetes.io/name: windmill-frontend
+    app.kubernetes.io/name: windmill-app
   sessionAffinity: None
   type: ClusterIP
 # ---
 # apiVersion: monitoring.coreos.com/v1
 # kind: ServiceMonitor
 # metadata:
-#   name: windmill-frontend
+#   name: windmill-app
 #   labels:
 #     instance: primary
 # spec:
 #   selector:
 #     matchLabels:
-#       app: windmill-frontend-metrics
+#       app: windmill-app-metrics
 #   endpoints:
 #   - port: metrics
 #     interval: 30s
