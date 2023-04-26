@@ -4,6 +4,6 @@ kind: Secret
 metadata:
   name: {{ .Release.Name }}-oauth-secret
 type: Opaque
-data:
-  oauth.json: {{ .Values.windmill.oauthConfig | toJson | b64enc }}
+stringData:
+  oauth.json: {{ .Values.windmill.oauthConfig | toJson }}
 {{- end }}
