@@ -77,15 +77,34 @@ spec:
           value: "0"
         - name: "JSON_FMT"
           value: "true"
+        {{ if .Values.windmill.instanceEventsWebhook }}
+        - name: "INSTANCE_EVENTS_WEBHOOK"
+          value: "true"
+        {{ end }}
         {{ if .Values.enterprise.enabled }}
         - name: "LICENSE_KEY"
           value: "{{ .Values.enterprise.licenseKey }}"
         {{ end }}
+        - name: "CUSTOM_TAGS"
+          value: "{{- range $v := .Values.windmill.workerGroups }}{{ $v.name }},{{ end}}"
+        resources:
+  {{ toYaml .Values.windmill.frontend.resources | indent 12 }}
       volumes:
       - name: oauth-volume
         secret:
           secretName: {{ if .Values.windmill.oauthSecretName }}{{ .Values.windmill.oauthSecretName }}{{ else }} {{ .Release.Name }}-oauth-secret {{- end }}
-
+    {{- with .Values.windmill.frontend.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.frontend.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.frontend.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
       securityContext:
         runAsUser: 0
 ---
@@ -100,7 +119,7 @@ spec:
     targetPort: 8000
   selector:
     app.kubernetes.io/name: windmill-app
-  sessionAffinity: None
+  sessionAffinity: ClientIP
   type: ClusterIP
 ---
 apiVersion: v1
@@ -119,6 +138,37 @@ spec:
     app.kubernetes.io/name: windmill-app
   sessionAffinity: None
   type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: windmill-lsp-ingress
+  annotations:
+    # alb.ingress.kubernetes.io/scheme: internet-facing
+    # alb.ingress.kubernetes.io/tags: Environment=dev,Team=test
+    # alb.ingress.kubernetes.io/target-type: ip
+    # alb.ingress.kubernetes.io/group.name: windmill
+    # alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.type=app_cookie,stickiness.app_cookie.cookie_name=token,stickiness.app_cookie.duration_seconds=86400
+    # alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=600
+    # {{ if .Values.windmill.sslIngress }}
+    # alb.ingress.kubernetes.io/certificate-arn: {{ .Values.certArn}}
+    # {{ end }}
+    # alb.ingress.kubernetes.io/success-codes: '200'
+    # alb.ingress.kubernetes.io/group.order: '1'
+spec:
+  ingressClassName: alb
+  rules:
+    - host:  {{ .Values.windmill.baseDomain }}
+      http:
+        paths:
+          - path: /ws/
+            pathType: Prefix
+            backend:
+              service:
+                name: windmill-lsp
+                port:
+                  number: 3001
+
 # ---
 # apiVersion: monitoring.coreos.com/v1
 # kind: ServiceMonitor

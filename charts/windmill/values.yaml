@@ -15,20 +15,57 @@ windmill:
   # -- replica for the application frontend
   frontendReplicas: 2
   # -- replicas for the workers, jobs are executed on the workers
-  workerReplicas: 4
+  workerReplicas: 2
   # -- replicas for the lsp containers used by the frontend
   lspReplicas: 2
   # -- Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in frontend and worker container
   databaseUrl: postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable
   # -- domain as shown in browser, change to https etc based on your endpoint/ingress configuration, sets BASE_URL environment variable in frontend and worker container
   baseUrl: http://localhost
+  # -- domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance 
+  cookieDomain: ""
   # -- rust log level, set to debug for more information etc, sets RUST_LOG environment variable in frontend and worker container
   rustLog: info
   # -- workers per worker container, default and recommended is 1 to isolate one process per container, sets NUM_WORKER environment variable for worker container.  Frontend container has 0 NUM_WORKERS by default
   numWorkers: 1
+  # -- name of the secret storing the oauthConfig. See https://docs.windmill.dev/docs/misc/setup_oauth
   oauthSecretName: ""
+  # -- raw oauth config. See https://docs.windmill.dev/docs/misc/setup_oauth
   oauthConfig: |
     {}
+  # -- pass the index url to pip for private registries
+  pipIndexUrl: ""
+  # -- pass the extra index url to pip for private registries
+  pipExtraIndexUrl: ""
+  # -- pass the trusted host to pip for private registries
+  pipTrustedHost: ""
+  # -- pass the npm for private registries
+  npmConfigRegistry: ""
+  # -- send instance events to a webhook. Can be hooked back to windmill
+  
+  instanceEventsWebhook: ""
+
+  # extra worker groups
+  workerGroups: 
+    # workers configuration
+    - name: 'gpu'
+      replicas: 1
+      # -- Annotations to apply to the pods
+      annotations: {}
+
+      # -- Node selector to use for scheduling the pods
+      nodeSelector: {}
+
+      # -- Tolerations to apply to the pods
+      tolerations: []
+
+      # -- Affinity rules to apply to the pods
+      affinity: {}
+
+      # -- Resource limits and requests for the pods
+      resources: {}
+
+
   # workers configuration
   workers:
     # -- Annotations to apply to the pods
@@ -111,6 +148,10 @@ windmill:
 
 # -- lsp image tag
 lsp: "latest"
+
+ingress:
+  className: ""
+  annotations: {}
 
 enterprise:
   # -- enable Windmill Enterprise , requires license key.

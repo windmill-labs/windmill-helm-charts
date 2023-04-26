@@ -35,6 +35,9 @@ spec:
        #because nsjail requires privileged access
         securityContext:
           privileged: true
+        {{ else }}
+        securityContext:
+          runAsUser: 0
         {{end}}
         {{ if .Values.enterprise.enabled }}
         image: ghcr.io/windmill-labs/windmill-ee:{{ .Values.windmill.image }}
@@ -62,6 +65,22 @@ spec:
           value: "true"
         - name: "JSON_FMT"
           value: "true"
+        {{ if .Values.windmill.pipIndexUrl }}
+        - name: "PIP_INDEX_URL"
+          value: "{{ .Values.windmill.pipIndexUrl }}"
+        {{ end }}
+        {{ if .Values.windmill.pipExtraIndexUrl }}
+        - name: "PIP_EXTRA_INDEX_URL"
+          value: "{{ .Values.windmill.pipExtraIndexUrl }}"
+        {{ end }}
+        {{ if .Values.windmill.pipTrustedHost }}
+        - name: "PIP_TRUSTED_HOST"
+          value: "{{ .Values.windmill.pipTrustedHost }}"
+        {{ end }}
+        {{ if .Values.windmill.npmConfigRegistry }}
+        - name: "NPM_CONFIG_REGISTRY"
+          value: "{{ .Values.windmill.npmConfigRegistry }}"
+        {{ end }}
         {{ if .Values.enterprise.enabled }}
         - name: "S3_CACHE_BUCKET"
           value: "{{ .Values.enterprise.s3CacheBucket }}"
@@ -74,8 +93,20 @@ spec:
           value: "false"
         {{ end }}
         {{ end }}
-      securityContext:
-        runAsUser: 0
+        resources:
+{{ toYaml .Values.windmill.workers.resources | indent 12 }}
+    {{- with .Values.windmill.workers.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.workers.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.workers.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}     
 ---
 apiVersion: v1
 kind: Service
@@ -119,28 +150,121 @@ spec:
 #   - port: metrics
 #     interval: 30s
 #     path: /metrics
-# ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: windmill
-# spec:
-#   externalTrafficPolicy: Cluster
-#   ports:
-#   - port: 80
-#     name: http
-#     protocol: TCP
-#     targetPort: 8000
-#     nodePort: 30080
-#   # - port: 443
-#   #   name: https
-#   #   protocol: TCP
-#   #   targetPort: 443
-#   #   nodePort: 30081
-#   selector:
-#     app: windmill
-#     container: caddy
-#   sessionAffinity: None
-#   type: NodePort
-# status:
-#   loadBalancer: {}
+
+{{- range $v := .Values.windmill.workerGroups }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: windmill-workers-{{ $v.name }}
+  labels:
+    app: windmill-workers
+    app.kubernetes.io/name: windmill-workers
+    chart: {{ template "windmill.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+    workerGroup: {{ $v.name }}
+spec:
+  replicas: {{ $v.replicas }}
+  strategy: 
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 3
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: windmill-workers
+      workerGroup: {{ $v.name }}
+  template:
+    metadata:
+      labels:
+        app: windmill-workers
+        app.kubernetes.io/name: windmill-workers
+        release: {{ $.Release.Name }}
+        workerGroup: {{ $v.name }}
+{{- with $v.annotations }}
+      annotations:
+{{ toYaml . | indent 8 }}       
+{{- end }}   
+    spec:
+      containers:
+      - name: windmill-worker
+       {{ if  $.Values.enterprise.nsjail }}
+       #because nsjail requires privileged access
+        securityContext:
+          privileged: true
+        {{ else }}
+        securityContext:
+          runAsUser: 0
+        {{end}}
+        {{ if $.Values.enterprise.enabled }}
+        image: ghcr.io/windmill-labs/windmill-ee:{{ $.Values.windmill.image }}
+        {{ else }}
+        image: ghcr.io/windmill-labs/windmill:{{ $.Values.windmill.image }}
+        {{ end }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        - containerPort: 8001
+        env:
+        - name : "METRICS_ADDR"
+          value: "true"
+        - name: "DATABASE_URL"
+          value: "{{ $.Values.windmill.databaseUrl }}"
+        - name: "BASE_URL"
+          value: "{{ $.Values.windmill.baseUrl }}"
+        - name: "BASE_INTERNAL_URL"
+          value: "http://windmill-app:8000"
+        - name: "RUST_LOG"
+          value: "{{ $.Values.windmill.rustLog }}"
+        - name: "NUM_WORKERS"
+          value: "{{ $.Values.windmill.numWorkers }}"
+        - name: "DISABLE_SERVER"
+          value: "true"
+        - name: "JSON_FMT"
+          value: "true"
+        {{ if $.Values.windmill.pipIndexUrl }}
+        - name: "PIP_INDEX_URL"
+          value: "{{ $.Values.windmill.pipIndexUrl }}"
+        {{ end }}
+        {{ if $.Values.windmill.pipExtraIndexUrl }}
+        - name: "PIP_EXTRA_INDEX_URL"
+          value: "{{ $.Values.windmill.pipExtraIndexUrl }}"
+        {{ end }}
+        {{ if $.Values.windmill.pipTrustedHost }}
+        - name: "PIP_TRUSTED_HOST"
+          value: "{{ $.Values.windmill.pipTrustedHost }}"
+        {{ end }}
+        {{ if $.Values.windmill.npmConfigRegistry }}
+        - name: "NPM_CONFIG_REGISTRY"
+          value: "{{ $.Values.windmill.npmConfigRegistry }}"
+        {{ end }}
+        {{ if $.Values.enterprise.enabled }}
+        - name: "S3_CACHE_BUCKET"
+          value: "{{ .Values.enterprise.s3CacheBucket }}"
+        - name: "LICENSE_KEY"
+          value: "{{ .Values.enterprise.licenseKey }}"
+        - name: "RCLONE_S3_PROVIDER"
+          value: "AWS"
+        {{ if $.Values.enterprise.nsjail }}
+        - name: "DISABLE_NSJAIL"
+          value: "false"
+        {{ end }}
+        {{ end }}
+        - name: "WORKER_TAGS"
+          value: "{{ $v.name }}"
+        resources:
+{{ toYaml $v.resources | indent 12 }}
+    {{- with $v.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with $v.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with $v.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+{{- end }}    
+{{- end }}
