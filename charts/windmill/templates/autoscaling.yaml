@@ -1,6 +1,6 @@
 {{- range $comp, $values := .Values.windmill -}}
 {{- if typeIs "map[string]interface {}" $values }}
-{{- if hasKey $values "autoscaling "}}
+{{- if hasKey $values "autoscaling"}}
 {{- if $values.autoscaling.enabled }}
 ---
 apiVersion: autoscaling/v1
