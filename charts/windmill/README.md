@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 1.4.0](https://img.shields.io/badge/Version-1.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.89.0](https://img.shields.io/badge/AppVersion-1.89.0-informational?style=flat-square)
+![Version: 1.4.1](https://img.shields.io/badge/Version-1.4.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.89.0](https://img.shields.io/badge/AppVersion-1.89.0-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -39,7 +39,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | postgresql.fullnameOverride | string | `"windmill-postgresql"` |  |
 | postgresql.primary.persistence.enabled | bool | `true` |  |
 | windmill.baseUrl | string | `"http://localhost"` | domain as shown in browser, change to https etc based on your endpoint/ingress configuration, sets BASE_URL environment variable in frontend and worker container |
-| windmill.cookieDomain | string | `""` | domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance  |
+| windmill.cookieDomain | string | `""` | domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance |
 | windmill.databaseUrl | string | `"postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in frontend and worker container |
 | windmill.frontend.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.frontend.annotations | object | `{}` | Annotations to apply to the pods |
