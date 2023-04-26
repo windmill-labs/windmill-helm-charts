@@ -22,7 +22,7 @@ windmill:
   databaseUrl: postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable
   # -- domain as shown in browser, change to https etc based on your endpoint/ingress configuration, sets BASE_URL environment variable in frontend and worker container
   baseUrl: http://localhost
-  # -- domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance 
+  # -- domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance
   cookieDomain: ""
   # -- rust log level, set to debug for more information etc, sets RUST_LOG environment variable in frontend and worker container
   rustLog: info
@@ -42,13 +42,13 @@ windmill:
   # -- pass the npm for private registries
   npmConfigRegistry: ""
   # -- send instance events to a webhook. Can be hooked back to windmill
-  
+
   instanceEventsWebhook: ""
 
   # extra worker groups
-  workerGroups: 
+  workerGroups:
     # workers configuration
-    - name: 'gpu'
+    - name: "gpu"
       replicas: 1
       # -- Annotations to apply to the pods
       annotations: {}
@@ -64,7 +64,6 @@ windmill:
 
       # -- Resource limits and requests for the pods
       resources: {}
-
 
   # workers configuration
   workers:
@@ -95,7 +94,7 @@ windmill:
       targetCPUUtilizationPercentage: 80
 
   # frontend configuration
-  frontend:
+  app:
     # -- Annotations to apply to the pods
     annotations: {}
 
