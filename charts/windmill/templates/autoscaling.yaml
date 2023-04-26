@@ -1,5 +1,6 @@
 {{- range $comp, $values := .Values.windmill -}}
-{{- if typeIs "map[string]interface {}" $values | ternary (hasKey $values "autoscaling") false }}
+{{- if typeIs "map[string]interface {}" $values }}
+{{- if hasKey $values "autoscaling "}}
 {{- if $values.autoscaling.enabled }}
 ---
 apiVersion: autoscaling/v1
@@ -14,6 +15,7 @@ spec:
   minReplicas: {{ $values.replicas }}
   maxReplicas: {{ $values.autoscaling.maxReplicas }}
   targetCPUUtilizationPercentage: {{ $values.autoscaling.targetCPUUtilizationPercentage }}
-{{ end }}
-{{ end }}
+{{- end }}
+{{- end }}
+{{- end }}
 {{- end }}
