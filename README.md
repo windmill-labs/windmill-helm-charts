@@ -195,7 +195,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: windmill-app
+                name: windmill-frontend
                 port:
                   number: 8000
 ```
@@ -205,6 +205,6 @@ Again, there are many ways to expose an app and it will depend on the requiremen
 windmill frontend on port 8000
 lsp application on port 3001
 metrics endpoints on port 8001 for the frontend/app and workers
-If you are using Prometheus, you can scrape the windmill-app-metrics service on port 8001 at /metrics endpoint to gather stats about the Windmill application.
+If you are using Prometheus, you can scrape the windmill-frontend-metrics service on port 8001 at /metrics endpoint to gather stats about the Windmill application.
 
 A ServiceMonitor is included in the chart for Prometheus Operator users.
