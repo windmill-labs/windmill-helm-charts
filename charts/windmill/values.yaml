@@ -150,6 +150,7 @@ windmill:
 lsp: "latest"
 
 ingress:
+  enabled: false
   className: ""
   annotations: {}
 
