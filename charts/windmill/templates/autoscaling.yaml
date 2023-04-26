@@ -1,4 +1,5 @@
 {{- range $comp, $values := .Values.windmill -}}
+{{- if typeIs "map[string]interface {}" $values }}
 {{- with $values.autoscaling -}}
 {{- if .enabled }}
 ---
@@ -14,6 +15,7 @@ spec:
   minReplicas: {{ $values.replicas }}
   maxReplicas: {{ $values.autoscaling.maxReplicas }}
   targetCPUUtilizationPercentage: {{ $values.autoscaling.targetCPUUtilizationPercentage }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
