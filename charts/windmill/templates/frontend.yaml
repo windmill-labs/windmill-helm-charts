@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: windmillfrontend
+  name: windmill-frontend
   labels:
-    app: windmillfrontend
-    app.kubernetes.io/name: windmillfrontend
+    app: windmill-frontend
+    app.kubernetes.io/name: windmill-frontend
     chart: {{ template "windmill.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -17,12 +17,12 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: windmillfrontend
+      app: windmill-frontend
   template:
     metadata:
       labels:
-        app: windmillfrontend
-        app.kubernetes.io/name: windmillfrontend
+        app: windmill-frontend
+        app.kubernetes.io/name: windmill-frontend
         release: {{ .Release.Name }}
 {{- with .Values.windmill.frontend.annotations }}
       annotations:
@@ -31,7 +31,7 @@ spec:
     spec:
       terminationGracePeriodSeconds: 40
       containers:
-      - name: windmillfrontend
+      - name: windmill-frontend
         lifecycle:
           preStop:
             exec:
@@ -111,21 +111,21 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: windmillfrontend
+  name: windmill-frontend
 spec:
   ports:
   - port: 8000
     protocol: TCP
     targetPort: 8000
   selector:
-    app.kubernetes.io/name: windmillfrontend
+    app.kubernetes.io/name: windmill-frontend
   sessionAffinity: ClientIP
   type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: windmillfrontend-metrics
+  name: windmill-frontend-metrics
   labels:
     operated-prometheus: "true"
 spec:
@@ -135,20 +135,20 @@ spec:
     name: metrics
     protocol: TCP
   selector:
-    app.kubernetes.io/name: windmillfrontend
+    app.kubernetes.io/name: windmill-frontend
   sessionAffinity: None
   type: ClusterIP
 # ---
 # apiVersion: monitoring.coreos.com/v1
 # kind: ServiceMonitor
 # metadata:
-#   name: windmillfrontend
+#   name: windmill-frontend
 #   labels:
 #     instance: primary
 # spec:
 #   selector:
 #     matchLabels:
-#       app: windmillfrontend-metrics
+#       app: windmill-frontend-metrics
 #   endpoints:
 #   - port: metrics
 #     interval: 30s
