@@ -9,7 +9,7 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}    
 spec:
-  replicas: 2
+  replicas: {{ .Values.windmill.lspReplicas }}
   strategy:
     type: RollingUpdate
     rollingUpdate:

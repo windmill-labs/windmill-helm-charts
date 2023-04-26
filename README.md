@@ -72,7 +72,7 @@ The default is set to localhost which is unlikely to be the case.
 Update it with a values.yml file like this:
 
 ```
-postgres:
+postgresql:
   enabled: true
   dbName: windmill
   password: changeme
