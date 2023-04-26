@@ -26,6 +26,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: windmill-app
+                name: windmill-frontend
                 port:
                   number: 8000

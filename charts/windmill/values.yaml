@@ -94,7 +94,7 @@ windmill:
       targetCPUUtilizationPercentage: 80
 
   # frontend configuration
-  app:
+  frontend:
     # -- Annotations to apply to the pods
     annotations: {}
 
