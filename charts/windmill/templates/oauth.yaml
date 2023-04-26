@@ -5,5 +5,5 @@ metadata:
   name: {{ .Release.Name }}-oauth-secret
 type: Opaque
 data:
-  oauth.json: {{ .Values.windmill.oauthConfig | toJson | b64enc }}
+  oauth.json: {{ .Values.windmill.oauthConfig | b64enc }}
 {{- end }}
