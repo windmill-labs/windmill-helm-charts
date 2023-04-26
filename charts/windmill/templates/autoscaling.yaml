@@ -1,46 +1,17 @@
-{{ if .Values.windmill.workers.autoscaling.enabled }}
+{{- range $comp, $values := .Values.windmill -}}
+{{- if $values.autoscaling.enabled }}
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: windmill-workers-hpa
+  name: windmill-{{ $comp }}-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: windmill-workers
-  minReplicas: {{ .Values.windmill.workerReplicas }}
-  maxReplicas: {{ .Values.windmill.workers.autoscaling.maxReplicas }}
-  targetCPUUtilizationPercentage: {{ .Values.windmill.workers.autoscaling.targetCPUUtilizationPercentage }}
+    name: windmill-{{ $comp }}
+  minReplicas: {{ $values.replicas }}
+  maxReplicas: {{ $values.autoscaling.maxReplicas }}
+  targetCPUUtilizationPercentage: {{ $values.autoscaling.targetCPUUtilizationPercentage }}
 {{ end }}
-{{ if .Values.windmill.frontend.autoscaling.enabled }}
----
-apiVersion: autoscaling/v1
-kind: HorizontalPodAutoscaler
-metadata:
-  name: windmill-app-hpa
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: windmill-app
-  minReplicas: {{ .Values.windmill.frontendReplicas }}
-  maxReplicas: {{ .Values.windmill.frontend.autoscaling.maxReplicas }}
-  targetCPUUtilizationPercentage: {{ .Values.windmill.frontend.autoscaling.targetCPUUtilizationPercentage }}
-{{ end }}
-{{ if .Values.windmill.lsp.autoscaling.enabled }}
----
-apiVersion: autoscaling/v1
-kind: HorizontalPodAutoscaler
-metadata:
-  name: windmill-lsp-hpa
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: windmill-lsp
-  minReplicas: {{ .Values.windmill.lspReplicas }}
-  maxReplicas: {{ .Values.windmill.lsp.autoscaling.maxReplicas }}
-  targetCPUUtilizationPercentage: {{ .Values.windmill.lsp.autoscaling.targetCPUUtilizationPercentage }}
-{{ end }}
-
+{{- end }}
