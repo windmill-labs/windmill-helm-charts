@@ -32,6 +32,8 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | enterprise.s3CacheBucket | string | `"mybucketname"` | S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
+| ingress.enabled | bool | `true` | enable/disable included ingress resource |
+| ingress.tls | list | `[]` | TLS config for the ingress resource. Useful when using cert-manager and nginx-ingress |
 | lsp | string | `"latest"` | lsp image tag |
 | postgresql.auth.database | string | `"windmill"` |  |
 | postgresql.auth.postgresPassword | string | `"windmill"` |  |
@@ -47,7 +49,8 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.app.resources | object | `{}` | Resource limits and requests for the pods |
 | windmill.app.tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.appReplicas | int | `2` | replica for the application app |
-| windmill.baseUrl | string | `"http://localhost"` | domain as shown in browser, change to https etc based on your endpoint/ingress configuration, sets BASE_URL environment variable in app and worker container |
+| windmill.baseDomain | string | `"localhost"` | domain as shown in browser, this variable and `baseProtocol` are used as part of the BASE_URL environment variable in app and worker container and in the ingress resource, if enabled |
+| windmill.baseProtocol | string | `"http"` | protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container |
 | windmill.cookieDomain | string | `""` | domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance |
 | windmill.databaseUrl | string | `"postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container |
 | windmill.image | string | `"main"` | windmill app image tag |
