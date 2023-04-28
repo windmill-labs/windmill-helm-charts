@@ -46,8 +46,9 @@ windmill:
   lspReplicas: 2
   # postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container
   databaseUrl: postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable
-  # domain as shown in browser, change to https etc based on your endpoint/ingress configuration, sets BASE_URL environment variable in app and worker container
-  baseUrl: http://localhost  
+  # domain as shown in browser, this is used together with `baseProtocol` as part of the BASE_URL environment variable in app and worker container and in the ingress resource, if enabled
+  baseDomain: localhost  
+  baseProtocol: http
   ...
 
 # enable postgres (bitnami) on kubernetes
@@ -87,6 +88,8 @@ enterprise:
 | enterprise.s3CacheBucket | string | `"mybucketname"` | S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
+| ingress.enabled | bool | `true` | enable/disable included ingress resource |
+| ingress.tls | list | `[]` | TLS config for the ingress resource. Useful when using cert-manager and nginx-ingress |
 | lsp | string | `"latest"` | lsp image tag |
 | postgresql.auth.database | string | `"windmill"` |  |
 | postgresql.auth.postgresPassword | string | `"windmill"` |  |
@@ -102,7 +105,8 @@ enterprise:
 | windmill.app.resources | object | `{}` | Resource limits and requests for the pods |
 | windmill.app.tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.appReplicas | int | `2` | replica for the application app |
-| windmill.baseUrl | string | `"http://localhost"` | domain as shown in browser, change to https etc based on your endpoint/ingress configuration, sets BASE_URL environment variable in app and worker container |
+| windmill.baseDomain | string | `"localhost"` | domain as shown in browser, this variable and `baseProtocol` are used as part of the BASE_URL environment variable in app and worker container and in the ingress resource, if enabled |
+| windmill.baseProtocol | string | `"http"` | protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container |
 | windmill.cookieDomain | string | `""` | domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance |
 | windmill.databaseUrl | string | `"postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container |
 | windmill.image | string | `"main"` | windmill app image tag |
@@ -169,13 +173,18 @@ The sync relies on rclone and uses its methods of authentication to s3 per
 
 ## Kubernetes Hosting Tips
 
-The included helm chart does not have any ingress configured. The default services are nodeports you can point a load balancer to, or alter the chart to suit. For example, on AWS you might use the AWS ALB controller and configure an ingress like this:
+The helm chart does have an ingress configuration included. It's enabled by default.
+The ingress uses the `windmill.baseDomain` variable for its hostname configuration.
+Here are two example configurations for an AWS ALB and nginx-ingress/cert-manager:
 
+AWS ALB:
 ```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: windmill-ingress
+windmill:
+  baseDomain: "windmill.example.com"
+  ...
+  
+ingress:
+  className: "alb"
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/tags: Environment=dev,Team=test
@@ -184,23 +193,30 @@ metadata:
     alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=600
     alb.ingress.kubernetes.io/group.name: windmill
     alb.ingress.kubernetes.io/group.order: '10'
-    alb.ingress.kubernetes.io/certificate-arn: certificatearn
-spec:
-  ingressClassName: alb
-  rules:
-    - host:  {{ .Values.windmill.baseDomain }}
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: windmill-app
-                port:
-                  number: 8000
+    alb.ingress.kubernetes.io/certificate-arn: my-certificatearn
+...
 ```
 
-Again, there are many ways to expose an app and it will depend on the requirements of your environment. Overall, you want the following endpoints accessible included in the chart:
+nginx ingress + cert-manager:
+```yaml
+windmill:
+  baseDomain: "windmill.example.com"
+  ...
+
+ingress:
+  className: "nginx"
+  tls:
+    - hosts:
+        - "windmill.example.com"
+      secretName: windmill-tls-cert
+  annotations:
+    cert-manager.io/issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/affinity-mode: "persistent"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route"
+...
+```
+There are many ways to expose an app and it will depend on the requirements of your environment. If you don't want to use the included ingress and roll your own, you can just disable it. Overall, you want the following endpoints accessible included in the chart:
 
 windmill app on port 8000
 lsp application on port 3001
