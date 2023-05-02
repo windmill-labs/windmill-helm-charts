@@ -11,7 +11,7 @@ postgresql:
 
 windmill:
   # -- windmill app image tag
-  image: "1.92.1"
+  image: "1.92.2"
   # -- replica for the application app
   appReplicas: 2
   # -- replicas for the workers, jobs are executed on the workers
