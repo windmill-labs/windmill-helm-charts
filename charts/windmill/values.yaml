@@ -10,7 +10,7 @@ postgresql:
     database: windmill
 
 windmill:
-  # -- windmill app image tag, will use the App version if not defined 
+  # -- windmill app image tag, will use the App version if not defined
   tag: ""
   # -- replica for the application app
   appReplicas: 2
