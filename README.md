@@ -109,7 +109,7 @@ enterprise:
 | windmill.baseProtocol | string | `"http"` | protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container |
 | windmill.cookieDomain | string | `""` | domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance |
 | windmill.databaseUrl | string | `"postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container |
-| windmill.image | string | `"main"` | windmill app image tag |
+| windmill.tag | string | `""` | windmill app image tag, will use the App version if not defined |
 | windmill.instanceEventsWebhook | string | `""` |  |
 | windmill.lsp.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.lsp.annotations | object | `{}` | Annotations to apply to the pods |

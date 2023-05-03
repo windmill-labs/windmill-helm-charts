@@ -10,8 +10,8 @@ postgresql:
     database: windmill
 
 windmill:
-  # -- windmill app image tag
-  image: "1.92.2"
+  # -- windmill app image tag, will use the App version if not defined
+  tag: ""
   # -- replica for the application app
   appReplicas: 2
   # -- replicas for the workers, jobs are executed on the workers

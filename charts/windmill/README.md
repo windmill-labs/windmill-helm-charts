@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 1.4.2](https://img.shields.io/badge/Version-1.4.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.89.0](https://img.shields.io/badge/AppVersion-1.89.0-informational?style=flat-square)
+![Version: 1.4.5](https://img.shields.io/badge/Version-1.4.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.93.0](https://img.shields.io/badge/AppVersion-1.93.0-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -53,7 +53,6 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.baseProtocol | string | `"http"` | protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container |
 | windmill.cookieDomain | string | `""` | domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance |
 | windmill.databaseUrl | string | `"postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container |
-| windmill.image | string | `"main"` | windmill app image tag |
 | windmill.instanceEventsWebhook | string | `""` |  |
 | windmill.lsp.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.lsp.annotations | object | `{}` | Annotations to apply to the pods |
@@ -72,6 +71,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.pipIndexUrl | string | `""` | pass the index url to pip for private registries |
 | windmill.pipTrustedHost | string | `""` | pass the trusted host to pip for private registries |
 | windmill.rustLog | string | `"info"` | rust log level, set to debug for more information etc, sets RUST_LOG environment variable in app and worker container |
+| windmill.tag | string | `""` | windmill app image tag, will use the App version if not defined  |
 | windmill.workerGroups[0].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[0].annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.workerGroups[0].name | string | `"gpu"` |  |

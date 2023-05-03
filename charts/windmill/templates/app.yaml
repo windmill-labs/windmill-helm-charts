@@ -42,9 +42,9 @@ spec:
           subPath: oauth.json
           readOnly: true
         {{ if .Values.enterprise.enabled }}
-        image: ghcr.io/windmill-labs/windmill-ee:{{ .Values.windmill.image }}
+        image: ghcr.io/windmill-labs/windmill-ee:{{ default .Chart.AppVersion .Values.windmill.tag }}
         {{ else }}
-        image: ghcr.io/windmill-labs/windmill:{{ .Values.windmill.image }}
+        image: ghcr.io/windmill-labs/windmill:{{ default .Chart.AppVersion .Values.windmill.tag }}
         {{ end }}
         imagePullPolicy: Always
         ports:
