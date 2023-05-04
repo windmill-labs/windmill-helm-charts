@@ -11,7 +11,7 @@ postgresql:
 
 minio:
   # -- enabled included Minio operator for s3 resource demo purposes
-  enabled: true
+  enabled: false
   fullnameOverride: windmill-minio
   mode: standalone
   primary:

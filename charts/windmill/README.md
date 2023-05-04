@@ -38,7 +38,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | lsp | string | `"latest"` | lsp image tag |
 | minio.auth.rootPassword | string | `"windmill"` |  |
 | minio.auth.rootUser | string | `"windmill"` |  |
-| minio.enabled | bool | `true` | enabled included Minio operator for s3 resource demo purposes |
+| minio.enabled | bool | `false` | enabled included Minio operator for s3 resource demo purposes |
 | minio.fullnameOverride | string | `"windmill-minio"` |  |
 | minio.mode | string | `"standalone"` |  |
 | minio.primary.enabled | bool | `true` |  |
