@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 1.4.5](https://img.shields.io/badge/Version-1.4.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.93.0](https://img.shields.io/badge/AppVersion-1.93.0-informational?style=flat-square)
+![Version: 1.4.8](https://img.shields.io/badge/Version-1.4.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.93.0](https://img.shields.io/badge/AppVersion-1.93.0-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -20,6 +20,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
 | Repository | Name | Version |
 |------------|------|---------|
+| https://charts.bitnami.com/bitnami | minio | 12.4.2 |
 | https://charts.bitnami.com/bitnami | postgresql | 12.3.1 |
 
 ## Values
@@ -35,6 +36,12 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | ingress.enabled | bool | `true` | enable/disable included ingress resource |
 | ingress.tls | list | `[]` | TLS config for the ingress resource. Useful when using cert-manager and nginx-ingress |
 | lsp | string | `"latest"` | lsp image tag |
+| minio.auth.rootPassword | string | `"windmill"` |  |
+| minio.auth.rootUser | string | `"windmill"` |  |
+| minio.enabled | bool | `true` | enabled included Minio operator for s3 resource demo purposes |
+| minio.fullnameOverride | string | `"windmill-minio"` |  |
+| minio.mode | string | `"standalone"` |  |
+| minio.primary.enabled | bool | `true` |  |
 | postgresql.auth.database | string | `"windmill"` |  |
 | postgresql.auth.postgresPassword | string | `"windmill"` |  |
 | postgresql.enabled | bool | `true` | enabled included Postgres container for demo purposes only using bitnami |
@@ -49,7 +56,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.app.resources | object | `{}` | Resource limits and requests for the pods |
 | windmill.app.tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.appReplicas | int | `2` | replica for the application app |
-| windmill.baseDomain | string | `"localhost"` | domain as shown in browser, this variable and `baseProtocol` are used as part of the BASE_URL environment variable in app and worker container and in the ingress resource, if enabled |
+| windmill.baseDomain | string | `"windmill"` | domain as shown in browser, this variable and `baseProtocol` are used as part of the BASE_URL environment variable in app and worker container and in the ingress resource, if enabled |
 | windmill.baseProtocol | string | `"http"` | protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container |
 | windmill.cookieDomain | string | `""` | domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance |
 | windmill.databaseUrl | string | `"postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container |
@@ -71,7 +78,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.pipIndexUrl | string | `""` | pass the index url to pip for private registries |
 | windmill.pipTrustedHost | string | `""` | pass the trusted host to pip for private registries |
 | windmill.rustLog | string | `"info"` | rust log level, set to debug for more information etc, sets RUST_LOG environment variable in app and worker container |
-| windmill.tag | string | `""` | windmill app image tag, will use the App version if not defined  |
+| windmill.tag | string | `""` | windmill app image tag, will use the App version if not defined |
 | windmill.workerGroups[0].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[0].annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.workerGroups[0].name | string | `"gpu"` |  |
