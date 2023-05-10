@@ -66,6 +66,9 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 5
         env:
+        {{- with .Values.windmill.app.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         - name : "METRICS_ADDR"
           value: "true"
         {{ if .Values.windmill.databaseUrlSecretName }}

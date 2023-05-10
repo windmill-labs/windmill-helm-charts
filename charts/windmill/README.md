@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 1.4.16](https://img.shields.io/badge/Version-1.4.16-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.99.0](https://img.shields.io/badge/AppVersion-1.99.0-informational?style=flat-square)
+![Version: 1.4.18](https://img.shields.io/badge/Version-1.4.18-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.99.0](https://img.shields.io/badge/AppVersion-1.99.0-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -47,6 +47,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.app.autoscaling.enabled | bool | `false` | enable or disable autoscaling |
 | windmill.app.autoscaling.maxReplicas | int | `10` | maximum autoscaler replicas |
 | windmill.app.autoscaling.targetCPUUtilizationPercentage | int | `80` | target CPU utilization |
+| windmill.app.extraEnv | list | `[]` | Extra environment variables to apply to the pods |
 | windmill.app.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.app.resources | object | `{}` | Resource limits and requests for the pods |
 | windmill.app.tolerations | list | `[]` | Tolerations to apply to the pods |
@@ -62,6 +63,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.lsp.autoscaling.enabled | bool | `false` | enable or disable autoscaling |
 | windmill.lsp.autoscaling.maxReplicas | int | `10` | maximum autoscaler replicas |
 | windmill.lsp.autoscaling.targetCPUUtilizationPercentage | int | `80` | target CPU utilization |
+| windmill.lsp.extraEnv | list | `[]` | Extra environment variables to apply to the pods |
 | windmill.lsp.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.lsp.resources | object | `{}` | Resource limits and requests for the pods |
 | windmill.lsp.tolerations | list | `[]` | Tolerations to apply to the pods |
@@ -77,6 +79,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.tag | string | `""` | windmill app image tag, will use the App version if not defined |
 | windmill.workerGroups[0].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[0].annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.workerGroups[0].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
 | windmill.workerGroups[0].name | string | `"gpu"` |  |
 | windmill.workerGroups[0].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.workerGroups[0].replicas | int | `1` |  |
@@ -88,6 +91,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workers.autoscaling.enabled | bool | `false` | will not benefit from the global cache and the performances will be poor for newly spawned pods |
 | windmill.workers.autoscaling.maxReplicas | int | `10` | maximum autoscaler replicas |
 | windmill.workers.autoscaling.targetCPUUtilizationPercentage | int | `80` | target CPU utilization |
+| windmill.workers.extraEnv | list | `[]` | Extra environment variables to apply to the pods |
 | windmill.workers.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.workers.resources | object | `{}` | Resource limits and requests for the pods |
 | windmill.workers.tolerations | list | `[]` | Tolerations to apply to the pods |

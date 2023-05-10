@@ -49,6 +49,9 @@ spec:
         - containerPort: 8000
         - containerPort: 8001
         env:
+        {{- with .Values.windmill.workers.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         - name : "METRICS_ADDR"
           value: "true"
         {{ if .Values.windmill.databaseUrlSecretName }}
@@ -216,6 +219,9 @@ spec:
         - containerPort: 8000
         - containerPort: 8001
         env:
+        {{- with $v.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         - name : "METRICS_ADDR"
           value: "true"
         - name: "DATABASE_URL"

@@ -35,6 +35,10 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 3001
+        {{- with .Values.windmill.lsp.extraEnv }}
+        env:
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         resources:
 {{ toYaml .Values.windmill.lsp.resources | indent 12 }}
     {{- with .Values.windmill.lsp.nodeSelector }}
