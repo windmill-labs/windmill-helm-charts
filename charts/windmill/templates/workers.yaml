@@ -198,6 +198,7 @@ spec:
 {{ toYaml . | indent 8 }}       
 {{- end }}   
     spec:
+      serviceAccountName: {{ template "windmill.serviceAccountName" $ }}
       containers:
       - name: windmill-worker
        {{ if  $.Values.enterprise.nsjail }}
