@@ -18,6 +18,8 @@ windmill:
   workerReplicas: 2
   # -- replicas for the lsp containers used by the app
   lspReplicas: 2
+  # -- name of the secret storing the database URI, take precedence over databaseUrl. The key of the url is 'url'
+  databaseUrlSecretName: ""
   # -- Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container
   databaseUrl: postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable
   # -- domain as shown in browser, this variable and `baseProtocol` are used as part of the BASE_URL environment variable in app and worker container and in the ingress resource, if enabled
@@ -167,3 +169,7 @@ enterprise:
   licenseKey: 123456F
   # -- use nsjail for sandboxing
   nsjail: false
+
+serviceAccount:
+  # -- create a service account for windmill app and container
+  create: true
