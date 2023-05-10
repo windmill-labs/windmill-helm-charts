@@ -69,6 +69,9 @@ windmill:
       # -- Resource limits and requests for the pods
       resources: {}
 
+      # -- Extra environment variables to apply to the pods
+      extraEnv: []
+
   # workers configuration
   workers:
     # -- Annotations to apply to the pods
@@ -85,6 +88,9 @@ windmill:
 
     # -- Resource limits and requests for the pods
     resources: {}
+
+    # -- Extra environment variables to apply to the pods
+    extraEnv: []
 
     # workers autoscaling configuration
     autoscaling:
@@ -114,6 +120,9 @@ windmill:
     # -- Resource limits and requests for the pods
     resources: {}
 
+    # -- Extra environment variables to apply to the pods
+    extraEnv: []
+
     # app autoscaling configuration
     autoscaling:
       # -- enable or disable autoscaling
@@ -139,6 +148,9 @@ windmill:
 
     # -- Resource limits and requests for the pods
     resources: {}
+
+    # -- Extra environment variables to apply to the pods
+    extraEnv: []
 
     # lsp autoscaling configuration
     autoscaling:

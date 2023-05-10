@@ -1,0 +1,49 @@
+{{ template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}
+
+## Keeping the PostgreSQL password secret
+
+If you would prefer to keep the PostgreSQL password or connection string out of the Helm values, there are two different possible approaches:
+
+1. Use `windmill.databaseUrlSecretName` to point at a Secret with a `url` key containing the entire database connection string.
+
+2. Use `windmill.databaseUrl` with [Dependent Environment Variables](https://kubernetes.io/docs/tasks/inject-data-application/define-interdependent-environment-variables/) together with `windmill.app.extraEnv` and `windmill.workers.extraEnv`.
+
+An example of the second approach might use Helm values similar to this:
+
+```yaml
+windmill:
+  databaseUrl: "postgres://windmill:$(DATABASE_PASSWORD)@windmill-postgres/windmill?sslmode=require"
+
+  workers:
+    extraEnv:
+    - name: DATABASE_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: windmill-postgres
+          key: password
+
+  app:
+    extraEnv:
+    - name: DATABASE_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: windmill-postgres
+          key: password
+```
+
+{{ template "helm-docs.versionFooter" . }}
