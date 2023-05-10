@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 1.4.14](https://img.shields.io/badge/Version-1.4.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.99.0](https://img.shields.io/badge/AppVersion-1.99.0-informational?style=flat-square)
+![Version: 1.4.16](https://img.shields.io/badge/Version-1.4.16-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.99.0](https://img.shields.io/badge/AppVersion-1.99.0-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -40,7 +40,8 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | postgresql.enabled | bool | `true` | enabled included Postgres container for demo purposes only using bitnami |
 | postgresql.fullnameOverride | string | `"windmill-postgresql"` |  |
 | postgresql.primary.persistence.enabled | bool | `true` |  |
-| serviceAccount.create | bool | `true` | create a service account for windmill app and container |
+| serviceAccount.create | bool | `true` |  |
+| serviceAccount.name | string | `nil` |  |
 | windmill.app.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.app.annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.app.autoscaling.enabled | bool | `false` | enable or disable autoscaling |
