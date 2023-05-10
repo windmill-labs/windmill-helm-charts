@@ -30,6 +30,7 @@ spec:
 {{- end }}  
     spec:
       terminationGracePeriodSeconds: 40
+      serviceAccountName: {{ template "windmill.serviceAccountName" . }}
       containers:
       - name: windmill-app
         lifecycle:
