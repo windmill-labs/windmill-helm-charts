@@ -30,6 +30,7 @@ spec:
 {{- end }}  
     spec:
       terminationGracePeriodSeconds: 40
+      serviceAccountName: {{ template "windmill.serviceAccountName" . }}
       containers:
       - name: windmill-app
         lifecycle:
@@ -65,10 +66,21 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 5
         env:
+        {{- with .Values.windmill.app.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         - name : "METRICS_ADDR"
           value: "true"
+        {{ if .Values.windmill.databaseUrlSecretName }}
+        - name: "DATABASE_URL"
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Values.windmill.databaseUrlSecretName }}"
+                key: url
+        {{ else }}
         - name: "DATABASE_URL"
           value: "{{ .Values.windmill.databaseUrl }}"
+        {{ end }}
         - name: "BASE_URL"
           value: "{{ .Values.windmill.baseProtocol }}://{{ .Values.windmill.baseDomain }}"
         - name: "RUST_LOG"

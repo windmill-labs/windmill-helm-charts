@@ -29,6 +29,8 @@ windmill:
   workerReplicas: 2
   # -- replicas for the lsp containers used by the app
   lspReplicas: 2
+  # -- name of the secret storing the database URI, take precedence over databaseUrl. The key of the url is 'url'
+  databaseUrlSecretName: ""
   # -- Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container
   databaseUrl: postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable
   # -- domain as shown in browser, this variable and `baseProtocol` are used as part of the BASE_URL environment variable in app and worker container and in the ingress resource, if enabled
@@ -78,6 +80,9 @@ windmill:
       # -- Resource limits and requests for the pods
       resources: {}
 
+      # -- Extra environment variables to apply to the pods
+      extraEnv: []
+
   # workers configuration
   workers:
     # -- Annotations to apply to the pods
@@ -94,6 +99,9 @@ windmill:
 
     # -- Resource limits and requests for the pods
     resources: {}
+
+    # -- Extra environment variables to apply to the pods
+    extraEnv: []
 
     # workers autoscaling configuration
     autoscaling:
@@ -123,6 +131,9 @@ windmill:
     # -- Resource limits and requests for the pods
     resources: {}
 
+    # -- Extra environment variables to apply to the pods
+    extraEnv: []
+
     # app autoscaling configuration
     autoscaling:
       # -- enable or disable autoscaling
@@ -148,6 +159,9 @@ windmill:
 
     # -- Resource limits and requests for the pods
     resources: {}
+
+    # -- Extra environment variables to apply to the pods
+    extraEnv: []
 
     # lsp autoscaling configuration
     autoscaling:
@@ -178,3 +192,10 @@ enterprise:
   licenseKey: 123456F
   # -- use nsjail for sandboxing
   nsjail: false
+
+serviceAccount:
+  # Specifies whether a ServiceAccount should be created
+  create: true
+  # The name of the ServiceAccount to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""

@@ -1,6 +1,8 @@
 # windmill
 
-![Version: 1.4.8](https://img.shields.io/badge/Version-1.4.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.93.0](https://img.shields.io/badge/AppVersion-1.93.0-informational?style=flat-square)
+
+![Version: 1.4.22](https://img.shields.io/badge/Version-1.4.22-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.99.0](https://img.shields.io/badge/AppVersion-1.99.0-informational?style=flat-square)
+
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -47,11 +49,14 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | postgresql.enabled | bool | `true` | enabled included Postgres container for demo purposes only using bitnami |
 | postgresql.fullnameOverride | string | `"windmill-postgresql"` |  |
 | postgresql.primary.persistence.enabled | bool | `true` |  |
+| serviceAccount.create | bool | `true` |  |
+| serviceAccount.name | string | `nil` |  |
 | windmill.app.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.app.annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.app.autoscaling.enabled | bool | `false` | enable or disable autoscaling |
 | windmill.app.autoscaling.maxReplicas | int | `10` | maximum autoscaler replicas |
 | windmill.app.autoscaling.targetCPUUtilizationPercentage | int | `80` | target CPU utilization |
+| windmill.app.extraEnv | list | `[]` | Extra environment variables to apply to the pods |
 | windmill.app.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.app.resources | object | `{}` | Resource limits and requests for the pods |
 | windmill.app.tolerations | list | `[]` | Tolerations to apply to the pods |
@@ -60,12 +65,14 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.baseProtocol | string | `"http"` | protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container |
 | windmill.cookieDomain | string | `""` | domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance |
 | windmill.databaseUrl | string | `"postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container |
+| windmill.databaseUrlSecretName | string | `""` | name of the secret storing the database URI, take precedence over databaseUrl. The key of the url is 'url' |
 | windmill.instanceEventsWebhook | string | `""` |  |
 | windmill.lsp.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.lsp.annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.lsp.autoscaling.enabled | bool | `false` | enable or disable autoscaling |
 | windmill.lsp.autoscaling.maxReplicas | int | `10` | maximum autoscaler replicas |
 | windmill.lsp.autoscaling.targetCPUUtilizationPercentage | int | `80` | target CPU utilization |
+| windmill.lsp.extraEnv | list | `[]` | Extra environment variables to apply to the pods |
 | windmill.lsp.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.lsp.resources | object | `{}` | Resource limits and requests for the pods |
 | windmill.lsp.tolerations | list | `[]` | Tolerations to apply to the pods |
@@ -81,6 +88,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.tag | string | `""` | windmill app image tag, will use the App version if not defined |
 | windmill.workerGroups[0].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[0].annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.workerGroups[0].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
 | windmill.workerGroups[0].name | string | `"gpu"` |  |
 | windmill.workerGroups[0].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.workerGroups[0].replicas | int | `1` |  |
@@ -92,9 +100,41 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workers.autoscaling.enabled | bool | `false` | will not benefit from the global cache and the performances will be poor for newly spawned pods |
 | windmill.workers.autoscaling.maxReplicas | int | `10` | maximum autoscaler replicas |
 | windmill.workers.autoscaling.targetCPUUtilizationPercentage | int | `80` | target CPU utilization |
+| windmill.workers.extraEnv | list | `[]` | Extra environment variables to apply to the pods |
 | windmill.workers.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.workers.resources | object | `{}` | Resource limits and requests for the pods |
 | windmill.workers.tolerations | list | `[]` | Tolerations to apply to the pods |
+
+## Keeping the PostgreSQL password secret
+
+If you would prefer to keep the PostgreSQL password or connection string out of the Helm values, there are two different possible approaches:
+
+1. Use `windmill.databaseUrlSecretName` to point at a Secret with a `url` key containing the entire database connection string.
+
+2. Use `windmill.databaseUrl` with [Dependent Environment Variables](https://kubernetes.io/docs/tasks/inject-data-application/define-interdependent-environment-variables/) together with `windmill.app.extraEnv` and `windmill.workers.extraEnv`.
+
+An example of the second approach might use Helm values similar to this:
+
+```yaml
+windmill:
+  databaseUrl: "postgres://windmill:$(DATABASE_PASSWORD)@windmill-postgres/windmill?sslmode=require"
+
+  workers:
+    extraEnv:
+    - name: DATABASE_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: windmill-postgres
+          key: password
+
+  app:
+    extraEnv:
+    - name: DATABASE_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: windmill-postgres
+          key: password
+```
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)

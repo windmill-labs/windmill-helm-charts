@@ -49,10 +49,21 @@ spec:
         - containerPort: 8000
         - containerPort: 8001
         env:
+        {{- with .Values.windmill.workers.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         - name : "METRICS_ADDR"
           value: "true"
+        {{ if .Values.windmill.databaseUrlSecretName }}
+        - name: "DATABASE_URL"
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Values.windmill.databaseUrlSecretName }}"
+                key: url
+        {{ else }}
         - name: "DATABASE_URL"
           value: "{{ .Values.windmill.databaseUrl }}"
+        {{ end }}
         - name: "BASE_URL"
           value: "{{ .Values.windmill.baseProtocol }}://{{ .Values.windmill.baseDomain }}"
         - name: "BASE_INTERNAL_URL"
@@ -187,6 +198,7 @@ spec:
 {{ toYaml . | indent 8 }}       
 {{- end }}   
     spec:
+      serviceAccountName: {{ template "windmill.serviceAccountName" $ }}
       containers:
       - name: windmill-worker
        {{ if  $.Values.enterprise.nsjail }}
@@ -207,6 +219,9 @@ spec:
         - containerPort: 8000
         - containerPort: 8001
         env:
+        {{- with $v.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         - name : "METRICS_ADDR"
           value: "true"
         - name: "DATABASE_URL"
