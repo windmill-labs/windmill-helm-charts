@@ -9,6 +9,17 @@ postgresql:
     postgresPassword: windmill
     database: windmill
 
+minio:
+  # -- enabled included Minio operator for s3 resource demo purposes
+  enabled: false
+  fullnameOverride: windmill-minio
+  mode: standalone
+  primary:
+    enabled: true
+  auth:
+    rootUser: windmill
+    rootPassword: windmill
+
 windmill:
   # -- windmill app image tag, will use the App version if not defined
   tag: ""

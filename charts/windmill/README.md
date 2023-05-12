@@ -1,6 +1,8 @@
 # windmill
 
-![Version: 1.4.18](https://img.shields.io/badge/Version-1.4.18-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.99.0](https://img.shields.io/badge/AppVersion-1.99.0-informational?style=flat-square)
+
+![Version: 1.4.22](https://img.shields.io/badge/Version-1.4.22-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.99.0](https://img.shields.io/badge/AppVersion-1.99.0-informational?style=flat-square)
+
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -20,6 +22,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
 | Repository | Name | Version |
 |------------|------|---------|
+| https://charts.bitnami.com/bitnami | minio | 12.4.2 |
 | https://charts.bitnami.com/bitnami | postgresql | 12.3.1 |
 
 ## Values
@@ -35,6 +38,12 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | ingress.enabled | bool | `true` | enable/disable included ingress resource |
 | ingress.tls | list | `[]` | TLS config for the ingress resource. Useful when using cert-manager and nginx-ingress |
 | lsp | string | `"latest"` | lsp image tag |
+| minio.auth.rootPassword | string | `"windmill"` |  |
+| minio.auth.rootUser | string | `"windmill"` |  |
+| minio.enabled | bool | `false` | enabled included Minio operator for s3 resource demo purposes |
+| minio.fullnameOverride | string | `"windmill-minio"` |  |
+| minio.mode | string | `"standalone"` |  |
+| minio.primary.enabled | bool | `true` |  |
 | postgresql.auth.database | string | `"windmill"` |  |
 | postgresql.auth.postgresPassword | string | `"windmill"` |  |
 | postgresql.enabled | bool | `true` | enabled included Postgres container for demo purposes only using bitnami |

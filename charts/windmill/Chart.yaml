@@ -1,14 +1,17 @@
 apiVersion: v2
 name: windmill
 type: application
-version: 1.4.21
+version: 1.4.22
 appVersion: 1.99.0
-
 dependencies:
   - condition: postgresql.enabled
     name: postgresql
     repository: https://charts.bitnami.com/bitnami
     version: 12.3.1
+  - condition: minio.enabled
+    name: minio
+    repository: https://charts.bitnami.com/bitnami
+    version: 12.4.2
 deprecated: false
 description: Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 home: https://www.windmill.dev/
