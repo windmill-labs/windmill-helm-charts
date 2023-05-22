@@ -57,8 +57,9 @@ windmill:
   # -- pass the npm for private registries
   npmConfigRegistry: ""
   # -- send instance events to a webhook. Can be hooked back to windmill
-
   instanceEventsWebhook: ""
+  # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
+  exposeHostDocker: false
 
   # extra worker groups
   workerGroups:

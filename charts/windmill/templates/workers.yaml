@@ -29,12 +29,20 @@ spec:
 {{ toYaml . | indent 8 }}       
 {{- end }}   
     spec:
+      {{ if .Values.windmill.exposeHostDocker }}
+      volumes:
+        - name: docker-sock
+          hostPath:
+            path: "/var/run/docker.sock"
+            type: File
+      {{ end }}
       containers:
       - name: windmill-worker
-       {{ if  .Values.enterprise.nsjail }}
+       {{ if or (.Values.enterprise.nsjail) (.Values.windmill.exposeHostDocker) }}
        #because nsjail requires privileged access
         securityContext:
           privileged: true
+          runAsUser: 0
         {{ else }}
         securityContext:
           runAsUser: 0
@@ -48,6 +56,12 @@ spec:
         ports:
         - containerPort: 8000
         - containerPort: 8001
+        {{ if .Values.windmill.exposeHostDocker }}
+        volumeMounts:
+          - mountPath: /var/run/docker.sock
+            name: docker-sock
+            readOnly: false
+        {{ end }}
         env:
         {{- with .Values.windmill.workers.extraEnv }}
         {{- toYaml . | nindent 8 }}
