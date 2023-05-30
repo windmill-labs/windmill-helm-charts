@@ -36,6 +36,7 @@ spec:
             path: "/var/run/docker.sock"
             type: File
       {{ end }}
+      serviceAccountName: {{ template "windmill.serviceAccountName" . }}
       containers:
       - name: windmill-worker
        {{ if or (.Values.enterprise.nsjail) (.Values.windmill.exposeHostDocker) }}
