@@ -35,6 +35,16 @@ spec:
     - host: {{ .Values.windmill.baseDomain | quote }}
       http:
         paths:
+          - path: /ws_mp/
+            pathType: Prefix
+            backend:
+              service:
+                name: windmill-multiplayer
+                port:
+                  number: 3002
+    - host: {{ .Values.windmill.baseDomain | quote }}
+      http:
+        paths:
           - path: /
             pathType: Prefix
             backend:

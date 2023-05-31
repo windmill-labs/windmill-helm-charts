@@ -29,6 +29,8 @@ windmill:
   workerReplicas: 2
   # -- replicas for the lsp containers used by the app
   lspReplicas: 2
+  # -- replicas for the lsp containers used by the app
+  multiplayerReplicas: 2
   # -- name of the secret storing the database URI, take precedence over databaseUrl. The key of the url is 'url'
   databaseUrlSecretName: ""
   # -- Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container
@@ -173,6 +175,34 @@ windmill:
       # -- target CPU utilization
       targetCPUUtilizationPercentage: 80
 
+  # multiplayer configuration
+  multiplayer:
+    # -- Annotations to apply to the pods
+    annotations: {}
+
+    # -- Node selector to use for scheduling the pods
+    nodeSelector: {}
+
+    # -- Tolerations to apply to the pods
+    tolerations: []
+
+    # -- Affinity rules to apply to the pods
+    affinity: {}
+
+    # -- Resource limits and requests for the pods
+    resources: {}
+
+    # -- Extra environment variables to apply to the pods
+    extraEnv: []
+
+    # lsp autoscaling configuration
+    autoscaling:
+      # -- enable or disable autoscaling
+      enabled: false
+      # -- maximum autoscaler replicas
+      maxReplicas: 10
+      # -- target CPU utilization
+      targetCPUUtilizationPercentage: 80
 # -- lsp image tag
 lsp: "latest"
 

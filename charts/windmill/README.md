@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 1.5.0](https://img.shields.io/badge/Version-1.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.103.0](https://img.shields.io/badge/AppVersion-1.103.0-informational?style=flat-square)
+![Version: 1.5.5](https://img.shields.io/badge/Version-1.5.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.108.0](https://img.shields.io/badge/AppVersion-1.108.0-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -76,6 +76,16 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.lsp.resources | object | `{}` | Resource limits and requests for the pods |
 | windmill.lsp.tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.lspReplicas | int | `2` | replicas for the lsp containers used by the app |
+| windmill.multiplayer.affinity | object | `{}` | Affinity rules to apply to the pods |
+| windmill.multiplayer.annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.multiplayer.autoscaling.enabled | bool | `false` | enable or disable autoscaling |
+| windmill.multiplayer.autoscaling.maxReplicas | int | `10` | maximum autoscaler replicas |
+| windmill.multiplayer.autoscaling.targetCPUUtilizationPercentage | int | `80` | target CPU utilization |
+| windmill.multiplayer.extraEnv | list | `[]` | Extra environment variables to apply to the pods |
+| windmill.multiplayer.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
+| windmill.multiplayer.resources | object | `{}` | Resource limits and requests for the pods |
+| windmill.multiplayer.tolerations | list | `[]` | Tolerations to apply to the pods |
+| windmill.multiplayerReplicas | int | `2` | replicas for the lsp containers used by the app |
 | windmill.npmConfigRegistry | string | `""` | pass the npm for private registries |
 | windmill.numWorkers | int | `1` | workers per worker container, default and recommended is 1 to isolate one process per container, sets NUM_WORKER environment variable for worker container.  app container has 0 NUM_WORKERS by default |
 | windmill.oauthConfig | string | `"{}\n"` | raw oauth config. See https://docs.windmill.dev/docs/misc/setup_oauth |
