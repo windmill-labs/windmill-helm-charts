@@ -81,8 +81,6 @@ spec:
         {{ end }}
         - name: "BASE_URL"
           value: "{{ .Values.windmill.baseProtocol }}://{{ .Values.windmill.baseDomain }}"
-        - name: "BASE_INTERNAL_URL"
-          value: "http://windmill-app:8000"
         - name: "RUST_LOG"
           value: "{{ .Values.windmill.rustLog }}"
         - name: "NUM_WORKERS"
@@ -243,8 +241,6 @@ spec:
           value: "{{ $.Values.windmill.databaseUrl }}"
         - name: "BASE_URL"
           value: "{{ $.Values.windmill.baseProtocol }}://{{ $.Values.windmill.baseDomain }}"
-        - name: "BASE_INTERNAL_URL"
-          value: "http://windmill-app:8000"
         - name: "RUST_LOG"
           value: "{{ $.Values.windmill.rustLog }}"
         - name: "NUM_WORKERS"
