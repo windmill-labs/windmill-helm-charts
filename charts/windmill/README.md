@@ -49,6 +49,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | postgresql.primary.persistence.enabled | bool | `true` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |
+| serviceAccount.annotations | object | `{}` | Annotations to apply to the serviceAccount |
 | windmill.app.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.app.annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.app.autoscaling.enabled | bool | `false` | enable or disable autoscaling |
