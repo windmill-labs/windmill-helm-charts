@@ -83,6 +83,11 @@ windmill:
   workerReplicas: 2
   # replicas for the lsp containers used by the app
   lspReplicas: 2
+  # add additional worker groups
+  workerGroups:
+  # workers configuration
+  - name: "gpu"
+    ...
   # windmill app image tag
   image: "main"
   ...
@@ -94,12 +99,6 @@ postgresql:
 # enable minio (bitnami) on kubernetes
 minio:
   enabled: true
-
-# add additional worker groups
-workerGroups:
-  # workers configuration
-  - name: "gpu"
-    ...
 
 # Configure Ingress
 ingress:
