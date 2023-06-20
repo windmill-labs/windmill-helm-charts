@@ -27,7 +27,7 @@ spec:
         container: windmill-multiplayer
 {{- with .Values.windmill.multiplayer.annotations }}
       annotations:
-{{ toYaml . | indent 8 }}       
+{{ toYaml . | indent 8 }}
 {{- end }}
     spec:
       containers:
