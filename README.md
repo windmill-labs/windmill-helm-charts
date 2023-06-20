@@ -54,7 +54,15 @@ Follow those
 To make it work on a local minkube to test. Get the ip address of the ingress:
 
 ```
-kubectl get ingress -n windmill
+▶ kubectl get ingress -n windmill
+NAME       CLASS    HOSTS                        ADDRESS        PORTS   AGE
+windmill   <none>   windmill,windmill,windmill   192.168.49.2   80      13m
+```
+
+If not ip address is displayed, enable the ingress addon:
+
+```
+minikube addons enable ingress
 ```
 
 Then modify /etc/hosts to match the `baseDomain`, by default 'windmill'.
