@@ -105,7 +105,7 @@ spec:
       - name: oauth-volume
         secret:
           secretName: {{ if .Values.windmill.oauthSecretName }}{{ .Values.windmill.oauthSecretName }}{{ else }} {{ .Release.Name }}-oauth-secret {{- end }}
-    {{- with .Values.windmill.app.nodeSelector }}
+{{- with .Values.windmill.app.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
     {{- end }}

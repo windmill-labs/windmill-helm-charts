@@ -39,6 +39,11 @@ spec:
       serviceAccountName: {{ template "windmill.serviceAccountName" . }}
       containers:
       - name: windmill-worker
+        volumeMounts:
+        - name: oauth-volume
+          mountPath: /usr/src/app/oauth.json
+          subPath: oauth.json
+          readOnly: true
        {{ if or (.Values.enterprise.nsjail) (.Values.windmill.exposeHostDocker) }}
        #because nsjail requires privileged access
         securityContext:
@@ -119,7 +124,11 @@ spec:
         {{ end }}
         resources:
 {{ toYaml .Values.windmill.workers.resources | indent 12 }}
-    {{- with .Values.windmill.workers.nodeSelector }}
+      volumes:
+      - name: oauth-volume
+        secret:
+          secretName: {{ if .Values.windmill.oauthSecretName }}{{ .Values.windmill.oauthSecretName }}{{ else }} {{ .Release.Name }}-oauth-secret {{- end }}
+{{- with .Values.windmill.workers.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
     {{- end }}
