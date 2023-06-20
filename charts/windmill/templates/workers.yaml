@@ -111,7 +111,7 @@ spec:
           value: "{{ .Values.windmill.npmConfigRegistry }}"
         {{ end }}
         {{ if .Values.enterprise.enabled }}
-         - name: "LICENSE_KEY"
+        - name: "LICENSE_KEY"
           value: "{{ .Values.enterprise.licenseKey }}"
         {{ if .Values.enterprise.enabledS3DistributedCache }}
         - name: "S3_CACHE_BUCKET"
@@ -277,11 +277,11 @@ spec:
           value: "{{ $.Values.windmill.npmConfigRegistry }}"
         {{ end }}
         {{ if $.Values.enterprise.enabled }}
-         - name: "LICENSE_KEY"
+        - name: "LICENSE_KEY"
           value: "{{ $.Values.enterprise.licenseKey }}"
         {{ if $.Values.enterprise.enabledS3DistributedCache }}
         - name: "S3_CACHE_BUCKET"
-          value: "{{ $.Values.enterprise.s3CacheBucket }}"
+          value: "{{ .Values.enterprise.s3CacheBucket }}"
         - name: "RCLONE_S3_PROVIDER"
           value: "AWS"
         {{ end }}

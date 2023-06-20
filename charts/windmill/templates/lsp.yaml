@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
       - name: windmill-lsp
-        image: ghcr.io/windmill-labs/windmill-lsp:{{ .Values.lsp }}
+        image: ghcr.io/windmill-labs/windmill-lsp:{{ .Values.windmill.lsp.tag }}
         imagePullPolicy: Always
         ports:
         - containerPort: 3001

@@ -148,6 +148,7 @@ windmill:
 
   # lsp configuration
   lsp:
+    tag: "latest"
     # -- Annotations to apply to the pods
     annotations: {}
 
@@ -177,6 +178,7 @@ windmill:
 
   # multiplayer configuration
   multiplayer:
+    tag: "latest"
     # -- Annotations to apply to the pods
     annotations: {}
 
@@ -203,8 +205,6 @@ windmill:
       maxReplicas: 10
       # -- target CPU utilization
       targetCPUUtilizationPercentage: 80
-# -- lsp image tag
-lsp: "latest"
 
 ingress:
   # -- enable/disable included ingress resource
