@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 1.5.5](https://img.shields.io/badge/Version-1.5.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.108.0](https://img.shields.io/badge/AppVersion-1.108.0-informational?style=flat-square)
+![Version: 1.6.19](https://img.shields.io/badge/Version-1.6.19-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.117.0](https://img.shields.io/badge/AppVersion-1.117.0-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -28,6 +28,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | enterprise.enabled | bool | `false` | enable Windmill Enterprise , requires license key. |
+| enterprise.enabledS3DistributedCache | bool | `false` |  |
 | enterprise.licenseKey | string | `"123456F"` | Windmill provided Enterprise license key. Sets LICENSE_KEY environment variable in app and worker container. |
 | enterprise.nsjail | bool | `false` | use nsjail for sandboxing |
 | enterprise.s3CacheBucket | string | `"mybucketname"` | S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container |
@@ -47,9 +48,9 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | postgresql.enabled | bool | `true` | enabled included Postgres container for demo purposes only using bitnami |
 | postgresql.fullnameOverride | string | `"windmill-postgresql"` |  |
 | postgresql.primary.persistence.enabled | bool | `true` |  |
+| serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |
-| serviceAccount.annotations | object | `{}` | Annotations to apply to the serviceAccount |
 | windmill.app.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.app.annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.app.autoscaling.enabled | bool | `false` | enable or disable autoscaling |

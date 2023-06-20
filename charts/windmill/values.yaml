@@ -217,6 +217,7 @@ ingress:
 enterprise:
   # -- enable Windmill Enterprise , requires license key.
   enabled: false
+  enabledS3DistributedCache: false
   # -- S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container
   s3CacheBucket: mybucketname
   # -- Windmill provided Enterprise license key. Sets LICENSE_KEY environment variable in app and worker container.
