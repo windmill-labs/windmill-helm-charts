@@ -28,14 +28,14 @@
 
 ```sh
 helm repo add windmill https://windmill-labs.github.io/windmill-helm-charts/
-helm install mywindmill windmill/windmill -n windmill --create-namespace --values values.yamls
+helm install mywindmill windmill/windmill -n windmill --create-namespace --values values.yaml
 ```
 
 To update versions:
 
 ```
 helm repo update windmill
-helm upgrade mywindmill windmill/windmill -n windmill --values values.yamls
+helm upgrade mywindmill windmill/windmill -n windmill --values values.yaml
 ```
 
 You do not need to provide a values.yaml to be able to test it on minikube.
@@ -235,6 +235,17 @@ def main():
 
 ## Enterprise features
 
+To use the enterprise version with the <license key> provided upon subscription,
+add the following to the values.yaml file:
+
+```
+enterprise:
+  enabled: true
+  licenseKey: <license key>
+```
+
+### S3 Cache
+
 Enterprise users can use S3 storage for dependency caching for performance.
 Cache is two way synced at regular intervals (10 minutes). To use it, the worker
 deployment requires access to an S3 bucket. There are several ways to do this:
@@ -254,6 +265,16 @@ deployment requires access to an S3 bucket. There are several ways to do this:
 
 The sync relies on rclone and uses its methods of authentication to s3 per
 [Rclone documentation](https://rclone.org/s3/#authentication)
+
+Then the values settings become:
+
+```
+enterprise:
+  enabled: true
+  licenseKey: <license key>
+  enabledS3DistributedCache: true
+  s3CacheBucket: mybucketname
+```
 
 ## Caveats
 
