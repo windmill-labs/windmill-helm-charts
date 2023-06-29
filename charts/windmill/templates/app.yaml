@@ -97,6 +97,20 @@ spec:
         - name: "LICENSE_KEY"
           value: "{{ .Values.enterprise.licenseKey }}"
         {{ end }}
+        {{ if .Values.windmill.smtp.enabled }}
+        - name: "SMTP_HOST"
+          value: "{{ .Values.windmill.smtp.host }}"
+        - name: "SMTP_USERNAME"
+          value: "{{ .Values.windmill.smtp.username }}"
+        - name: "SMTP_PASSWORD"
+          value: "{{ .Values.windmill.smtp.password }}"
+        - name: "SMTP_FROM"
+          value: "{{ .Values.windmill.smtp.from }}"
+        - name: "SMTP_TLS_IMPLICIT"
+          value: "{{ .Values.windmill.smtp.tls_implicit }}"
+        - name: "SMTP_PORT"
+          value: "{{ .Values.windmill.smtp.port }}"
+        {{ end }}
         - name: "CUSTOM_TAGS"
           value: "{{- range $v := .Values.windmill.workerGroups }}{{ $v.name }},{{ end}}"
         resources:

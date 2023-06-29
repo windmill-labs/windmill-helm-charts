@@ -63,6 +63,16 @@ windmill:
   # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
   exposeHostDocker: false
 
+  # -- set smtp configs for windmill to be able to send emails when adding users to instance and workspaces
+  smtp:
+    enabled: false
+    host: smtp.gmail.com
+    port: 587
+    from: noreply@windmill.dev
+    username: ruben@windmill.dev
+    password: bar
+    tls_implicit: false
+
   # extra worker groups
   workerGroups:
     # workers configuration
