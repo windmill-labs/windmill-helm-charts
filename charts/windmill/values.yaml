@@ -62,7 +62,10 @@ windmill:
   instanceEventsWebhook: ""
   # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
   exposeHostDocker: false
-
+  # -- if set, the path to a script in the admins workspace that will be triggered upon any jobs failure
+  globalErrorHandlerPath: ""
+  # -- is any user allowed to create workspaces
+  createWorkspaceRequireSuperadmin: false
   # -- set smtp configs for windmill to be able to send emails when adding users to instance and workspaces
   smtp:
     enabled: false

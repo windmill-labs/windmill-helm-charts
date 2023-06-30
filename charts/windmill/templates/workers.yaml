@@ -110,6 +110,10 @@ spec:
         - name: "NPM_CONFIG_REGISTRY"
           value: "{{ .Values.windmill.npmConfigRegistry }}"
         {{ end }}
+        {{ if .Values.windmill.globalErrorHandlerPath }}
+        - name: "GLOBAL_ERROR_HANDLER_PATH_IN_ADMINS_WORKSPACE"
+          value: "{{ .Values.windmill.globalErrorHandlerPath }}"
+        {{ end }}
         {{ if .Values.enterprise.enabled }}
         - name: "LICENSE_KEY"
           value: "{{ .Values.enterprise.licenseKey }}"
@@ -267,6 +271,10 @@ spec:
         {{ if $.Values.windmill.pipExtraIndexUrl }}
         - name: "PIP_EXTRA_INDEX_URL"
           value: "{{ $.Values.windmill.pipExtraIndexUrl }}"
+        {{ end }}
+        {{ if $.Values.windmill.globalErrorHandlerPath }}
+        - name: "GLOBAL_ERROR_HANDLER_PATH_IN_ADMINS_WORKSPACE"
+          value: "{{ $.Values.windmill.globalErrorHandlerPath }}"
         {{ end }}
         {{ if $.Values.windmill.pipTrustedHost }}
         - name: "PIP_TRUSTED_HOST"
