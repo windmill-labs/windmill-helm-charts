@@ -54,9 +54,9 @@ spec:
           runAsUser: 0
         {{end}}
         {{ if .Values.enterprise.enabled }}
-        image: ghcr.io/windmill-labs/windmill-ee:{{ default .Chart.AppVersion .Values.windmill.tag }}
+        image: {{ default "ghcr.io/windmill-labs/windmill-ee" .Values.windmill.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
         {{ else }}
-        image: ghcr.io/windmill-labs/windmill:{{ default .Chart.AppVersion .Values.windmill.tag }}
+        image: {{ default "ghcr.io/windmill-labs/windmill" .Values.windmill.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
         {{ end }}
         imagePullPolicy: Always
         ports:
@@ -238,9 +238,9 @@ spec:
           runAsUser: 0
         {{end}}
         {{ if $.Values.enterprise.enabled }}
-        image: ghcr.io/windmill-labs/windmill-ee:{{ default $.Chart.AppVersion $.Values.windmill.tag }}
+        image: {{ default "ghcr.io/windmill-labs/windmill-ee" $.Values.windmill.image }}:{{ default $.Chart.AppVersion $.Values.windmill.tag }}
         {{ else }}
-        image: ghcr.io/windmill-labs/windmill:{{ default $.Chart.AppVersion $.Values.windmill.tag }}
+        image: {{ default "ghcr.io/windmill-labs/windmill" $.Values.windmill.image }}:{{ default $.Chart.AppVersion $.Values.windmill.tag }}
         {{ end }}
         imagePullPolicy: Always
         ports:

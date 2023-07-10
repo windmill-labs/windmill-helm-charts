@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 1.6.32](https://img.shields.io/badge/Version-1.6.32-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.124.0](https://img.shields.io/badge/AppVersion-1.124.0-informational?style=flat-square)
+![Version: 1.6.34](https://img.shields.io/badge/Version-1.6.34-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.127.0](https://img.shields.io/badge/AppVersion-1.127.0-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -68,6 +68,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.databaseUrlSecretName | string | `""` | name of the secret storing the database URI, take precedence over databaseUrl. The key of the url is 'url' |
 | windmill.exposeHostDocker | bool | `false` | mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon |
 | windmill.globalErrorHandlerPath | string | `""` | if set, the path to a script in the admins workspace that will be triggered upon any jobs failure |
+| windmill.image | string | `""` | windmill image tag, will use the Acorresponding ee or ce image from ghcr if not defined. Do not include tag in the image name. |
 | windmill.instanceEventsWebhook | string | `""` | send instance events to a webhook. Can be hooked back to windmill |
 | windmill.lsp.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.lsp.annotations | object | `{}` | Annotations to apply to the pods |

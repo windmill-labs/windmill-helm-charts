@@ -23,6 +23,8 @@ minio:
 windmill:
   # -- windmill app image tag, will use the App version if not defined
   tag: ""
+  # -- windmill image tag, will use the Acorresponding ee or ce image from ghcr if not defined. Do not include tag in the image name.
+  image: ""
   # -- replica for the application app
   appReplicas: 2
   # -- replicas for the workers, jobs are executed on the workers
