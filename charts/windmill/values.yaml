@@ -237,6 +237,8 @@ enterprise:
   s3CacheBucket: mybucketname
   # -- Windmill provided Enterprise license key. Sets LICENSE_KEY environment variable in app and worker container.
   licenseKey: 123456F
+  # -- SAML Metadata URL to enable SAML SSO
+  samlMetadata: ""
   # -- use nsjail for sandboxing
   nsjail: false
 
