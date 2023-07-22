@@ -101,6 +101,10 @@ spec:
         - name: "SAML_METADATA"
           value: "{{ .Values.enterprise.samlMetadata }}"
         {{ end }}
+        {{ if .Values.enterprise.scimToken}}
+        - name: "SCIM_TOKEN"
+          value: "{{ .Values.enterprise.scimToken }}"
+        {{ end }}
         {{ if .Values.windmill.createWorkspaceRequireSuperadmin }}
         - name: "CREATE_WORKSPACE_REQUIRE_SUPERADMIN"
           value: "{{ .Values.windmill.createWorkspaceRequireSuperadmin}}"

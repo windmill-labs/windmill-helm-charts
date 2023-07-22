@@ -239,6 +239,7 @@ enterprise:
   licenseKey: 123456F
   # -- SAML Metadata URL to enable SAML SSO
   samlMetadata: ""
+  scimToken: ""
   # -- use nsjail for sandboxing
   nsjail: false
 
