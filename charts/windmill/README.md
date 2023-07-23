@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 1.6.34](https://img.shields.io/badge/Version-1.6.34-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.127.0](https://img.shields.io/badge/AppVersion-1.127.0-informational?style=flat-square)
+![Version: 1.6.44](https://img.shields.io/badge/Version-1.6.44-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.135.0](https://img.shields.io/badge/AppVersion-1.135.0-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -32,6 +32,8 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | enterprise.licenseKey | string | `"123456F"` | Windmill provided Enterprise license key. Sets LICENSE_KEY environment variable in app and worker container. |
 | enterprise.nsjail | bool | `false` | use nsjail for sandboxing |
 | enterprise.s3CacheBucket | string | `"mybucketname"` | S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container |
+| enterprise.samlMetadata | string | `""` | SAML Metadata URL to enable SAML SSO |
+| enterprise.scimToken | string | `""` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
 | ingress.enabled | bool | `true` | enable/disable included ingress resource |
