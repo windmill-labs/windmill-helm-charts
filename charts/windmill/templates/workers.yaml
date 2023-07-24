@@ -29,13 +29,6 @@ spec:
 {{ toYaml . | indent 8 }}       
 {{- end }}   
     spec:
-      {{ if .Values.windmill.exposeHostDocker }}
-      volumes:
-        - name: docker-sock
-          hostPath:
-            path: "/var/run/docker.sock"
-            type: File
-      {{ end }}
       serviceAccountName: {{ template "windmill.serviceAccountName" . }}
       containers:
       - name: windmill-worker
@@ -134,6 +127,12 @@ spec:
       - name: oauth-volume
         secret:
           secretName: {{ if .Values.windmill.oauthSecretName }}{{ .Values.windmill.oauthSecretName }}{{ else }} {{ .Release.Name }}-oauth-secret {{- end }}
+    {{ if .Values.windmill.exposeHostDocker }}
+      - name: docker-sock
+        hostPath:
+          path: "/var/run/docker.sock"
+          type: File
+    {{ end }}
 {{- with .Values.windmill.workers.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
@@ -302,6 +301,16 @@ spec:
           value: "{{ $v.name }}"
         resources:
 {{ toYaml $v.resources | indent 12 }}
+      volumes:
+      - name: oauth-volume
+        secret:
+          secretName: {{ if $.Values.windmill.oauthSecretName }}{{ $.Values.windmill.oauthSecretName }}{{ else }} {{ $.Release.Name }}-oauth-secret {{- end }}
+    {{ if $.Values.windmill.exposeHostDocker }}
+      - name: docker-sock
+        hostPath:
+          path: "/var/run/docker.sock"
+          type: File
+    {{ end }}
     {{- with $v.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
