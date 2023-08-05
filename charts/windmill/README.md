@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 1.6.44](https://img.shields.io/badge/Version-1.6.44-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.135.0](https://img.shields.io/badge/AppVersion-1.135.0-informational?style=flat-square)
+![Version: 1.6.53](https://img.shields.io/badge/Version-1.6.53-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.141.0](https://img.shields.io/badge/AppVersion-1.141.0-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -68,6 +68,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.createWorkspaceRequireSuperadmin | bool | `false` | is any user allowed to create workspaces |
 | windmill.databaseUrl | string | `"postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container |
 | windmill.databaseUrlSecretName | string | `""` | name of the secret storing the database URI, take precedence over databaseUrl. The key of the url is 'url' |
+| windmill.denoExtraImportMap | string | `""` | custom deno extra import maps (syntax: `key1=value1,key2=value2`) |
 | windmill.exposeHostDocker | bool | `false` | mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon |
 | windmill.globalErrorHandlerPath | string | `""` | if set, the path to a script in the admins workspace that will be triggered upon any jobs failure |
 | windmill.image | string | `""` | windmill image tag, will use the Acorresponding ee or ce image from ghcr if not defined. Do not include tag in the image name. |

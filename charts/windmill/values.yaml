@@ -68,6 +68,8 @@ windmill:
   globalErrorHandlerPath: ""
   # -- is any user allowed to create workspaces
   createWorkspaceRequireSuperadmin: false
+  # -- custom deno extra import maps (syntax: `key1=value1,key2=value2`)
+  denoExtraImportMap: ""
   # -- set smtp configs for windmill to be able to send emails when adding users to instance and workspaces
   smtp:
     enabled: false

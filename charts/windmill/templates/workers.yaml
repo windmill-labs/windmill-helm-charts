@@ -99,6 +99,10 @@ spec:
         - name: "PIP_TRUSTED_HOST"
           value: "{{ .Values.windmill.pipTrustedHost }}"
         {{ end }}
+        {{ if .Values.windmill.denoExtraImportMap }}
+        - name: "DENO_EXTRA_IMPORT_MAP"
+          value: "{{ .Values.windmill.denoExtraImportMap }}"
+        {{ end }}
         {{ if .Values.windmill.npmConfigRegistry }}
         - name: "NPM_CONFIG_REGISTRY"
           value: "{{ .Values.windmill.npmConfigRegistry }}"
@@ -278,6 +282,10 @@ spec:
         {{ if $.Values.windmill.pipTrustedHost }}
         - name: "PIP_TRUSTED_HOST"
           value: "{{ $.Values.windmill.pipTrustedHost }}"
+        {{ end }}
+        {{ if $.Values.windmill.denoExtraImportMap }}
+        - name: "DENO_EXTRA_IMPORT_MAP"
+          value: "{{ $.Values.windmill.denoExtraImportMap }}"
         {{ end }}
         {{ if $.Values.windmill.npmConfigRegistry }}
         - name: "NPM_CONFIG_REGISTRY"
