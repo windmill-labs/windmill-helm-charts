@@ -375,9 +375,12 @@ your environment. If you don't want to use the included ingress and roll your
 own, you can just disable it. Overall, you want the following endpoints
 accessible included in the chart:
 
-windmill app on port 8000 lsp application on port 3001 metrics endpoints on port
-8001 for the app/app and workers If you are using Prometheus, you can scrape the
-windmill-app-metrics service on port 8001 at /metrics endpoint to gather stats
-about the Windmill application.
+- windmill app on port 8000
+- lsp application on port 3001
+- metrics endpoints on port 8001 for the app and workers (ee only)
 
-A ServiceMonitor is included in the chart for Prometheus Operator users.
+If you are using Prometheus and if the enterprise edition is enabled, you can
+scrape the windmill-app-metrics service on port 8001 at /metrics endpoint to
+gather stats about the Windmill application.
+
+<!--

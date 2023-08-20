@@ -69,8 +69,10 @@ spec:
         {{- with .Values.windmill.app.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{ if .Values.enterprise.enabled }}
         - name : "METRICS_ADDR"
           value: "true"
+        {{ end }}
         {{ if .Values.windmill.databaseUrlSecretName }}
         - name: "DATABASE_URL"
           valueFrom:

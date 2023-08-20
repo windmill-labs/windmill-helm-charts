@@ -65,8 +65,10 @@ spec:
         {{- with .Values.windmill.workers.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{ if .Values.enterprise.enabled }}
         - name : "METRICS_ADDR"
           value: "true"
+        {{ end }}
         {{ if .Values.windmill.databaseUrlSecretName }}
         - name: "DATABASE_URL"
           valueFrom:
@@ -253,8 +255,10 @@ spec:
         {{- with $v.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{ if $.Values.enterprise.enabled }}
         - name : "METRICS_ADDR"
           value: "true"
+        {{ end }}
         - name: "DATABASE_URL"
           value: "{{ $.Values.windmill.databaseUrl }}"
         - name: "BASE_URL"
