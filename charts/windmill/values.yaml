@@ -45,8 +45,6 @@ windmill:
   cookieDomain: ""
   # -- rust log level, set to debug for more information etc, sets RUST_LOG environment variable in app and worker container
   rustLog: info
-  # -- workers per worker container, default and recommended is 1 to isolate one process per container, sets NUM_WORKER environment variable for worker container.  app container has 0 NUM_WORKERS by default
-  numWorkers: 1
   # -- name of the secret storing the oauthConfig. See https://docs.windmill.dev/docs/misc/setup_oauth
   oauthSecretName: ""
   # -- raw oauth config. See https://docs.windmill.dev/docs/misc/setup_oauth
