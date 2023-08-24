@@ -121,16 +121,16 @@ windmill:
     # -- Extra environment variables to apply to the pods
     extraEnv: []
 
-    # workers autoscaling configuration
-    autoscaling:
-      # -- enable or disable autoscaling
-      # -- autoscaling is not recommended without using the enterprise edition since workers
-      # -- will not benefit from the global cache and the performances will be poor for newly spawned pods
-      enabled: false
-      # -- maximum autoscaler replicas
-      maxReplicas: 10
-      # -- target CPU utilization
-      targetCPUUtilizationPercentage: 80
+    # # workers autoscaling configuration
+    # autoscaling:
+    #   # -- enable or disable autoscaling
+    #   # -- autoscaling is not recommended without using the enterprise edition since workers
+    #   # -- will not benefit from the global cache and the performances will be poor for newly spawned pods
+    #   enabled: false
+    #   # -- maximum autoscaler replicas
+    #   maxReplicas: 10
+    #   # -- target CPU utilization
+    #   targetCPUUtilizationPercentage: 80
 
   # app configuration
   app:
