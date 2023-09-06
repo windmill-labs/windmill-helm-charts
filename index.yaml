@@ -3,6 +3,41 @@ entries:
   windmill:
   - apiVersion: v2
     appVersion: 1.168.2
+    created: "2023-09-06T13:51:33.925899782Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.3.1
+    - condition: minio.enabled
+      name: minio
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.4.2
+    description: Windmill - Turn scripts into endpoints, workflows and UIs in minutes
+    digest: 5ae076c617cff4d9b8f1303568bb9251b12ab9c2ca640893aeb8146ae40293af
+    home: https://www.windmill.dev/
+    icon: https://www.windmill.dev/img/windmill.svg
+    keywords:
+    - windmill
+    - scripts
+    - flows
+    - workflows
+    - internal
+    - apps
+    - open-source
+    maintainers:
+    - email: ruben@windmill.dev
+      name: windmill
+      url: https://www.windmill.dev/
+    name: windmill
+    sources:
+    - https://github.com/windmill-labs/windmill-helm-charts.git
+    type: application
+    urls:
+    - https://github.com/windmill-labs/windmill-helm-charts/releases/download/windmill-1.7.20/windmill-1.7.20.tgz
+    version: 1.7.20
+  - apiVersion: v2
+    appVersion: 1.168.2
     created: "2023-09-06T11:41:26.676643272Z"
     dependencies:
     - condition: postgresql.enabled
@@ -4406,4 +4441,4 @@ entries:
     urls:
     - https://github.com/windmill-labs/windmill-helm-charts/releases/download/windmill-0.1.0/windmill-0.1.0.tgz
     version: 0.1.0
-generated: "2023-09-06T11:41:26.677120413Z"
+generated: "2023-09-06T13:51:33.926262802Z"
