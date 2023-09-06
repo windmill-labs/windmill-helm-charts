@@ -101,6 +101,31 @@ windmill:
       # -- Extra environment variables to apply to the pods
       extraEnv: []
 
+  # extra worker groups
+  dedicatedWorkers:
+    # workers configuration
+    - name: "mydedicatedWorker"
+      # -- The script and its workspace to whom that worker is dedicated
+      dedicatedWorker: "workspace:f/foo/path"
+      replicas: 0
+      # -- Annotations to apply to the pods
+      annotations: {}
+
+      # -- Node selector to use for scheduling the pods
+      nodeSelector: {}
+
+      # -- Tolerations to apply to the pods
+      tolerations: []
+
+      # -- Affinity rules to apply to the pods
+      affinity: {}
+
+      # -- Resource limits and requests for the pods
+      resources: {}
+
+      # -- Extra environment variables to apply to the pods
+      extraEnv: []
+
   # workers configuration
   workers:
     # -- Annotations to apply to the pods

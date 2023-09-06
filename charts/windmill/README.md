@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 1.7.6](https://img.shields.io/badge/Version-1.7.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.156.0](https://img.shields.io/badge/AppVersion-1.156.0-informational?style=flat-square)
+![Version: 1.7.17](https://img.shields.io/badge/Version-1.7.17-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.168.0](https://img.shields.io/badge/AppVersion-1.168.0-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -68,6 +68,15 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.createWorkspaceRequireSuperadmin | bool | `false` | is any user allowed to create workspaces |
 | windmill.databaseUrl | string | `"postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container |
 | windmill.databaseUrlSecretName | string | `""` | name of the secret storing the database URI, take precedence over databaseUrl. The key of the url is 'url' |
+| windmill.dedicatedWorkers[0].affinity | object | `{}` | Affinity rules to apply to the pods |
+| windmill.dedicatedWorkers[0].annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.dedicatedWorkers[0].dedicatedWorker | string | `"workspace:f/foo/path"` | The script and its workspace to whom that worker is dedicated |
+| windmill.dedicatedWorkers[0].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
+| windmill.dedicatedWorkers[0].name | string | `"mydedicatedWorker"` |  |
+| windmill.dedicatedWorkers[0].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
+| windmill.dedicatedWorkers[0].replicas | int | `0` |  |
+| windmill.dedicatedWorkers[0].resources | object | `{}` | Resource limits and requests for the pods |
+| windmill.dedicatedWorkers[0].tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.denoExtraImportMap | string | `""` | custom deno extra import maps (syntax: `key1=value1,key2=value2`) |
 | windmill.exposeHostDocker | bool | `false` | mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon |
 | windmill.globalErrorHandlerPath | string | `""` | if set, the path to a script in the admins workspace that will be triggered upon any jobs failure |
