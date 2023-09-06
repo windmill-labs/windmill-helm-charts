@@ -82,7 +82,7 @@ windmill:
   workerGroups:
     # workers configuration
     - name: "gpu"
-      replicas: 0
+      replicas: 2
       # -- Annotations to apply to the pods
       annotations: {}
 

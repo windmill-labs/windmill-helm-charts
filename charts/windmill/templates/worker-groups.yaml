@@ -1,5 +1,5 @@
 {{- range $v := .Values.windmill.workerGroups }}
-{{ if and $v.replicas (gt $v.replicas 0)}}
+{{ if and $v.replicas (gt (int $v.replicas) 0)}}
 ---
 apiVersion: apps/v1
 kind: Deployment
