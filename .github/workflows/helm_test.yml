@@ -44,11 +44,11 @@ jobs:
           helm repo update
 
       - name: Run chart-testing (lint)
-        run: ct lint --target-branch ${{ github.event.repository.default_branch }}
+        run:
+          ct lint --target-branch ${{ github.event.repository.default_branch }}
 
-      # Currently error in name resolution
-      # - name: Create kind cluster
-      #   uses: helm/kind-action@v1.4.0
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.4.0
 
-      # - name: Run chart-testing (install)
-      #   run: ct install --all
+      - name: Run chart-testing (install)
+        run: ct install --all
