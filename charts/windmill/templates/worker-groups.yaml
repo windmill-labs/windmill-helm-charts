@@ -113,7 +113,7 @@ spec:
           value: "false"
         {{ end }}
         {{ end }}
-        - name: "WORKER_TAGS"
+        - name: "WORKER_GROUP"
           value: "{{ $v.name }}"
         resources:
 {{ toYaml $v.resources | indent 12 }}
