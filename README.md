@@ -75,6 +75,8 @@ E.g:
 
 Then open your browser at <http://windmill>
 
+Even if you setup oauth, login as** admin@windmill.dev **/ changeme to setup the instance & accounts and give yourself admin privileges.
+
 ## Core Values
 
 ```yaml
