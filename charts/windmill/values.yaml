@@ -28,11 +28,9 @@ windmill:
   # -- replica for the application app
   appReplicas: 2
   # -- replicas for the workers, jobs are executed on the workers
-  workerReplicas: 2
-  # -- replicas for the lsp containers used by the app
   lspReplicas: 2
   # -- replicas for the lsp containers used by the app
-  multiplayerReplicas: 2
+  multiplayerReplicas: 1
   # -- name of the secret storing the database URI, take precedence over databaseUrl. The key of the url is 'url'
   databaseUrlSecretName: ""
   # -- Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container
@@ -45,11 +43,6 @@ windmill:
   cookieDomain: ""
   # -- rust log level, set to debug for more information etc, sets RUST_LOG environment variable in app and worker container
   rustLog: info
-  # -- name of the secret storing the oauthConfig. See https://docs.windmill.dev/docs/misc/setup_oauth
-  oauthSecretName: ""
-  # -- raw oauth config. See https://docs.windmill.dev/docs/misc/setup_oauth
-  oauthConfig: |
-    {}
   # -- pass the index url to pip for private registries
   pipIndexUrl: ""
   # -- pass the extra index url to pip for private registries
@@ -65,22 +58,40 @@ windmill:
   # -- if set, the path to a script in the admins workspace that will be triggered upon any jobs failure
   globalErrorHandlerPath: ""
   # -- is any user allowed to create workspaces
-  createWorkspaceRequireSuperadmin: false
+  createWorkspaceRequireSuperadmin: true
   # -- custom deno extra import maps (syntax: `key1=value1,key2=value2`)
   denoExtraImportMap: ""
-  # -- set smtp configs for windmill to be able to send emails when adding users to instance and workspaces
-  smtp:
-    enabled: false
-    host: smtp.gmail.com
-    port: 587
-    from: noreply@windmill.dev
-    username: ruben@windmill.dev
-    password: bar
-    tls_implicit: false
 
   # extra worker groups
   workerGroups:
     # workers configuration
+    # The default worker group
+    - name: "default"
+      replicas: 3
+      # -- Annotations to apply to the pods
+      annotations: {}
+
+      # -- Node selector to use for scheduling the pods
+      nodeSelector: {}
+
+      # -- Tolerations to apply to the pods
+      tolerations: []
+
+      # -- Affinity rules to apply to the pods
+      affinity: {}
+
+      # -- Resource limits and requests for the pods
+      resources:
+        requests:
+          memory: "1028Mi"
+          cpu: "500m"
+        limits:
+          memory: "2048Mi"
+          cpu: "1000m"
+
+      # -- Extra environment variables to apply to the pods
+      extraEnv: []
+
     - name: "gpu"
       replicas: 0
       # -- Annotations to apply to the pods
@@ -101,13 +112,8 @@ windmill:
       # -- Extra environment variables to apply to the pods
       extraEnv: []
 
-  # extra dedicated workers
-  dedicatedWorkers:
-    # workers configuration
-    - name: "worker"
-      # -- The script and its workspace to whom that worker is dedicated
-      dedicatedWorker: "workspace:f/foo/path"
-      replicas: 0
+    - name: "native"
+      replicas: 4
       # -- Annotations to apply to the pods
       annotations: {}
 
@@ -121,41 +127,16 @@ windmill:
       affinity: {}
 
       # -- Resource limits and requests for the pods
-      resources: {}
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "256Mi"
+          cpu: "200m"
 
       # -- Extra environment variables to apply to the pods
       extraEnv: []
-
-  # workers configuration
-  workers:
-    # -- Annotations to apply to the pods
-    annotations: {}
-
-    # -- Node selector to use for scheduling the pods
-    nodeSelector: {}
-
-    # -- Tolerations to apply to the pods
-    tolerations: []
-
-    # -- Affinity rules to apply to the pods
-    affinity: {}
-
-    # -- Resource limits and requests for the pods
-    resources: {}
-
-    # -- Extra environment variables to apply to the pods
-    extraEnv: []
-
-    # # workers autoscaling configuration
-    # autoscaling:
-    #   # -- enable or disable autoscaling
-    #   # -- autoscaling is not recommended without using the enterprise edition since workers
-    #   # -- will not benefit from the global cache and the performances will be poor for newly spawned pods
-    #   enabled: false
-    #   # -- maximum autoscaler replicas
-    #   maxReplicas: 10
-    #   # -- target CPU utilization
-    #   targetCPUUtilizationPercentage: 80
 
   # app configuration
   app:

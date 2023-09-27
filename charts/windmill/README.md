@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 1.7.17](https://img.shields.io/badge/Version-1.7.17-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.168.0](https://img.shields.io/badge/AppVersion-1.168.0-informational?style=flat-square)
+![Version: 1.7.29](https://img.shields.io/badge/Version-1.7.29-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.175.0](https://img.shields.io/badge/AppVersion-1.175.0-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -65,18 +65,9 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.baseDomain | string | `"windmill"` | domain as shown in browser, this variable and `baseProtocol` are used as part of the BASE_URL environment variable in app and worker container and in the ingress resource, if enabled |
 | windmill.baseProtocol | string | `"http"` | protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container |
 | windmill.cookieDomain | string | `""` | domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance |
-| windmill.createWorkspaceRequireSuperadmin | bool | `false` | is any user allowed to create workspaces |
+| windmill.createWorkspaceRequireSuperadmin | bool | `true` | is any user allowed to create workspaces |
 | windmill.databaseUrl | string | `"postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container |
 | windmill.databaseUrlSecretName | string | `""` | name of the secret storing the database URI, take precedence over databaseUrl. The key of the url is 'url' |
-| windmill.dedicatedWorkers[0].affinity | object | `{}` | Affinity rules to apply to the pods |
-| windmill.dedicatedWorkers[0].annotations | object | `{}` | Annotations to apply to the pods |
-| windmill.dedicatedWorkers[0].dedicatedWorker | string | `"workspace:f/foo/path"` | The script and its workspace to whom that worker is dedicated |
-| windmill.dedicatedWorkers[0].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
-| windmill.dedicatedWorkers[0].name | string | `"mydedicatedWorker"` |  |
-| windmill.dedicatedWorkers[0].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
-| windmill.dedicatedWorkers[0].replicas | int | `0` |  |
-| windmill.dedicatedWorkers[0].resources | object | `{}` | Resource limits and requests for the pods |
-| windmill.dedicatedWorkers[0].tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.denoExtraImportMap | string | `""` | custom deno extra import maps (syntax: `key1=value1,key2=value2`) |
 | windmill.exposeHostDocker | bool | `false` | mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon |
 | windmill.globalErrorHandlerPath | string | `""` | if set, the path to a script in the admins workspace that will be triggered upon any jobs failure |
@@ -92,7 +83,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.lsp.resources | object | `{}` | Resource limits and requests for the pods |
 | windmill.lsp.tag | string | `"latest"` |  |
 | windmill.lsp.tolerations | list | `[]` | Tolerations to apply to the pods |
-| windmill.lspReplicas | int | `2` | replicas for the lsp containers used by the app |
+| windmill.lspReplicas | int | `2` | replicas for the workers, jobs are executed on the workers |
 | windmill.multiplayer.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.multiplayer.annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.multiplayer.autoscaling.enabled | bool | `false` | enable or disable autoscaling |
@@ -103,31 +94,37 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.multiplayer.resources | object | `{}` | Resource limits and requests for the pods |
 | windmill.multiplayer.tag | string | `"latest"` |  |
 | windmill.multiplayer.tolerations | list | `[]` | Tolerations to apply to the pods |
-| windmill.multiplayerReplicas | int | `2` | replicas for the lsp containers used by the app |
+| windmill.multiplayerReplicas | int | `1` | replicas for the lsp containers used by the app |
 | windmill.npmConfigRegistry | string | `""` | pass the npm for private registries |
-| windmill.oauthConfig | string | `"{}\n"` | raw oauth config. See https://docs.windmill.dev/docs/misc/setup_oauth |
-| windmill.oauthSecretName | string | `""` | name of the secret storing the oauthConfig. See https://docs.windmill.dev/docs/misc/setup_oauth |
 | windmill.pipExtraIndexUrl | string | `""` | pass the extra index url to pip for private registries |
 | windmill.pipIndexUrl | string | `""` | pass the index url to pip for private registries |
 | windmill.pipTrustedHost | string | `""` | pass the trusted host to pip for private registries |
 | windmill.rustLog | string | `"info"` | rust log level, set to debug for more information etc, sets RUST_LOG environment variable in app and worker container |
-| windmill.smtp | object | `{"enabled":false,"from":"noreply@windmill.dev","host":"smtp.gmail.com","password":"bar","port":587,"tls_implicit":false,"username":"ruben@windmill.dev"}` | set smtp configs for windmill to be able to send emails when adding users to instance and workspaces |
 | windmill.tag | string | `""` | windmill app image tag, will use the App version if not defined |
 | windmill.workerGroups[0].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[0].annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.workerGroups[0].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
-| windmill.workerGroups[0].name | string | `"gpu"` |  |
+| windmill.workerGroups[0].name | string | `"default"` |  |
 | windmill.workerGroups[0].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
-| windmill.workerGroups[0].replicas | int | `0` |  |
-| windmill.workerGroups[0].resources | object | `{}` | Resource limits and requests for the pods |
+| windmill.workerGroups[0].replicas | int | `3` |  |
+| windmill.workerGroups[0].resources | object | `{"limits":{"cpu":"1000m","memory":"2048Mi"},"requests":{"cpu":"500m","memory":"1028Mi"}}` | Resource limits and requests for the pods |
 | windmill.workerGroups[0].tolerations | list | `[]` | Tolerations to apply to the pods |
-| windmill.workerReplicas | int | `2` | replicas for the workers, jobs are executed on the workers |
-| windmill.workers.affinity | object | `{}` | Affinity rules to apply to the pods |
-| windmill.workers.annotations | object | `{}` | Annotations to apply to the pods |
-| windmill.workers.extraEnv | list | `[]` | Extra environment variables to apply to the pods |
-| windmill.workers.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
-| windmill.workers.resources | object | `{}` | Resource limits and requests for the pods |
-| windmill.workers.tolerations | list | `[]` | Tolerations to apply to the pods |
+| windmill.workerGroups[1].affinity | object | `{}` | Affinity rules to apply to the pods |
+| windmill.workerGroups[1].annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.workerGroups[1].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
+| windmill.workerGroups[1].name | string | `"gpu"` |  |
+| windmill.workerGroups[1].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
+| windmill.workerGroups[1].replicas | int | `0` |  |
+| windmill.workerGroups[1].resources | object | `{}` | Resource limits and requests for the pods |
+| windmill.workerGroups[1].tolerations | list | `[]` | Tolerations to apply to the pods |
+| windmill.workerGroups[2].affinity | object | `{}` | Affinity rules to apply to the pods |
+| windmill.workerGroups[2].annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.workerGroups[2].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
+| windmill.workerGroups[2].name | string | `"native"` |  |
+| windmill.workerGroups[2].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
+| windmill.workerGroups[2].replicas | int | `4` |  |
+| windmill.workerGroups[2].resources | object | `{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | Resource limits and requests for the pods |
+| windmill.workerGroups[2].tolerations | list | `[]` | Tolerations to apply to the pods |
 
 ## Keeping the PostgreSQL password secret
 

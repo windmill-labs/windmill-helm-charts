@@ -1,9 +1,0 @@
-{{- if not .Values.windmill.oauthSecretName }}
-apiVersion: v1
-kind: Secret
-metadata:
-  name: {{ .Release.Name }}-oauth-secret
-type: Opaque
-stringData:
-  oauth.json: {{ .Values.windmill.oauthConfig | toJson }}
-{{- end }}
