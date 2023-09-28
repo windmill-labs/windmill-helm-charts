@@ -102,10 +102,6 @@ spec:
         - name: "SCIM_TOKEN"
           value: "{{ .Values.enterprise.scimToken }}"
         {{ end }}
-        {{ if .Values.windmill.createWorkspaceRequireSuperadmin }}
-        - name: "CREATE_WORKSPACE_REQUIRE_SUPERADMIN"
-          value: "{{ .Values.windmill.createWorkspaceRequireSuperadmin}}"
-        {{ end }}
         resources:
 {{ toYaml .Values.windmill.app.resources | indent 12 }}
 {{- with .Values.windmill.app.nodeSelector }}

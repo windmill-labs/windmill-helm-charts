@@ -57,8 +57,6 @@ windmill:
   exposeHostDocker: false
   # -- if set, the path to a script in the admins workspace that will be triggered upon any jobs failure
   globalErrorHandlerPath: ""
-  # -- is any user allowed to create workspaces
-  createWorkspaceRequireSuperadmin: true
   # -- custom deno extra import maps (syntax: `key1=value1,key2=value2`)
   denoExtraImportMap: ""
 

@@ -24,14 +24,13 @@
 
 ## 2.0.0 Breaking Changes
 
-- SMTP and oauth settings are now configured directly in windmill in the
-  superadmin settings.
+- SMTP, oauth settings and license key are now configured directly in windmill in the
+  superadmin settings -> instance settings. They are propagated automatically and without requiring a restart. After update, set them directly in the superadmin settings.
 - worker configuration has been unified to be all using worker groups. The
   default values include the "default" and "native" worker groups. Those have a
   default configuration in windmill that make them accept respetively "all jobs
-  except native ones" and "only native jobs".
-
-It is likely that your values.yaml will need to migrate to this new setup
+  except native ones" and "only native jobs". It is likely that your values.yaml
+  will need to migrate to this new setup, in particular, you should have a `windmill.workerGroups` block.
 
 ## Install
 
@@ -146,14 +145,10 @@ windmill:
     - name: "gpu"
       replicas: 0
 
-
-
-  ...
   # Use those to override the tag or image used for the app and worker containers. Windmill uses the same image for both.
   # By default, if enterprise is enable, the image is set to ghcr.io/windmill-labs/windmill-ee, otherwise the image is set to ghcr.io/windmill-labs/windmill
   #tag: "mytag"
   #image: "ghcr.io/windmill-labs/windmill"
-  ...
 
 # enable postgres (bitnami) on kubernetes
 postgresql:
@@ -161,23 +156,16 @@ postgresql:
 
 # enable minio (bitnami) on kubernetes
 minio:
-  enabled: true
+  enabled: false
 
 # Configure Ingress
-ingress:
-  className: ""
-  ...
+# ingress:
+#   className: ""
 
 # enable enterprise features
 enterprise:
   # -- enable windmill enterprise, requires license key.
   enabled: false
-  # -- s3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container
-  s3CacheBucket: mybucketname
-  # -- windmill provided Enterprise license key. Sets LICENSE_KEY environment variable in app and worker container.
-  licenseKey: 123456F
-  # -- use nsjail for sandboxing
-  nsjail: false
 ```
 
 ## Full Values
@@ -222,7 +210,6 @@ enterprise:
 | windmill.baseDomain                                             | string | `"windmill"`                                                                               | domain as shown in browser, this variable and `baseProtocol` are used as part of the BASE_URL environment variable in app and worker container and in the ingress resource, if enabled                           |
 | windmill.baseProtocol                                           | string | `"http"`                                                                                   | protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container |
 | windmill.cookieDomain                                           | string | `""`                                                                                       | domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance                                                                           |
-| windmill.createWorkspaceRequireSuperadmin                       | bool   | `true`                                                                                     | is any user allowed to create workspaces                                                                                                                                                                         |
 | windmill.databaseUrl                                            | string | `"postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable"`              | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container                                                                                 |
 | windmill.databaseUrlSecretName                                  | string | `""`                                                                                       | name of the secret storing the database URI, take precedence over databaseUrl. The key of the url is 'url'                                                                                                       |
 | windmill.denoExtraImportMap                                     | string | `""`                                                                                       | custom deno extra import maps (syntax: `key1=value1,key2=value2`)                                                                                                                                                |
@@ -334,12 +321,13 @@ add the following to the values.yaml file:
 ```
 enterprise:
   enabled: true
-  licenseKey: <license key>
 ```
+
+Then go to the superadmin settings -> instance settings -> license key and set your license key
 
 ### S3 Cache
 
-Enterprise users can use S3 storage for dependency caching for performance.
+Enterprise users can use S3 storage for dependency caching for performance reasons at high scale (use only with #workers > 20).
 Cache is two way synced at regular intervals (10 minutes). To use it, the worker
 deployment requires access to an S3 bucket. There are several ways to do this:
 
@@ -364,7 +352,6 @@ Then the values settings become:
 ```
 enterprise:
   enabled: true
-  licenseKey: <license key>
   enabledS3DistributedCache: true
   s3CacheBucket: mybucketname
 ```
