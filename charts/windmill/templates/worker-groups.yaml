@@ -118,9 +118,6 @@ spec:
         resources:
 {{ toYaml $v.resources | indent 12 }}
       volumes:
-      - name: oauth-volume
-        secret:
-          secretName: {{ if $.Values.windmill.oauthSecretName }}{{ $.Values.windmill.oauthSecretName }}{{ else }} {{ $.Release.Name }}-oauth-secret {{- end }}
     {{ if $.Values.windmill.exposeHostDocker }}
       - name: docker-sock
         hostPath:
