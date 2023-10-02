@@ -63,8 +63,16 @@ spec:
         - name : "METRICS_ADDR"
           value: "true"
         {{ end }}
+        {{ if $.Values.windmill.databaseUrlSecretName }}
+        - name: "DATABASE_URL"
+          valueFrom:
+            secretKeyRef:
+              name: "{{ $.Values.windmill.databaseUrlSecretName }}"
+              key: url
+        {{ else }}
         - name: "DATABASE_URL"
           value: "{{ $.Values.windmill.databaseUrl }}"
+        {{ end }}
         - name: "BASE_URL"
           value: "{{ $.Values.windmill.baseProtocol }}://{{ $.Values.windmill.baseDomain }}"
         - name: "RUST_LOG"
