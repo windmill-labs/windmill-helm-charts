@@ -82,8 +82,8 @@ spec:
           value: "{{ .Values.windmill.baseProtocol }}://{{ .Values.windmill.baseDomain }}"
         - name: "RUST_LOG"
           value: "{{ .Values.windmill.rustLog }}"
-        - name: "NUM_WORKERS"
-          value: "0"
+        - name: "MODE"
+          value: "server"
         - name: "JSON_FMT"
           value: "true"
         {{ if .Values.windmill.instanceEventsWebhook }}

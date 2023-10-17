@@ -77,10 +77,8 @@ spec:
           value: "{{ $.Values.windmill.baseProtocol }}://{{ $.Values.windmill.baseDomain }}"
         - name: "RUST_LOG"
           value: "{{ $.Values.windmill.rustLog }}"
-        - name: "NUM_WORKERS"
-          value: "1"
-        - name: "DISABLE_SERVER"
-          value: "true"
+        - name: "MODE"
+          value: "worker"
         - name: "JSON_FMT"
           value: "true"
         {{ if $.Values.windmill.pipIndexUrl }}
