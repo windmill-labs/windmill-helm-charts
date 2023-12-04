@@ -76,6 +76,9 @@ windmill:
       # -- Annotations to apply to the pods
       annotations: {}
 
+      # -- Labels to apply to the pods
+      labels: {}
+
       # -- Node selector to use for scheduling the pods
       nodeSelector: {}
 
@@ -102,6 +105,9 @@ windmill:
       # -- Annotations to apply to the pods
       annotations: {}
 
+      # -- Labels to apply to the pods
+      labels: {}
+
       # -- Node selector to use for scheduling the pods
       nodeSelector: {}
 
@@ -121,6 +127,9 @@ windmill:
       replicas: 4
       # -- Annotations to apply to the pods
       annotations: {}
+
+      # -- Labels to apply to the pods
+      labels: {}
 
       # -- Node selector to use for scheduling the pods
       nodeSelector: {}
@@ -147,6 +156,9 @@ windmill:
   app:
     # -- Annotations to apply to the pods
     annotations: {}
+
+    # -- Annotations to apply to the pods
+    labels: {}
 
     # -- Node selector to use for scheduling the pods
     nodeSelector: {}
@@ -178,6 +190,9 @@ windmill:
     # -- Annotations to apply to the pods
     annotations: {}
 
+    # -- Annotations to apply to the pods
+    labels: {}
+
     # -- Node selector to use for scheduling the pods
     nodeSelector: {}
 
@@ -207,6 +222,9 @@ windmill:
     tag: "latest"
     # -- Annotations to apply to the pods
     annotations: {}
+
+    # -- Annotations to apply to the pods
+    labels: {}
 
     # -- Node selector to use for scheduling the pods
     nodeSelector: {}
