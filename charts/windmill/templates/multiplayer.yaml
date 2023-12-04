@@ -25,6 +25,9 @@ spec:
         app: windmill-multiplayer
         app.kubernetes.io/name: windmill-multiplayer
         container: windmill-multiplayer
+{{- with .Values.windmill.multiplayer.labels }}
+{{ toYaml . | indent 8 }}
+{{- end }}
 {{- with .Values.windmill.multiplayer.annotations }}
       annotations:
 {{ toYaml . | indent 8 }}

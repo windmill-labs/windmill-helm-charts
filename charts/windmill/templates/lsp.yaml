@@ -24,6 +24,9 @@ spec:
         app: windmill-lsp
         app.kubernetes.io/name: windmill-lsp
         container: windmill-lsp
+{{- with .Values.windmill.lsp.labels }}
+{{ toYaml . | indent 8 }}
+{{- end }}
 {{- with .Values.windmill.lsp.annotations }}
       annotations:
 {{ toYaml . | indent 8 }}

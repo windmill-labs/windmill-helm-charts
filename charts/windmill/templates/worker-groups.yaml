@@ -30,10 +30,13 @@ spec:
         app.kubernetes.io/name: windmill-workers
         release: {{ $.Release.Name }}
         workerGroup: {{ $v.name }}
+{{- with $v.labels }}
+{{ toYaml . | indent 8 }}
+{{- end }}
 {{- with $v.annotations }}
       annotations:
-{{ toYaml . | indent 8 }}       
-{{- end }}   
+{{ toYaml . | indent 8 }}
+{{- end }}
     spec:
       serviceAccountName: {{ template "windmill.serviceAccountName" $ }}
       containers:

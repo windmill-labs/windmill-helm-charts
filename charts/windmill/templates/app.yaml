@@ -24,10 +24,13 @@ spec:
         app: windmill-app
         app.kubernetes.io/name: windmill-app
         release: {{ .Release.Name }}
+{{- with .Values.windmill.app.labels }}
+{{ toYaml . | indent 8 }}
+{{- end }}
 {{- with .Values.windmill.app.annotations }}
       annotations:
-{{ toYaml . | indent 8 }}       
-{{- end }}  
+{{ toYaml . | indent 8 }}
+{{- end }}
     spec:
       terminationGracePeriodSeconds: 40
       serviceAccountName: {{ template "windmill.serviceAccountName" . }}
