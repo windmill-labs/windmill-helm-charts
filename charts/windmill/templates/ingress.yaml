@@ -32,6 +32,7 @@ spec:
                 name: windmill-lsp
                 port:
                   number: 3001
+    {{ if .Values.enterprise.enabled }}
     - host: {{ .Values.windmill.baseDomain | quote }}
       http:
         paths:
@@ -42,6 +43,7 @@ spec:
                 name: windmill-multiplayer
                 port:
                   number: 3002
+    {{ end }}
     - host: {{ .Values.windmill.baseDomain | quote }}
       http:
         paths:
