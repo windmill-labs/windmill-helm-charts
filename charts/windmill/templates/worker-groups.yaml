@@ -133,6 +133,9 @@ spec:
           path: "/var/run/docker.sock"
           type: File
     {{ end }}
+    {{- with $v.volumes }}
+{{- toYaml . | nindent 8 }}
+    {{- end }}
     {{- with $v.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
