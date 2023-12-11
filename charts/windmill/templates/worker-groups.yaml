@@ -58,12 +58,14 @@ spec:
         ports:
         - containerPort: 8000
         - containerPort: 8001
-        env:
-        {{- with $v.extraEnv }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        {{ if $.Values.windmill.volumeMounts}}
         volumeMounts:
         {{- with $v.volumeMounts }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{ end }}
+        env:
+        {{- with $v.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
         {{ if $.Values.enterprise.enabled }}
