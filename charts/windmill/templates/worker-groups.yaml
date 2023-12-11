@@ -58,7 +58,7 @@ spec:
         ports:
         - containerPort: 8000
         - containerPort: 8001
-        {{ if $.Values.windmill.volumeMounts}}
+        {{ if $v.volumeMounts }}
         volumeMounts:
         {{- with $v.volumeMounts }}
         {{- toYaml . | nindent 8 }}
@@ -140,7 +140,7 @@ spec:
           type: File
     {{ end }}
     {{- with $v.volumes }}
-{{- toYaml . | indent 8 }}
+    {{ toYaml . | nindent 8 }}
     {{- end }}
     {{- with $v.nodeSelector }}
       nodeSelector:
