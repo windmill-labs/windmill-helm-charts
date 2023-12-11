@@ -100,7 +100,7 @@ windmill:
       # -- Extra environment variables to apply to the pods
       extraEnv: []
       volumes: []
-
+      volumeMounts: []
     - name: "gpu"
       replicas: 0
       # -- Annotations to apply to the pods
@@ -124,6 +124,7 @@ windmill:
       # -- Extra environment variables to apply to the pods
       extraEnv: []
       volumes: []
+      volumeMounts: []
 
     - name: "native"
       replicas: 4
@@ -154,6 +155,7 @@ windmill:
       # -- Extra environment variables to apply to the pods
       extraEnv: []
       volumes: []
+      volumeMounts: []
 
   # app configuration
   app:

@@ -62,6 +62,10 @@ spec:
         {{- with $v.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        volumeMounts:
+        {{- with $v.volumeMounts }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         {{ if $.Values.enterprise.enabled }}
         - name : "METRICS_ADDR"
           value: "true"
@@ -134,7 +138,7 @@ spec:
           type: File
     {{ end }}
     {{- with $v.volumes }}
-{{- toYaml . | nindent 8 }}
+{{- toYaml . | indent 8 }}
     {{- end }}
     {{- with $v.nodeSelector }}
       nodeSelector:
