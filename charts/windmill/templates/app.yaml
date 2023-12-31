@@ -10,7 +10,7 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.windmill.appReplicas }}
-  strategy: 
+  strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 3
@@ -76,7 +76,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: "{{ .Values.windmill.databaseUrlSecretName }}"
-              key: url
+              key: "{{ .Values.windmill.databaseUrlSecretKey }}"
         {{ else }}
         - name: "DATABASE_URL"
           value: "{{ .Values.windmill.databaseUrl }}"

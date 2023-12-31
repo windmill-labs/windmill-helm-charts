@@ -19,7 +19,7 @@
 
 If you would prefer to keep the PostgreSQL password or connection string out of the Helm values, there are two different possible approaches:
 
-1. Use `windmill.databaseUrlSecretName` to point at a Secret with a `url` key containing the entire database connection string.
+1. Use `windmill.databaseUrlSecretName` to point at a Secret with a `url` key or another key set with `windmill.databaseUrlSecretKey` that contains the entire database connection string.
 
 2. Use `windmill.databaseUrl` with [Dependent Environment Variables](https://kubernetes.io/docs/tasks/inject-data-application/define-interdependent-environment-variables/) together with `windmill.app.extraEnv` and `windmill.workers.extraEnv`.
 
