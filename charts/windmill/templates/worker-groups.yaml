@@ -14,7 +14,7 @@ metadata:
     workerGroup: {{ $v.name }}
 spec:
   replicas: {{ $v.replicas }}
-  strategy: 
+  strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 3
@@ -77,7 +77,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: "{{ $.Values.windmill.databaseUrlSecretName }}"
-              key: url
+              key: "{{ $.Values.windmill.databaseUrlSecretKey }}"
         {{ else }}
         - name: "DATABASE_URL"
           value: "{{ $.Values.windmill.databaseUrl }}"
@@ -153,6 +153,6 @@ spec:
     {{- with $v.tolerations }}
       tolerations:
 {{ toYaml . | indent 8 }}
-{{- end }}    
+{{- end }}
 {{- end }}
 {{- end }}
