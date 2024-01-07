@@ -34,9 +34,9 @@ windmill:
   image: ""
   # -- replica for the application app
   appReplicas: 2
-  # -- replicas for the workers, jobs are executed on the workers
+  # -- replicas for the lsp smart assistant (not required but useful for the web IDE)
   lspReplicas: 2
-  # -- replicas for the lsp containers used by the app
+  # -- replicas for the multiplayer containers used by the app (ee only and ignored if enterprise not enabled)
   multiplayerReplicas: 1
   # -- name of the secret storing the database URI, take precedence over databaseUrl.
   databaseUrlSecretName: ""
@@ -44,14 +44,12 @@ windmill:
   databaseUrlSecretKey: url
   # -- Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container
   databaseUrl: postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable
-  # -- domain as shown in browser, this variable and `baseProtocol` are used as part of the BASE_URL environment variable in app and worker container and in the ingress resource, if enabled
+  # -- domain as shown in browser. url of ths service is at: {baseProtocol}://{baseDomain}
   baseDomain: windmill
   # -- protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container
   baseProtocol: http
   # -- domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance
   cookieDomain: ""
-  # -- rust log level, set to debug for more information etc, sets RUST_LOG environment variable in app and worker container
-  rustLog: info
   # -- pass the index url to pip for private registries
   pipIndexUrl: ""
   # -- pass the extra index url to pip for private registries
@@ -64,10 +62,8 @@ windmill:
   instanceEventsWebhook: ""
   # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
   exposeHostDocker: false
-  # -- if set, the path to a script in the admins workspace that will be triggered upon any jobs failure
-  globalErrorHandlerPath: ""
-  # -- custom deno extra import maps (syntax: `key1=value1,key2=value2`)
-  denoExtraImportMap: ""
+  # -- rust log level, set to debug for more information etc, sets RUST_LOG environment variable in app and worker container
+  rustLog: info
 
   # extra worker groups
   workerGroups:
@@ -98,30 +94,6 @@ windmill:
         limits:
           memory: "2048Mi"
           cpu: "1000m"
-
-      # -- Extra environment variables to apply to the pods
-      extraEnv: []
-      volumes: []
-      volumeMounts: []
-    - name: "gpu"
-      replicas: 0
-      # -- Annotations to apply to the pods
-      annotations: {}
-
-      # -- Labels to apply to the pods
-      labels: {}
-
-      # -- Node selector to use for scheduling the pods
-      nodeSelector: {}
-
-      # -- Tolerations to apply to the pods
-      tolerations: []
-
-      # -- Affinity rules to apply to the pods
-      affinity: {}
-
-      # -- Resource limits and requests for the pods
-      resources: {}
 
       # -- Extra environment variables to apply to the pods
       extraEnv: []
@@ -159,6 +131,31 @@ windmill:
       volumes: []
       volumeMounts: []
 
+    - name: "gpu"
+      replicas: 0
+      # -- Annotations to apply to the pods
+      annotations: {}
+
+      # -- Labels to apply to the pods
+      labels: {}
+
+      # -- Node selector to use for scheduling the pods
+      nodeSelector: {}
+
+      # -- Tolerations to apply to the pods
+      tolerations: []
+
+      # -- Affinity rules to apply to the pods
+      affinity: {}
+
+      # -- Resource limits and requests for the pods
+      resources: {}
+
+      # -- Extra environment variables to apply to the pods
+      extraEnv: []
+      volumes: []
+      volumeMounts: []
+  
   # app configuration
   app:
     # -- Annotations to apply to the pods
@@ -266,13 +263,13 @@ ingress:
   tls: []
 
 enterprise:
-  # -- enable Windmill Enterprise , requires license key.
+  # -- enable Windmill Enterprise, requires license key.
   enabled: false
+  # -- enterprise license key. (Recommended to avoid: It is recommended to pass it from the Instance settings UI instead)
+  licenseKey: ""
   enabledS3DistributedCache: false
   # -- S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container
-  s3CacheBucket: mybucketname
-  # -- Windmill provided Enterprise license key. Sets LICENSE_KEY environment variable in app and worker container.
-  licenseKey: 123456F
+  s3CacheBucket: ""
   # -- SAML Metadata URL to enable SAML SSO
   samlMetadata: ""
   scimToken: ""

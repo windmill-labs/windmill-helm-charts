@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 2.0.15](https://img.shields.io/badge/Version-2.0.15-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.194.0](https://img.shields.io/badge/AppVersion-1.194.0-informational?style=flat-square)
+![Version: 2.0.62](https://img.shields.io/badge/Version-2.0.62-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.232.0](https://img.shields.io/badge/AppVersion-1.232.0-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -27,11 +27,11 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| enterprise.enabled | bool | `false` | enable Windmill Enterprise , requires license key. |
+| enterprise.enabled | bool | `false` | enable Windmill Enterprise, requires license key. |
 | enterprise.enabledS3DistributedCache | bool | `false` |  |
-| enterprise.licenseKey | string | `"123456F"` | Windmill provided Enterprise license key. Sets LICENSE_KEY environment variable in app and worker container. |
+| enterprise.licenseKey | string | `""` | enterprise license key. (Recommended to avoid: It is recommended to pass it from the Instance settings UI instead) |
 | enterprise.nsjail | bool | `false` | use nsjail for sandboxing |
-| enterprise.s3CacheBucket | string | `"mybucketname"` | S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container |
+| enterprise.s3CacheBucket | string | `""` | S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container |
 | enterprise.samlMetadata | string | `""` | SAML Metadata URL to enable SAML SSO |
 | enterprise.scimToken | string | `""` |  |
 | ingress.annotations | object | `{}` |  |
@@ -62,18 +62,18 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.app.autoscaling.maxReplicas | int | `10` | maximum autoscaler replicas |
 | windmill.app.autoscaling.targetCPUUtilizationPercentage | int | `80` | target CPU utilization |
 | windmill.app.extraEnv | list | `[]` | Extra environment variables to apply to the pods |
+| windmill.app.labels | object | `{}` | Annotations to apply to the pods |
 | windmill.app.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.app.resources | object | `{}` | Resource limits and requests for the pods |
 | windmill.app.tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.appReplicas | int | `2` | replica for the application app |
-| windmill.baseDomain | string | `"windmill"` | domain as shown in browser, this variable and `baseProtocol` are used as part of the BASE_URL environment variable in app and worker container and in the ingress resource, if enabled |
+| windmill.baseDomain | string | `"windmill"` | domain as shown in browser. url of ths service is at: {baseProtocol}://{baseDomain} |
 | windmill.baseProtocol | string | `"http"` | protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container |
 | windmill.cookieDomain | string | `""` | domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance |
 | windmill.databaseUrl | string | `"postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container |
-| windmill.databaseUrlSecretName | string | `""` | name of the secret storing the database URI, take precedence over databaseUrl. The key of the url is 'url' |
-| windmill.denoExtraImportMap | string | `""` | custom deno extra import maps (syntax: `key1=value1,key2=value2`) |
+| windmill.databaseUrlSecretKey | string | `"url"` | name of the key in secret storing the database URI. The default key of the url is 'url' |
+| windmill.databaseUrlSecretName | string | `""` | name of the secret storing the database URI, take precedence over databaseUrl. |
 | windmill.exposeHostDocker | bool | `false` | mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon |
-| windmill.globalErrorHandlerPath | string | `""` | if set, the path to a script in the admins workspace that will be triggered upon any jobs failure |
 | windmill.image | string | `""` | windmill image tag, will use the Acorresponding ee or ce image from ghcr if not defined. Do not include tag in the image name. |
 | windmill.instanceEventsWebhook | string | `""` | send instance events to a webhook. Can be hooked back to windmill |
 | windmill.lsp.affinity | object | `{}` | Affinity rules to apply to the pods |
@@ -82,22 +82,24 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.lsp.autoscaling.maxReplicas | int | `10` | maximum autoscaler replicas |
 | windmill.lsp.autoscaling.targetCPUUtilizationPercentage | int | `80` | target CPU utilization |
 | windmill.lsp.extraEnv | list | `[]` | Extra environment variables to apply to the pods |
+| windmill.lsp.labels | object | `{}` | Annotations to apply to the pods |
 | windmill.lsp.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.lsp.resources | object | `{}` | Resource limits and requests for the pods |
 | windmill.lsp.tag | string | `"latest"` |  |
 | windmill.lsp.tolerations | list | `[]` | Tolerations to apply to the pods |
-| windmill.lspReplicas | int | `2` | replicas for the workers, jobs are executed on the workers |
+| windmill.lspReplicas | int | `2` | replicas for the lsp smart assistant (not required but useful for the web IDE) |
 | windmill.multiplayer.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.multiplayer.annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.multiplayer.autoscaling.enabled | bool | `false` | enable or disable autoscaling |
 | windmill.multiplayer.autoscaling.maxReplicas | int | `10` | maximum autoscaler replicas |
 | windmill.multiplayer.autoscaling.targetCPUUtilizationPercentage | int | `80` | target CPU utilization |
 | windmill.multiplayer.extraEnv | list | `[]` | Extra environment variables to apply to the pods |
+| windmill.multiplayer.labels | object | `{}` | Annotations to apply to the pods |
 | windmill.multiplayer.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.multiplayer.resources | object | `{}` | Resource limits and requests for the pods |
 | windmill.multiplayer.tag | string | `"latest"` |  |
 | windmill.multiplayer.tolerations | list | `[]` | Tolerations to apply to the pods |
-| windmill.multiplayerReplicas | int | `1` | replicas for the lsp containers used by the app |
+| windmill.multiplayerReplicas | int | `1` | replicas for the multiplayer containers used by the app (ee only and ignored if enterprise not enabled) |
 | windmill.npmConfigRegistry | string | `""` | pass the npm for private registries |
 | windmill.pipExtraIndexUrl | string | `""` | pass the extra index url to pip for private registries |
 | windmill.pipIndexUrl | string | `""` | pass the index url to pip for private registries |
@@ -107,33 +109,42 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[0].annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.workerGroups[0].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
+| windmill.workerGroups[0].labels | object | `{}` | Labels to apply to the pods |
 | windmill.workerGroups[0].name | string | `"default"` |  |
 | windmill.workerGroups[0].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.workerGroups[0].replicas | int | `3` |  |
 | windmill.workerGroups[0].resources | object | `{"limits":{"cpu":"1000m","memory":"2048Mi"},"requests":{"cpu":"500m","memory":"1028Mi"}}` | Resource limits and requests for the pods |
 | windmill.workerGroups[0].tolerations | list | `[]` | Tolerations to apply to the pods |
+| windmill.workerGroups[0].volumeMounts | list | `[]` |  |
+| windmill.workerGroups[0].volumes | list | `[]` |  |
 | windmill.workerGroups[1].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[1].annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.workerGroups[1].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
-| windmill.workerGroups[1].name | string | `"gpu"` |  |
+| windmill.workerGroups[1].labels | object | `{}` | Labels to apply to the pods |
+| windmill.workerGroups[1].name | string | `"native"` |  |
 | windmill.workerGroups[1].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
-| windmill.workerGroups[1].replicas | int | `0` |  |
-| windmill.workerGroups[1].resources | object | `{}` | Resource limits and requests for the pods |
+| windmill.workerGroups[1].replicas | int | `4` |  |
+| windmill.workerGroups[1].resources | object | `{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | Resource limits and requests for the pods |
 | windmill.workerGroups[1].tolerations | list | `[]` | Tolerations to apply to the pods |
+| windmill.workerGroups[1].volumeMounts | list | `[]` |  |
+| windmill.workerGroups[1].volumes | list | `[]` |  |
 | windmill.workerGroups[2].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[2].annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.workerGroups[2].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
-| windmill.workerGroups[2].name | string | `"native"` |  |
+| windmill.workerGroups[2].labels | object | `{}` | Labels to apply to the pods |
+| windmill.workerGroups[2].name | string | `"gpu"` |  |
 | windmill.workerGroups[2].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
-| windmill.workerGroups[2].replicas | int | `4` |  |
-| windmill.workerGroups[2].resources | object | `{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | Resource limits and requests for the pods |
+| windmill.workerGroups[2].replicas | int | `0` |  |
+| windmill.workerGroups[2].resources | object | `{}` | Resource limits and requests for the pods |
 | windmill.workerGroups[2].tolerations | list | `[]` | Tolerations to apply to the pods |
+| windmill.workerGroups[2].volumeMounts | list | `[]` |  |
+| windmill.workerGroups[2].volumes | list | `[]` |  |
 
 ## Keeping the PostgreSQL password secret
 
 If you would prefer to keep the PostgreSQL password or connection string out of the Helm values, there are two different possible approaches:
 
-1. Use `windmill.databaseUrlSecretName` to point at a Secret with a `url` key containing the entire database connection string.
+1. Use `windmill.databaseUrlSecretName` to point at a Secret with a `url` key or another key set with `windmill.databaseUrlSecretKey` that contains the entire database connection string.
 
 2. Use `windmill.databaseUrl` with [Dependent Environment Variables](https://kubernetes.io/docs/tasks/inject-data-application/define-interdependent-environment-variables/) together with `windmill.app.extraEnv` and `windmill.workers.extraEnv`.
 
@@ -161,4 +172,4 @@ windmill:
 ```
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.11.2](https://github.com/norwoodj/helm-docs/releases/v1.11.2)
+Autogenerated from chart metadata using [helm-docs v1.11.3](https://github.com/norwoodj/helm-docs/releases/v1.11.3)

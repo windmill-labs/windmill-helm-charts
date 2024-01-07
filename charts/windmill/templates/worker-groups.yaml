@@ -98,17 +98,9 @@ spec:
         - name: "PIP_EXTRA_INDEX_URL"
           value: "{{ $.Values.windmill.pipExtraIndexUrl }}"
         {{ end }}
-        {{ if $.Values.windmill.globalErrorHandlerPath }}
-        - name: "GLOBAL_ERROR_HANDLER_PATH_IN_ADMINS_WORKSPACE"
-          value: "{{ $.Values.windmill.globalErrorHandlerPath }}"
-        {{ end }}
         {{ if $.Values.windmill.pipTrustedHost }}
         - name: "PIP_TRUSTED_HOST"
           value: "{{ $.Values.windmill.pipTrustedHost }}"
-        {{ end }}
-        {{ if $.Values.windmill.denoExtraImportMap }}
-        - name: "DENO_EXTRA_IMPORT_MAP"
-          value: "{{ $.Values.windmill.denoExtraImportMap }}"
         {{ end }}
         {{ if $.Values.windmill.npmConfigRegistry }}
         - name: "NPM_CONFIG_REGISTRY"
