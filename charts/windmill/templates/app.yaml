@@ -119,8 +119,10 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
+    {{- with .Values.windmill.app.securityContext }}
       securityContext:
-        runAsUser: 0
+{{ toYaml . | indent 8 }}
+    {{- end }}
 ---
 apiVersion: v1
 kind: Service
