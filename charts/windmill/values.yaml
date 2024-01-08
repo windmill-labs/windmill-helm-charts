@@ -83,6 +83,13 @@ windmill:
       # -- Tolerations to apply to the pods
       tolerations: []
 
+      # -- Security context to apply to the pods
+      securityContext:
+        # -- run as user. The default is 0 for root user
+        runAsUser: 0
+        # -- run explicitly as a non-root user. The default is false.
+        runAsNonRoot: false
+
       # -- Affinity rules to apply to the pods
       affinity: {}
 
@@ -113,6 +120,13 @@ windmill:
 
       # -- Tolerations to apply to the pods
       tolerations: []
+
+      # -- Security context to apply to the pods
+      securityContext:
+        # -- run as user. The default is 0 for root user
+        runAsUser: 0
+        # -- run explicitly as a non-root user. The default is false.
+        runAsNonRoot: false
 
       # -- Affinity rules to apply to the pods
       affinity: {}
@@ -145,6 +159,13 @@ windmill:
       # -- Tolerations to apply to the pods
       tolerations: []
 
+      # -- Security context to apply to the pods
+      securityContext:
+        # -- run as user. The default is 0 for root user
+        runAsUser: 0
+        # -- run explicitly as a non-root user. The default is false.
+        runAsNonRoot: false
+
       # -- Affinity rules to apply to the pods
       affinity: {}
 
@@ -169,6 +190,13 @@ windmill:
 
     # -- Tolerations to apply to the pods
     tolerations: []
+
+    # -- Security context to apply to the pods
+    securityContext:
+      # -- run as user. The default is 0 for root user
+      runAsUser: 0
+      # -- run explicitly as a non-root user. The default is false.
+      runAsNonRoot: false
 
     # -- Affinity rules to apply to the pods
     affinity: {}
@@ -203,6 +231,13 @@ windmill:
     # -- Tolerations to apply to the pods
     tolerations: []
 
+    # -- Security context to apply to the pods
+    securityContext:
+      # -- run as user. The default is 0 for root user
+      runAsUser: 0
+      # -- run explicitly as a non-root user. The default is false.
+      runAsNonRoot: false
+
     # -- Affinity rules to apply to the pods
     affinity: {}
 
@@ -235,6 +270,13 @@ windmill:
 
     # -- Tolerations to apply to the pods
     tolerations: []
+
+    # -- Security context to apply to the pods
+    securityContext:
+      # -- run as user. The default is 0 for root user
+      runAsUser: 0
+      # -- run explicitly as a non-root user. The default is false.
+      runAsNonRoot: false
 
     # -- Affinity rules to apply to the pods
     affinity: {}

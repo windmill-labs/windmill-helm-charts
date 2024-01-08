@@ -47,8 +47,10 @@ spec:
           privileged: true
         {{ else }}
         securityContext:
-          runAsUser: 0
-        {{end}}
+        {{- with $v.securityContext }}
+        {{ toYaml . | indent 8 }}
+        {{- end }}
+        {{ end }}
         {{ if $.Values.enterprise.enabled }}
         image: {{ default "ghcr.io/windmill-labs/windmill-ee" $.Values.windmill.image }}:{{ default $.Chart.AppVersion $.Values.windmill.tag }}
         {{ else }}
