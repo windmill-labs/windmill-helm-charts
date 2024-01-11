@@ -111,7 +111,7 @@ spec:
         {{ end }}
         {{ if .Values.windmill.openaiAzureBasePath}}
         - name: OPENAI_AZURE_BASE_PATH
-          value: 'https://chat-ai.cisco.com/openai/deployments/gpt-35-turbo'        
+          value: "{{ .Values.windmill.openaiAzureBasePath }}"
         {{ end }}
         resources:
 {{ toYaml .Values.windmill.app.resources | indent 12 }}
