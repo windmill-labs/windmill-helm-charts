@@ -33,9 +33,13 @@ spec:
 {{ toYaml . | indent 8 }}
   {{- end }}
     spec:
+      {{ if .Values.windmill.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.windmill.imagePullSecrets }}
+      {{ end }}  
       containers:
       - name: windmill-multiplayer
-        image: ghcr.io/windmill-labs/windmill-multiplayer:{{ .Values.windmill.multiplayer.tag }}
+        image: {{ default "ghcr.io/windmill-labs/windmill-multiplayer" .Values.windmill.multiplayer.image }}:{{ default "latest" .Values.windmill.multiplayer.tag }}
         imagePullPolicy: Always
         ports:
         - containerPort: 3002
@@ -55,7 +59,7 @@ spec:
     {{- end }} 
     {{- with .Values.windmill.multiplayer.securityContext }}
       securityContext:
-{{ toYaml . | indent 8 }}
+{{ toYaml . | indent 12 }}
     {{- end }}
 ---
 apiVersion: v1

@@ -34,6 +34,10 @@ spec:
     spec:
       terminationGracePeriodSeconds: 40
       serviceAccountName: {{ template "windmill.serviceAccountName" . }}
+      {{ if .Values.windmill.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.windmill.imagePullSecrets }}
+      {{ end }}      
       containers:
       - name: windmill-app
         lifecycle:
@@ -105,6 +109,10 @@ spec:
         - name: "SCIM_TOKEN"
           value: "{{ .Values.enterprise.scimToken }}"
         {{ end }}
+        {{ if .Values.windmill.openaiAzureBasePath}}
+        - name: OPENAI_AZURE_BASE_PATH
+          value: "{{ .Values.windmill.openaiAzureBasePath }}"
+        {{ end }}
         resources:
 {{ toYaml .Values.windmill.app.resources | indent 12 }}
 {{- with .Values.windmill.app.nodeSelector }}
@@ -121,7 +129,7 @@ spec:
     {{- end }}
     {{- with .Values.windmill.app.securityContext }}
       securityContext:
-{{ toYaml . | indent 8 }}
+{{ toYaml . | indent 12 }}
     {{- end }}
 ---
 apiVersion: v1
