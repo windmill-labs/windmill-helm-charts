@@ -2,11 +2,13 @@ name: Windmill Chart Release
 
 on:
   push:
+    paths:
+      - charts/windmill/Chart.yaml
     branches:
       - main
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-  
+
 jobs:
   release:
     # depending on default permission settings for your org (contents being read-only or read-write for workloads), you will have to add permissions
