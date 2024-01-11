@@ -39,6 +39,10 @@ spec:
 {{- end }}
     spec:
       serviceAccountName: {{ template "windmill.serviceAccountName" $ }}
+      {{- if $.Values.windmill.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ $.Values.windmill.imagePullSecrets }}
+      {{ end -}}
       containers:
       - name: windmill-worker
        {{ if  $.Values.enterprise.nsjail }}
@@ -47,9 +51,9 @@ spec:
           privileged: true
         {{ else }}
         securityContext:
-        {{- with $v.securityContext }}
-        {{ toYaml . | indent 8 }}
-        {{- end }}
+        {{ with $v.securityContext }}
+{{ toYaml . | indent 12 }}
+        {{ end }}
         {{ end }}
         {{ if $.Values.enterprise.enabled }}
         image: {{ default "ghcr.io/windmill-labs/windmill-ee" $.Values.windmill.image }}:{{ default $.Chart.AppVersion $.Values.windmill.tag }}

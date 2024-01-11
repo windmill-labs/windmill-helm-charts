@@ -32,9 +32,13 @@ spec:
 {{ toYaml . | indent 8 }}
 {{- end }}
     spec:
+      {{ if .Values.windmill.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.windmill.imagePullSecrets }}
+      {{ end }}       
       containers:
       - name: windmill-lsp
-        image: ghcr.io/windmill-labs/windmill-lsp:{{ .Values.windmill.lsp.tag }}
+        image: {{ default "ghcr.io/windmill-labs/windmill-lsp" .Values.windmill.lsp.image }}:{{ default "latest" .Values.windmill.lsp.tag }}
         imagePullPolicy: Always
         ports:
         - containerPort: 3001
@@ -58,7 +62,7 @@ spec:
     {{- end }}
     {{- with .Values.windmill.lsp.securityContext }}
       securityContext:
-{{ toYaml . | indent 8 }}
+{{ toYaml . | indent 12 }}
     {{- end }}
 ---
 apiVersion: v1
