@@ -42,6 +42,7 @@ jobs:
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
           helm repo update
+          heln
 
       - name: Run chart-testing (lint)
         run:
