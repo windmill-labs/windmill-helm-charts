@@ -42,7 +42,7 @@ spec:
       {{- if $.Values.windmill.imagePullSecrets }}
       imagePullSecrets:
       - name: {{ $.Values.windmill.imagePullSecrets }}
-      {{ end -}}
+      {{ end }}
       containers:
       - name: windmill-worker
        {{ if  $.Values.enterprise.nsjail }}
