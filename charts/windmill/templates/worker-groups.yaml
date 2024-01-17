@@ -62,7 +62,6 @@ spec:
         {{ end }}
         imagePullPolicy: Always
         ports:
-        - containerPort: 8000
         - containerPort: 8001
         {{ if $v.volumeMounts }}
         volumeMounts:
