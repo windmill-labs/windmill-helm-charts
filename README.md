@@ -123,6 +123,9 @@ windmill:
       # -- Extra environment variables to apply to the pods
       extraEnv: []
 
+      # -- Extra sidecar containers
+      extraContainers: []
+
     # Thenative worker group will only execute native jobs. Windmill has a default worker group configuration for it
     - name: "native"
       replicas: 4
@@ -137,6 +140,9 @@ windmill:
 
       # -- Extra environment variables to apply to the pods
       extraEnv: []
+
+      # -- Extra sidecar containers
+      extraContainers: []
 
     - name: "gpu"
       replicas: 0
