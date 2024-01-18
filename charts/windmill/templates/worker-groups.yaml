@@ -45,7 +45,7 @@ spec:
       {{ end }}
       containers:
       {{- with $v.extraContainers }}
-      {{- toYaml . | nindent 8 }}
+      {{- toYaml . | nindent 6 }}
       {{- end }}
       - name: windmill-worker
        {{ if  $.Values.enterprise.nsjail }}
