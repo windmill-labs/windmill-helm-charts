@@ -44,6 +44,9 @@ spec:
       - name: {{ $.Values.windmill.imagePullSecrets }}
       {{ end }}
       containers:
+      {{- with $v.extraContainers }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
       - name: windmill-worker
        {{ if  $.Values.enterprise.nsjail }}
        #because nsjail requires privileged access
