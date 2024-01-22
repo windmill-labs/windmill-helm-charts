@@ -328,6 +328,10 @@ enterprise:
   # -- SAML Metadata URL to enable SAML SSO
   samlMetadata: ""
   scimToken: ""
+  # -- name of the secret storing the SCIM token, takes precedence over SCIM token string.
+  scimTokenSecretName: ""
+  # -- name of the key in secret storing the SCIM token. The default key of the SCIM token is 'scimToken'
+  scimTokenSecretKey: scimToken
   # -- use nsjail for sandboxing
   nsjail: false
 
