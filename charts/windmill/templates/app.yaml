@@ -111,7 +111,7 @@ spec:
             secretKeyRef:
               name: "{{ .Values.enterprise.scimTokenSecretName }}"
               key: "{{ .Values.enterprise.scimTokenSecretKey }}"
-        {{ else}}
+        {{ else if .Values.enterprise.scimToken}}
         - name: "SCIM_TOKEN"
           value: "{{ .Values.enterprise.scimToken }}"
         {{ end }}
