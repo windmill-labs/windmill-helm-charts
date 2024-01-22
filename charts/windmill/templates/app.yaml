@@ -105,7 +105,13 @@ spec:
         - name: "SAML_METADATA"
           value: "{{ .Values.enterprise.samlMetadata }}"
         {{ end }}
-        {{ if .Values.enterprise.scimToken}}
+        {{if .Values.enterprise.scimTokenSecretName}}
+        - name: "SCIM_TOKEN"
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.enterprise.scimTokenSecretName }}"
+              key: "{{ .Values.enterprise.scimTokenSecretKey }}"
+        {{ else if .Values.enterprise.scimToken}}
         - name: "SCIM_TOKEN"
           value: "{{ .Values.enterprise.scimToken }}"
         {{ end }}
