@@ -111,6 +111,8 @@ windmill:
       # -- Extra sidecar containers
       extraContainers: []
 
+      mode: "worker"
+
       volumes: []
       volumeMounts: []
 
@@ -152,6 +154,8 @@ windmill:
       # -- Extra sidecar containers
       extraContainers: []
 
+      mode: "worker"
+
       volumes: []
       volumeMounts: []
 
@@ -186,6 +190,8 @@ windmill:
       extraEnv: []
       # -- Extra sidecar containers
       extraContainers: []
+
+      mode: "worker"
 
       volumes: []
       volumeMounts: []
