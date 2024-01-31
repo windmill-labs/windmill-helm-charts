@@ -38,10 +38,12 @@ spec:
       imagePullSecrets:
       - name: {{ .Values.windmill.imagePullSecrets }}
       {{ end }}
+      {{ if .Values.windmill.app.initContainers}}
       initContainers:
       {{- with .Values.windmill.app.initContainers }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
+      {{ end }}
       containers:
       {{- with .Values.windmill.app.extraContainers }}
       {{- toYaml . | nindent 6 }}
