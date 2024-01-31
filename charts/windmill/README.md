@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 2.0.81](https://img.shields.io/badge/Version-2.0.81-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.257.0](https://img.shields.io/badge/AppVersion-1.257.0-informational?style=flat-square)
+![Version: 2.0.83](https://img.shields.io/badge/Version-2.0.83-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.258.0](https://img.shields.io/badge/AppVersion-1.258.0-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -65,6 +65,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.app.autoscaling.targetCPUUtilizationPercentage | int | `80` | target CPU utilization |
 | windmill.app.extraContainers | list | `[]` | Extra sidecar containers |
 | windmill.app.extraEnv | list | `[]` | Extra environment variables to apply to the pods |
+| windmill.app.initContainers | list | `[]` | Init containers |
 | windmill.app.labels | object | `{}` | Annotations to apply to the pods |
 | windmill.app.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.app.resources | object | `{}` | Resource limits and requests for the pods |
@@ -124,6 +125,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.workerGroups[0].extraContainers | list | `[]` | Extra sidecar containers |
 | windmill.workerGroups[0].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
+| windmill.workerGroups[0].initContainers | list | `[]` | Init containers |
 | windmill.workerGroups[0].labels | object | `{}` | Labels to apply to the pods |
 | windmill.workerGroups[0].name | string | `"default"` |  |
 | windmill.workerGroups[0].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |

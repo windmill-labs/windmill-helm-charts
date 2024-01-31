@@ -110,7 +110,8 @@ windmill:
       extraEnv: []
       # -- Extra sidecar containers
       extraContainers: []
-
+      # -- Init containers
+      initContainers: []
       volumes: []
       volumeMounts: []
 
@@ -219,6 +220,9 @@ windmill:
 
     # -- Extra environment variables to apply to the pods
     extraEnv: []
+
+    # -- Init containers
+    initContainers: []
 
     # -- Extra sidecar containers
     extraContainers: []
