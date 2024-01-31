@@ -227,6 +227,9 @@ windmill:
     # -- Extra sidecar containers
     extraContainers: []
 
+    # -- volumes
+    volumes: []
+      
     # app autoscaling configuration
     autoscaling:
       # -- enable or disable autoscaling
@@ -235,6 +238,7 @@ windmill:
       maxReplicas: 10
       # -- target CPU utilization
       targetCPUUtilizationPercentage: 80
+
 
   # lsp configuration
   lsp:

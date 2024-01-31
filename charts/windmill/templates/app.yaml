@@ -134,6 +134,10 @@ spec:
       nodeSelector:
 {{ toYaml . | indent 8 }}
     {{- end }}
+    {{- with .Values.windmill.app.volumes }}
+      volumes:
+{{ toYaml . | indent 8 }}
+    {{- end }}
     {{- with .Values.windmill.app.affinity }}
       affinity:
 {{ toYaml . | indent 8 }}
