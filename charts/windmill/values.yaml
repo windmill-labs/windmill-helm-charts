@@ -220,6 +220,9 @@ windmill:
     # -- Extra environment variables to apply to the pods
     extraEnv: []
 
+    # -- Extra sidecar containers
+    extraContainers: []
+
     # app autoscaling configuration
     autoscaling:
       # -- enable or disable autoscaling

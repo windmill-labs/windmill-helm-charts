@@ -39,6 +39,9 @@ spec:
       - name: {{ .Values.windmill.imagePullSecrets }}
       {{ end }}      
       containers:
+      {{- with .Values.windmill.app.extraContainers }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
       - name: windmill-app
         lifecycle:
           preStop:
