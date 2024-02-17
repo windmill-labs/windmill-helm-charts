@@ -336,8 +336,9 @@ enterprise:
   enabledS3DistributedCache: false
   # -- S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container
   s3CacheBucket: ""
-  # -- SAML Metadata URL to enable SAML SSO
+  # -- SAML Metadata URL/Content to enable SAML SSO (Can be set in the Instance Settings UI which is the recommended method)
   samlMetadata: ""
+  #-- SCIM token (Can be set in the instance settings UI which is the recommended method)
   scimToken: ""
   # -- name of the secret storing the SCIM token, takes precedence over SCIM token string.
   scimTokenSecretName: ""

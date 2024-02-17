@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 2.0.83](https://img.shields.io/badge/Version-2.0.83-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.258.0](https://img.shields.io/badge/AppVersion-1.258.0-informational?style=flat-square)
+![Version: 2.0.100](https://img.shields.io/badge/Version-2.0.100-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.271.0](https://img.shields.io/badge/AppVersion-1.271.0-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -32,7 +32,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | enterprise.licenseKey | string | `""` | enterprise license key. (Recommended to avoid: It is recommended to pass it from the Instance settings UI instead) |
 | enterprise.nsjail | bool | `false` | use nsjail for sandboxing |
 | enterprise.s3CacheBucket | string | `""` | S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container |
-| enterprise.samlMetadata | string | `""` | SAML Metadata URL to enable SAML SSO |
+| enterprise.samlMetadata | string | `""` | SAML Metadata URL/Content to enable SAML SSO (Can be set in the Instance Settings UI which is the recommended method) |
 | enterprise.scimToken | string | `""` |  |
 | enterprise.scimTokenSecretKey | string | `"scimToken"` | name of the key in secret storing the SCIM token. The default key of the SCIM token is 'scimToken' |
 | enterprise.scimTokenSecretName | string | `""` | name of the secret storing the SCIM token, takes precedence over SCIM token string. |
@@ -73,6 +73,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.app.securityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
 | windmill.app.securityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
 | windmill.app.tolerations | list | `[]` | Tolerations to apply to the pods |
+| windmill.app.volumes | list | `[]` | volumes |
 | windmill.appReplicas | int | `2` | replica for the application app |
 | windmill.baseDomain | string | `"windmill"` | domain as shown in browser. url of ths service is at: {baseProtocol}://{baseDomain} |
 | windmill.baseProtocol | string | `"http"` | protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container |
