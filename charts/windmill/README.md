@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 2.0.62](https://img.shields.io/badge/Version-2.0.62-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.232.0](https://img.shields.io/badge/AppVersion-1.232.0-informational?style=flat-square)
+![Version: 2.0.100](https://img.shields.io/badge/Version-2.0.100-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.271.0](https://img.shields.io/badge/AppVersion-1.271.0-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -32,8 +32,10 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | enterprise.licenseKey | string | `""` | enterprise license key. (Recommended to avoid: It is recommended to pass it from the Instance settings UI instead) |
 | enterprise.nsjail | bool | `false` | use nsjail for sandboxing |
 | enterprise.s3CacheBucket | string | `""` | S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container |
-| enterprise.samlMetadata | string | `""` | SAML Metadata URL to enable SAML SSO |
+| enterprise.samlMetadata | string | `""` | SAML Metadata URL/Content to enable SAML SSO (Can be set in the Instance Settings UI which is the recommended method) |
 | enterprise.scimToken | string | `""` |  |
+| enterprise.scimTokenSecretKey | string | `"scimToken"` | name of the key in secret storing the SCIM token. The default key of the SCIM token is 'scimToken' |
+| enterprise.scimTokenSecretName | string | `""` | name of the secret storing the SCIM token, takes precedence over SCIM token string. |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
 | ingress.enabled | bool | `true` | enable/disable included ingress resource |
@@ -61,11 +63,17 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.app.autoscaling.enabled | bool | `false` | enable or disable autoscaling |
 | windmill.app.autoscaling.maxReplicas | int | `10` | maximum autoscaler replicas |
 | windmill.app.autoscaling.targetCPUUtilizationPercentage | int | `80` | target CPU utilization |
+| windmill.app.extraContainers | list | `[]` | Extra sidecar containers |
 | windmill.app.extraEnv | list | `[]` | Extra environment variables to apply to the pods |
+| windmill.app.initContainers | list | `[]` | Init containers |
 | windmill.app.labels | object | `{}` | Annotations to apply to the pods |
 | windmill.app.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.app.resources | object | `{}` | Resource limits and requests for the pods |
+| windmill.app.securityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
+| windmill.app.securityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
+| windmill.app.securityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
 | windmill.app.tolerations | list | `[]` | Tolerations to apply to the pods |
+| windmill.app.volumes | list | `[]` | volumes |
 | windmill.appReplicas | int | `2` | replica for the application app |
 | windmill.baseDomain | string | `"windmill"` | domain as shown in browser. url of ths service is at: {baseProtocol}://{baseDomain} |
 | windmill.baseProtocol | string | `"http"` | protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container |
@@ -75,6 +83,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.databaseUrlSecretName | string | `""` | name of the secret storing the database URI, take precedence over databaseUrl. |
 | windmill.exposeHostDocker | bool | `false` | mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon |
 | windmill.image | string | `""` | windmill image tag, will use the Acorresponding ee or ce image from ghcr if not defined. Do not include tag in the image name. |
+| windmill.imagePullSecrets | string | `""` | image pull secrets for windmill.  by default no image pull secrets will be configured. |
 | windmill.instanceEventsWebhook | string | `""` | send instance events to a webhook. Can be hooked back to windmill |
 | windmill.lsp.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.lsp.annotations | object | `{}` | Annotations to apply to the pods |
@@ -85,6 +94,9 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.lsp.labels | object | `{}` | Annotations to apply to the pods |
 | windmill.lsp.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.lsp.resources | object | `{}` | Resource limits and requests for the pods |
+| windmill.lsp.securityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
+| windmill.lsp.securityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
+| windmill.lsp.securityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
 | windmill.lsp.tag | string | `"latest"` |  |
 | windmill.lsp.tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.lspReplicas | int | `2` | replicas for the lsp smart assistant (not required but useful for the web IDE) |
@@ -97,10 +109,14 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.multiplayer.labels | object | `{}` | Annotations to apply to the pods |
 | windmill.multiplayer.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.multiplayer.resources | object | `{}` | Resource limits and requests for the pods |
+| windmill.multiplayer.securityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
+| windmill.multiplayer.securityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
+| windmill.multiplayer.securityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
 | windmill.multiplayer.tag | string | `"latest"` |  |
 | windmill.multiplayer.tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.multiplayerReplicas | int | `1` | replicas for the multiplayer containers used by the app (ee only and ignored if enterprise not enabled) |
 | windmill.npmConfigRegistry | string | `""` | pass the npm for private registries |
+| windmill.openaiAzureBasePath | string | `""` | configure a custom openai base path for azure |
 | windmill.pipExtraIndexUrl | string | `""` | pass the extra index url to pip for private registries |
 | windmill.pipIndexUrl | string | `""` | pass the index url to pip for private registries |
 | windmill.pipTrustedHost | string | `""` | pass the trusted host to pip for private registries |
@@ -108,34 +124,47 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.tag | string | `""` | windmill app image tag, will use the App version if not defined |
 | windmill.workerGroups[0].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[0].annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.workerGroups[0].extraContainers | list | `[]` | Extra sidecar containers |
 | windmill.workerGroups[0].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
+| windmill.workerGroups[0].initContainers | list | `[]` | Init containers |
 | windmill.workerGroups[0].labels | object | `{}` | Labels to apply to the pods |
 | windmill.workerGroups[0].name | string | `"default"` |  |
 | windmill.workerGroups[0].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.workerGroups[0].replicas | int | `3` |  |
 | windmill.workerGroups[0].resources | object | `{"limits":{"cpu":"1000m","memory":"2048Mi"},"requests":{"cpu":"500m","memory":"1028Mi"}}` | Resource limits and requests for the pods |
+| windmill.workerGroups[0].securityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
+| windmill.workerGroups[0].securityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
+| windmill.workerGroups[0].securityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
 | windmill.workerGroups[0].tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.workerGroups[0].volumeMounts | list | `[]` |  |
 | windmill.workerGroups[0].volumes | list | `[]` |  |
 | windmill.workerGroups[1].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[1].annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.workerGroups[1].extraContainers | list | `[]` | Extra sidecar containers |
 | windmill.workerGroups[1].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
 | windmill.workerGroups[1].labels | object | `{}` | Labels to apply to the pods |
 | windmill.workerGroups[1].name | string | `"native"` |  |
 | windmill.workerGroups[1].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.workerGroups[1].replicas | int | `4` |  |
 | windmill.workerGroups[1].resources | object | `{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | Resource limits and requests for the pods |
+| windmill.workerGroups[1].securityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
+| windmill.workerGroups[1].securityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
+| windmill.workerGroups[1].securityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
 | windmill.workerGroups[1].tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.workerGroups[1].volumeMounts | list | `[]` |  |
 | windmill.workerGroups[1].volumes | list | `[]` |  |
 | windmill.workerGroups[2].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[2].annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.workerGroups[2].extraContainers | list | `[]` | Extra sidecar containers |
 | windmill.workerGroups[2].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
 | windmill.workerGroups[2].labels | object | `{}` | Labels to apply to the pods |
 | windmill.workerGroups[2].name | string | `"gpu"` |  |
 | windmill.workerGroups[2].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.workerGroups[2].replicas | int | `0` |  |
 | windmill.workerGroups[2].resources | object | `{}` | Resource limits and requests for the pods |
+| windmill.workerGroups[2].securityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
+| windmill.workerGroups[2].securityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
+| windmill.workerGroups[2].securityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
 | windmill.workerGroups[2].tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.workerGroups[2].volumeMounts | list | `[]` |  |
 | windmill.workerGroups[2].volumes | list | `[]` |  |
@@ -172,4 +201,4 @@ windmill:
 ```
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.11.3](https://github.com/norwoodj/helm-docs/releases/v1.11.3)
+Autogenerated from chart metadata using [helm-docs v1.12.0](https://github.com/norwoodj/helm-docs/releases/v1.12.0)
