@@ -101,7 +101,7 @@ spec:
         - name: "RUST_LOG"
           value: "{{ $.Values.windmill.rustLog }}"
         - name: "MODE"
-          value: "worker"
+          value: {{ default "worker" $v.mode }}
         - name: "JSON_FMT"
           value: "true"
         {{ if $.Values.windmill.pipIndexUrl }}

@@ -110,6 +110,8 @@ windmill:
       extraEnv: []
       # -- Extra sidecar containers
       extraContainers: []
+      mode: "worker"
+
       # -- Init containers
       initContainers: []
       volumes: []
@@ -153,6 +155,8 @@ windmill:
       # -- Extra sidecar containers
       extraContainers: []
 
+      mode: "worker"
+
       volumes: []
       volumeMounts: []
 
@@ -188,9 +192,10 @@ windmill:
       # -- Extra sidecar containers
       extraContainers: []
 
+      mode: "worker"
+
       volumes: []
       volumeMounts: []
-  
   # app configuration
   app:
     # -- Annotations to apply to the pods
@@ -229,7 +234,6 @@ windmill:
 
     # -- volumes
     volumes: []
-      
     # app autoscaling configuration
     autoscaling:
       # -- enable or disable autoscaling
@@ -338,7 +342,7 @@ enterprise:
   s3CacheBucket: ""
   # -- SAML Metadata URL/Content to enable SAML SSO (Can be set in the Instance Settings UI which is the recommended method)
   samlMetadata: ""
-  #-- SCIM token (Can be set in the instance settings UI which is the recommended method)
+  # -- SCIM token (Can be set in the instance settings UI which is the recommended method)
   scimToken: ""
   # -- name of the secret storing the SCIM token, takes precedence over SCIM token string.
   scimTokenSecretName: ""
