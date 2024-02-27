@@ -7,8 +7,8 @@ postgresql:
       enabled: true
     resources:
       limits:
-        cpu: "1000m"
-        memory: "2048Mi"
+        cpu: "1"
+        memory: "2Gi"
       requests:
         cpu: "250m"
         memory: "1024Mi"
@@ -100,11 +100,11 @@ windmill:
       # -- Resource limits and requests for the pods
       resources:
         requests:
-          memory: "1028Mi"
           cpu: "500m"
+          memory: "1Gi"
         limits:
-          memory: "2048Mi"
-          cpu: "1000m"
+          cpu: "1"
+          memory: "2Gi"
 
       # -- Extra environment variables to apply to the pods
       extraEnv: []
@@ -144,11 +144,11 @@ windmill:
       # -- Resource limits and requests for the pods
       resources:
         requests:
-          memory: "128Mi"
           cpu: "100m"
+          memory: "128Mi"
         limits:
-          memory: "256Mi"
           cpu: "200m"
+          memory: "256Mi"
 
       # -- Extra environment variables to apply to the pods
       extraEnv: []
