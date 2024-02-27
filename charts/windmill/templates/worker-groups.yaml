@@ -61,7 +61,7 @@ spec:
         {{ else }}
         securityContext:
         {{ with $v.securityContext }}
-{{ toYaml . | indent 12 }}
+{{ toYaml . | indent 10 }}
         {{ end }}
         {{ end }}
         {{ if $.Values.enterprise.enabled }}
