@@ -5,7 +5,7 @@ metadata:
   name: windmill
 {{- with .Values.ingress.annotations }}
   annotations:
-{{ toYaml . | indent 8 }}
+{{ toYaml . | indent 4 }}
 {{- end }}
 spec:
   {{ if .Values.ingress.className }}
