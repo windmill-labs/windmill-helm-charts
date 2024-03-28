@@ -117,6 +117,9 @@ windmill:
       volumes: []
       volumeMounts: []
 
+      # -- command override
+      command: []
+
     - name: "native"
       replicas: 4
       # -- Annotations to apply to the pods
@@ -196,6 +199,9 @@ windmill:
 
       volumes: []
       volumeMounts: []
+
+      # -- command override
+      command: []
   # app configuration
   app:
     # -- Annotations to apply to the pods
