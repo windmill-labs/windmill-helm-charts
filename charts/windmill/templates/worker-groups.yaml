@@ -132,8 +132,6 @@ spec:
         {{ if $.Values.enterprise.enabledS3DistributedCache }}
         - name: "S3_CACHE_BUCKET"
           value: "{{ $.Values.enterprise.s3CacheBucket }}"
-        - name: "RCLONE_S3_PROVIDER"
-          value: "AWS"
         {{ end }}
         {{ if $.Values.enterprise.nsjail }}
         - name: "DISABLE_NSJAIL"

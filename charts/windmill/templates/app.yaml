@@ -114,6 +114,10 @@ spec:
         - name: "SAML_METADATA"
           value: "{{ .Values.enterprise.samlMetadata }}"
         {{ end }}
+        {{ if $.Values.enterprise.enabledS3DistributedCache }}
+        - name: "S3_CACHE_BUCKET"
+          value: "{{ $.Values.enterprise.s3CacheBucket }}"
+        {{ end }}
         {{if .Values.enterprise.scimTokenSecretName}}
         - name: "SCIM_TOKEN"
           valueFrom:
