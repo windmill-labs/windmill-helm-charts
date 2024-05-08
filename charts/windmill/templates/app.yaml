@@ -132,6 +132,10 @@ spec:
         - name: OPENAI_AZURE_BASE_PATH
           value: "{{ .Values.windmill.openaiAzureBasePath }}"
         {{ end }}
+        {{ if .Values.windmill.cookieDomain }}
+        - name: "COOKIE_DOMAIN"
+          value: "{{ .Values.windmill.cookieDomain }}"
+        {{ end }}
         resources:
 {{ toYaml .Values.windmill.app.resources | indent 12 }}
 {{- with .Values.windmill.app.nodeSelector }}

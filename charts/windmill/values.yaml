@@ -364,3 +364,64 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
   annotations: {}
+
+hub:
+  # -- enable Windmill Hub, requires Windmill Enterprise and license key
+  enabled: false
+  # -- enterprise license key
+  licenseKey: ""
+  # -- replicas for the hub
+  replicas: 1
+  # -- image
+  image: ""
+  # -- name of the secret storing the database URI, take precedence over databaseUrl.
+  databaseUrlSecretName: ""
+  # -- name of the key in secret storing the database URI. The default key of the url is 'url'
+  databaseUrlSecretKey: url
+  # -- Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container
+  databaseUrl: postgres://postgres:windmill@windmill-hub-postgresql/windmillhub?sslmode=disable
+  # -- domain as shown in browser. url of ths service is at: {baseProtocol}://{baseDomain}
+  # -- should be a subdomain of the app domain so that cookies can be shared
+  # -- you also need to set the cookieDomain to the root domain in the app configuration
+  baseDomain: hub.windmill
+  # -- protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container
+  baseProtocol: http
+
+  # -- Annotations to apply to the pods
+  annotations: {}
+  # -- Annotations to apply to the pods
+  labels: {}
+  # -- Node selector to use for scheduling the pods
+  nodeSelector: {}
+  # -- Tolerations to apply to the pods
+  tolerations: []
+  # -- Security context to apply to the pods
+  securityContext:
+    # -- run as user. The default is 0 for root user
+    runAsUser: 0
+    # -- run explicitly as a non-root user. The default is false.
+    runAsNonRoot: false
+  # -- Affinity rules to apply to the pods
+  affinity: {}
+  # -- Resource limits and requests for the pods
+  resources: {}
+  # -- Extra environment variables to apply to the pods
+  extraEnv: []
+
+hub-postgresql:
+  # -- enabled included Postgres container for demo purposes only using bitnami
+  enabled: false
+  fullnameOverride: windmill-hub-postgresql
+  primary:
+    persistence:
+      enabled: true
+    resources:
+      limits:
+        cpu: "1"
+        memory: "2Gi"
+      requests:
+        cpu: "250m"
+        memory: "1024Mi"
+  auth:
+    postgresPassword: windmill
+    database: windmillhub
