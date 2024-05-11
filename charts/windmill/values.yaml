@@ -227,7 +227,10 @@ windmill:
     affinity: {}
 
     # -- Resource limits and requests for the pods
-    resources: {}
+    resources:
+      limits:
+        cpu: "1"
+        memory: "2Gi"
 
     # -- Extra environment variables to apply to the pods
     extraEnv: []
