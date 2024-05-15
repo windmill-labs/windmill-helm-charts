@@ -1,0 +1,90 @@
+{{ if .Values.hub.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: windmill-hub
+  labels:
+    app: windmill-hub
+    app.kubernetes.io/name: windmill-hub
+    chart: {{ template "windmill.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}    
+spec:
+  replicas: {{ .Values.hub.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 3
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: windmill-hub
+  template:
+    metadata:
+      labels:
+        app: windmill-hub
+        app.kubernetes.io/name: windmill-hub
+        container: windmill-hub
+{{- with .Values.hub.labels }}
+{{ toYaml . | indent 8 }}
+{{- end }}
+{{- with .Values.hub.annotations }}
+      annotations:
+{{ toYaml . | indent 8 }}
+{{- end }}
+    spec:
+      {{ if .Values.windmill.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.windmill.imagePullSecrets }}
+      {{ end }}       
+      containers:
+      - name: windmill-hub
+        image: {{ default "ghcr.io/windmill-labs/windmillhub-ee-public" .Values.hub.image }}:{{ default "main" .Values.hub.tag }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        env:
+        {{- with .Values.hub.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        - name: DATABASE_URL
+          value: "{{ .Values.hub.databaseUrl }}"
+        - name: PUBLIC_PRIVATE_HUB
+          value: "true"
+        - name: PUBLIC_APP_URL
+          value: "{{ .Values.windmill.baseProtocol }}://{{ .Values.windmill.baseDomain }}"
+        - name: LICENSE_KEY
+          value: "{{ .Values.hub.licenseKey }}"
+        resources:
+{{ toYaml .Values.hub.resources | indent 12 }}
+    {{- with .Values.hub.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.hub.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.hub.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.hub.securityContext }}
+      securityContext:
+{{ toYaml . | indent 12 }}
+    {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: windmill-hub
+spec:
+  ports:
+    - port: 3003
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app.kubernetes.io/name: windmill-hub
+  sessionAffinity: ClientIP
+  type: ClusterIP
+{{ end }}

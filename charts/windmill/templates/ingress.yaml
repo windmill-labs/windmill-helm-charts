@@ -43,6 +43,18 @@ spec:
                 name: windmill-multiplayer
                 port:
                   number: 3002
+    {{ if .Values.hub.enabled }}
+    - host: {{ .Values.hub.baseDomain | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: windmill-hub
+                port:
+                  number: 3003
+    {{ end }}
     {{ end }}
     - host: {{ .Values.windmill.baseDomain | quote }}
       http:

@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 2.0.100](https://img.shields.io/badge/Version-2.0.100-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.271.0](https://img.shields.io/badge/AppVersion-1.271.0-informational?style=flat-square)
+![Version: 2.0.182](https://img.shields.io/badge/Version-2.0.182-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.323.6](https://img.shields.io/badge/AppVersion-1.323.6-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -22,6 +22,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 |------------|------|---------|
 | https://charts.bitnami.com/bitnami | minio | 12.4.2 |
 | https://charts.bitnami.com/bitnami | postgresql | 12.3.1 |
+| https://charts.bitnami.com/bitnami | hub-postgresql(postgresql) | 12.3.1 |
 
 ## Values
 
@@ -33,9 +34,37 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | enterprise.nsjail | bool | `false` | use nsjail for sandboxing |
 | enterprise.s3CacheBucket | string | `""` | S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container |
 | enterprise.samlMetadata | string | `""` | SAML Metadata URL/Content to enable SAML SSO (Can be set in the Instance Settings UI which is the recommended method) |
-| enterprise.scimToken | string | `""` |  |
+| enterprise.scimToken | string | `""` | SCIM token (Can be set in the instance settings UI which is the recommended method) |
 | enterprise.scimTokenSecretKey | string | `"scimToken"` | name of the key in secret storing the SCIM token. The default key of the SCIM token is 'scimToken' |
 | enterprise.scimTokenSecretName | string | `""` | name of the secret storing the SCIM token, takes precedence over SCIM token string. |
+| hub-postgresql.auth.database | string | `"windmillhub"` |  |
+| hub-postgresql.auth.postgresPassword | string | `"windmill"` |  |
+| hub-postgresql.enabled | bool | `false` | enabled included Postgres container for demo purposes only using bitnami |
+| hub-postgresql.fullnameOverride | string | `"windmill-hub-postgresql"` |  |
+| hub-postgresql.primary.persistence.enabled | bool | `true` |  |
+| hub-postgresql.primary.resources.limits.cpu | string | `"1"` |  |
+| hub-postgresql.primary.resources.limits.memory | string | `"2Gi"` |  |
+| hub-postgresql.primary.resources.requests.cpu | string | `"250m"` |  |
+| hub-postgresql.primary.resources.requests.memory | string | `"1024Mi"` |  |
+| hub.affinity | object | `{}` | Affinity rules to apply to the pods |
+| hub.annotations | object | `{}` | Annotations to apply to the pods |
+| hub.baseDomain | string | `"hub.windmill"` | you also need to set the cookieDomain to the root domain in the app configuration |
+| hub.baseProtocol | string | `"http"` | protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container |
+| hub.databaseUrl | string | `"postgres://postgres:windmill@windmill-hub-postgresql/windmillhub?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container |
+| hub.databaseUrlSecretKey | string | `"url"` | name of the key in secret storing the database URI. The default key of the url is 'url' |
+| hub.databaseUrlSecretName | string | `""` | name of the secret storing the database URI, take precedence over databaseUrl. |
+| hub.enabled | bool | `false` | enable Windmill Hub, requires Windmill Enterprise and license key |
+| hub.extraEnv | list | `[]` | Extra environment variables to apply to the pods |
+| hub.image | string | `""` | image |
+| hub.labels | object | `{}` | Annotations to apply to the pods |
+| hub.licenseKey | string | `""` | enterprise license key |
+| hub.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
+| hub.replicas | int | `1` | replicas for the hub |
+| hub.resources | object | `{}` | Resource limits and requests for the pods |
+| hub.securityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
+| hub.securityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
+| hub.securityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
+| hub.tolerations | list | `[]` | Tolerations to apply to the pods |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
 | ingress.enabled | bool | `true` | enable/disable included ingress resource |
@@ -51,8 +80,8 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | postgresql.enabled | bool | `true` | enabled included Postgres container for demo purposes only using bitnami |
 | postgresql.fullnameOverride | string | `"windmill-postgresql"` |  |
 | postgresql.primary.persistence.enabled | bool | `true` |  |
-| postgresql.primary.resources.limits.cpu | string | `"1000m"` |  |
-| postgresql.primary.resources.limits.memory | string | `"2048Mi"` |  |
+| postgresql.primary.resources.limits.cpu | string | `"1"` |  |
+| postgresql.primary.resources.limits.memory | string | `"2Gi"` |  |
 | postgresql.primary.resources.requests.cpu | string | `"250m"` |  |
 | postgresql.primary.resources.requests.memory | string | `"1024Mi"` |  |
 | serviceAccount.annotations | object | `{}` |  |
@@ -124,14 +153,16 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.tag | string | `""` | windmill app image tag, will use the App version if not defined |
 | windmill.workerGroups[0].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[0].annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.workerGroups[0].command | list | `[]` | command override |
 | windmill.workerGroups[0].extraContainers | list | `[]` | Extra sidecar containers |
 | windmill.workerGroups[0].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
 | windmill.workerGroups[0].initContainers | list | `[]` | Init containers |
 | windmill.workerGroups[0].labels | object | `{}` | Labels to apply to the pods |
+| windmill.workerGroups[0].mode | string | `"worker"` |  |
 | windmill.workerGroups[0].name | string | `"default"` |  |
 | windmill.workerGroups[0].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.workerGroups[0].replicas | int | `3` |  |
-| windmill.workerGroups[0].resources | object | `{"limits":{"cpu":"1000m","memory":"2048Mi"},"requests":{"cpu":"500m","memory":"1028Mi"}}` | Resource limits and requests for the pods |
+| windmill.workerGroups[0].resources | object | `{"limits":{"cpu":"1","memory":"2Gi"},"requests":{"cpu":"500m","memory":"1Gi"}}` | Resource limits and requests for the pods |
 | windmill.workerGroups[0].securityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
 | windmill.workerGroups[0].securityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
 | windmill.workerGroups[0].securityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
@@ -143,6 +174,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[1].extraContainers | list | `[]` | Extra sidecar containers |
 | windmill.workerGroups[1].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
 | windmill.workerGroups[1].labels | object | `{}` | Labels to apply to the pods |
+| windmill.workerGroups[1].mode | string | `"worker"` |  |
 | windmill.workerGroups[1].name | string | `"native"` |  |
 | windmill.workerGroups[1].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.workerGroups[1].replicas | int | `4` |  |
@@ -155,9 +187,11 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[1].volumes | list | `[]` |  |
 | windmill.workerGroups[2].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[2].annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.workerGroups[2].command | list | `[]` | command override |
 | windmill.workerGroups[2].extraContainers | list | `[]` | Extra sidecar containers |
 | windmill.workerGroups[2].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
 | windmill.workerGroups[2].labels | object | `{}` | Labels to apply to the pods |
+| windmill.workerGroups[2].mode | string | `"worker"` |  |
 | windmill.workerGroups[2].name | string | `"gpu"` |  |
 | windmill.workerGroups[2].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.workerGroups[2].replicas | int | `0` |  |
@@ -201,4 +235,4 @@ windmill:
 ```
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.12.0](https://github.com/norwoodj/helm-docs/releases/v1.12.0)
+Autogenerated from chart metadata using [helm-docs v1.13.1](https://github.com/norwoodj/helm-docs/releases/v1.13.1)
