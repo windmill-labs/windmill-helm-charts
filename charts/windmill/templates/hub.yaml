@@ -47,8 +47,16 @@ spec:
         {{- with .Values.hub.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        - name: DATABASE_URL
+        {{ if .Values.hub.databaseUrlSecretName }}
+        - name: "DATABASE_URL"
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.hub.databaseUrlSecretName }}"
+              key: "{{ .Values.hub.databaseUrlSecretKey }}"
+        {{ else }}
+        - name: "DATABASE_URL"
           value: "{{ .Values.hub.databaseUrl }}"
+        {{ end }}
         - name: PUBLIC_PRIVATE_HUB
           value: "true"
         - name: PUBLIC_APP_URL
