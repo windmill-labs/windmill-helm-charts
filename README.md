@@ -17,7 +17,7 @@
   <a href="#full-values">Full Values</a> •
   <a href="#local-s3">Local S3</a> •
   <a href="#caveats">Caveats</a> •  
-  <a href="#k8s-tips">Kubernetes Tips</a>
+  <a href="#kubernetes-hosting-tips">Kubernetes Tips</a>
 </p>
 
 <hr>
