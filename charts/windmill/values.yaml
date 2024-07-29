@@ -99,9 +99,6 @@ windmill:
 
       # -- Resource limits and requests for the pods
       resources:
-        requests:
-          cpu: "500m"
-          memory: "1Gi"
         limits:
           cpu: "1"
           memory: "2Gi"
@@ -121,7 +118,7 @@ windmill:
       command: []
 
     - name: "native"
-      replicas: 4
+      replicas: 1
       # -- Annotations to apply to the pods
       annotations: {}
 
@@ -146,15 +143,16 @@ windmill:
 
       # -- Resource limits and requests for the pods
       resources:
-        requests:
-          cpu: "100m"
-          memory: "128Mi"
         limits:
-          cpu: "200m"
-          memory: "256Mi"
+          cpu: "1"
+          memory: "2Gi"
 
       # -- Extra environment variables to apply to the pods
-      extraEnv: []
+      extraEnv:
+        - name: "NUM_WORKERS"
+          value: "8"
+        - name: "SLEEP_QUEUE"
+          value: "200"
       # -- Extra sidecar containers
       extraContainers: []
 
