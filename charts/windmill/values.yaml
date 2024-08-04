@@ -249,8 +249,8 @@ windmill:
       maxReplicas: 10
       # -- target CPU utilization
       targetCPUUtilizationPercentage: 80
-  
-    # -- whether to open and export the smtp port for the app for email triggers
+
+    # -- whether to expose the smtp port of the app for email triggers
     exposeSmtp: false
 
 
