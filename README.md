@@ -393,15 +393,28 @@ enterprise:
 
 The helm chart does have an ingress configuration included. It's enabled by
 default. The ingress uses the `windmill.baseDomain` variable for its hostname
-configuration. Here are two example configurations for an AWS ALB and
-nginx-ingress/cert-manager:
+configuration. Here are example configurations for a few cloud providers.
 
-AWS ALB:
+It configures the HTTP ingress for the app, lsp and multiplayer containers.
+The configuration (except for plain nginx ingress) also exposes the windmill app SMTP service for email triggers on a separate IP address. 
+This is the IP address you need to point your `mail.<domain>` MX/A records to.
+
+
+### AWS ALB
 
 ```yaml
 windmill:
   baseDomain: "windmill.example.com"
+  app:
+    smtpService:
+      enabled: true
+      annotations:
+        service.beta.kubernetes.io/aws-load-balancer-type: "external"
+        service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+        service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    ...
   ...
+...
 
 ingress:
   className: "alb"
@@ -414,10 +427,84 @@ ingress:
     alb.ingress.kubernetes.io/group.name: windmill
     alb.ingress.kubernetes.io/group.order: '10'
     alb.ingress.kubernetes.io/certificate-arn: my-certificatearn
-...
 ```
 
-nginx ingress + cert-manager:
+### GCP + GCE LB + managed certificates
+
+```yaml
+windmill:
+  baseDomain: "windmill.example.com"
+  app:
+    service:
+      annotations:
+        cloud.google.com/backend-config: '{"default": "session-config"}'
+    smtpService:
+      enabled: true
+      annotations:
+        cloud.google.com/l4-rbs: "enabled"
+        # # for static ip:
+        # networking.gke.io/load-balancer-ip-addresses: <REGIONAL_IP_NAME>
+  lsp:
+    service:
+      annotations:
+        cloud.google.com/backend-config: '{"default": "session-config"}'
+        
+ingress:
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: <GLOBAL_IP_NAME>
+    networking.gke.io/managed-certificates: managed-cert
+```
+
+Replace `<GLOBAL_IP_NAME>` with the name of a global static IP address you've created in GCP.
+
+In addition to the above, you will need to apply the following resources for session affinity and managed certificates:
+
+```yaml
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: windmill-backendconfig
+spec:
+  sessionAffinity:
+    affinityType: "GENERATED_COOKIE"
+    affinityCookieTtlSec: 86400 # max
+```
+
+```yaml
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: managed-cert
+spec:
+  domains:
+    - windmill.example.com
+```
+
+### Azure + app routing + keyvault certificate
+
+```yaml
+windmill:
+  baseDomain: "windmill.example.com"
+  app:
+    smtpService:
+      enabled: true
+      # # for static ip:
+      # annotations:
+      #   service.beta.kubernetes.io/azure-load-balancer-ipv4: <IP-V4>
+ingress:
+  annotations:
+    kubernetes.azure.com/tls-cert-keyvault-uri: <KeyVaultCertificateUri>
+  className: webapprouting.kubernetes.azure.com
+  tls:
+    - hosts:
+      - "windmill.example.com"
+      secretName: keyvault-windmill
+```
+
+You can find more details about SSL certificates with webapprouting in Azure [here](https://learn.microsoft.com/en-us/azure/aks/app-routing-dns-ssl).
+
+### NGINX ingress + cert-manager:
 
 ```yaml
 windmill:
@@ -438,6 +525,10 @@ ingress:
 ...
 ```
 
+You will also need to install cert-manager and configure an issuer. More details [here](https://cert-manager.io/docs/installation/#default-static-install) and [here](https://cert-manager.io/docs/tutorials/acme/nginx-ingress/#step-6---configure-a-lets-encrypt-issuer). Cert-manager can also be used with the other cloud providers.
+
+### Generic
+
 There are many ways to expose an app and it will depend on the requirements of
 your environment. If you don't want to use the included ingress and roll your
 own, you can just disable it. Overall, you want the following endpoints
@@ -446,6 +537,7 @@ accessible included in the chart:
 - windmill app on port 8000
 - lsp application on port 3001
 - metrics endpoints on port 8001 for the app and workers (ee only)
+- windmill app smtp service on port 2525 for email triggers (need to be exposed on port 25)
 
 If you are using Prometheus and if the enterprise edition is enabled, you can
 scrape the windmill-app-metrics service on port 8001 at /metrics endpoint to
