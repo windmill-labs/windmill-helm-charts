@@ -69,6 +69,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: windmill-lsp
+{{- with .Values.windmill.lsp.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
 spec:
   ports:
     - port: 3001
