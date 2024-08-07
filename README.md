@@ -396,8 +396,8 @@ default. The ingress uses the `windmill.baseDomain` variable for its hostname
 configuration. Here are example configurations for a few cloud providers.
 
 It configures the HTTP ingress for the app, lsp and multiplayer containers.
-The configuration (except for plain nginx ingress) also exposes the windmill app SMTP service for email triggers on a separate IP address. 
-This is the IP address you need to point your `mail.<domain>` MX/A records to.
+The configuration (except for plain nginx ingress) also exposes the windmill app SMTP service for email triggers on a separate IP address/domain name. 
+This is the IP address/domain name you need to point your MX/A records to, learn more [here](https://www.windmill.dev/docs/advanced/email_triggers).
 
 
 ### AWS ALB
@@ -412,6 +412,8 @@ windmill:
         service.beta.kubernetes.io/aws-load-balancer-type: "external"
         service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
         service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+        # # for static ip (more info on https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.7/guide/service/annotations/#eip-allocations):
+        # service.beta.kubernetes.io/aws-load-balancer-eip-allocations: eipalloc-xxxxxxxxxxxxxxxxx,eipalloc-yyyyyyyyyyyyyyyyy
     ...
   ...
 ...
@@ -442,7 +444,7 @@ windmill:
       enabled: true
       annotations:
         cloud.google.com/l4-rbs: "enabled"
-        # # for static ip:
+        # # for static ip (more info on https://cloud.google.com/kubernetes-engine/docs/concepts/service-load-balancer-parameters#spd-static-ip-parameters):
         # networking.gke.io/load-balancer-ip-addresses: <REGIONAL_IP_NAME>
   lsp:
     service:
@@ -489,9 +491,9 @@ windmill:
   app:
     smtpService:
       enabled: true
-      # # for static ip:
+      # # for static ip (more info on https://learn.microsoft.com/en-us/azure/aks/static-ip):
       # annotations:
-      #   service.beta.kubernetes.io/azure-load-balancer-ipv4: <IP-V4>
+      #   service.beta.kubernetes.io/azure-pip-name: <myAKSPublicIP>
 ingress:
   annotations:
     kubernetes.azure.com/tls-cert-keyvault-uri: <KeyVaultCertificateUri>
