@@ -78,6 +78,9 @@ windmill:
       # -- Annotations to apply to the pods
       annotations: {}
 
+      # -- If a job is being ran, the container will wait for it to finish before terminating until this grace period
+      terminationGracePeriodSeconds: 300
+
       # -- Labels to apply to the pods
       labels: {}
 

@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 2.0.182](https://img.shields.io/badge/Version-2.0.182-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.323.6](https://img.shields.io/badge/AppVersion-1.323.6-informational?style=flat-square)
+![Version: 2.0.261](https://img.shields.io/badge/Version-2.0.261-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.388.0](https://img.shields.io/badge/AppVersion-1.388.0-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -97,7 +97,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.app.initContainers | list | `[]` | Init containers |
 | windmill.app.labels | object | `{}` | Annotations to apply to the pods |
 | windmill.app.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
-| windmill.app.resources | object | `{}` | Resource limits and requests for the pods |
+| windmill.app.resources | object | `{"limits":{"cpu":"1","memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.app.securityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
 | windmill.app.securityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
 | windmill.app.securityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
@@ -162,23 +162,24 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].name | string | `"default"` |  |
 | windmill.workerGroups[0].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.workerGroups[0].replicas | int | `3` |  |
-| windmill.workerGroups[0].resources | object | `{"limits":{"cpu":"1","memory":"2Gi"},"requests":{"cpu":"500m","memory":"1Gi"}}` | Resource limits and requests for the pods |
+| windmill.workerGroups[0].resources | object | `{"limits":{"cpu":"1","memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.workerGroups[0].securityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
 | windmill.workerGroups[0].securityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
 | windmill.workerGroups[0].securityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
+| windmill.workerGroups[0].terminationGracePeriodSeconds | int | `300` | If a job is being ran, the container will wait for it to finish before terminating until this grace period |
 | windmill.workerGroups[0].tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.workerGroups[0].volumeMounts | list | `[]` |  |
 | windmill.workerGroups[0].volumes | list | `[]` |  |
 | windmill.workerGroups[1].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[1].annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.workerGroups[1].extraContainers | list | `[]` | Extra sidecar containers |
-| windmill.workerGroups[1].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
+| windmill.workerGroups[1].extraEnv | list | `[{"name":"NUM_WORKERS","value":"8"},{"name":"SLEEP_QUEUE","value":"200"}]` | Extra environment variables to apply to the pods |
 | windmill.workerGroups[1].labels | object | `{}` | Labels to apply to the pods |
 | windmill.workerGroups[1].mode | string | `"worker"` |  |
 | windmill.workerGroups[1].name | string | `"native"` |  |
 | windmill.workerGroups[1].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
-| windmill.workerGroups[1].replicas | int | `4` |  |
-| windmill.workerGroups[1].resources | object | `{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | Resource limits and requests for the pods |
+| windmill.workerGroups[1].replicas | int | `1` |  |
+| windmill.workerGroups[1].resources | object | `{"limits":{"cpu":"1","memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.workerGroups[1].securityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
 | windmill.workerGroups[1].securityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
 | windmill.workerGroups[1].securityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
