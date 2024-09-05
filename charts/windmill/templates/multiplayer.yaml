@@ -57,9 +57,13 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }} 
+    {{- with .Values.windmill.multiplayer.podSecurityContext }}
+      securityContext:
+{{ toYaml . | indent 8 }}
+    {{- end }}
     {{- with .Values.windmill.multiplayer.securityContext }}
       securityContext:
-{{ toYaml . | indent 12 }}
+{{ toYaml . | indent 8 }}
     {{- end }}
 ---
 apiVersion: v1

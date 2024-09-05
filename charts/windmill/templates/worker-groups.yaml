@@ -64,6 +64,9 @@ spec:
         {{ with $v.securityContext }}
 {{ toYaml . | indent 10 }}
         {{ end }}
+        {{ with $v.containerSecurityContext }}
+{{ toYaml . | indent 10 }}
+        {{ end }}
         {{ end }}
         {{ if $.Values.enterprise.enabled }}
         image: {{ default "ghcr.io/windmill-labs/windmill-ee" $.Values.windmill.image }}:{{ default $.Chart.AppVersion $.Values.windmill.tag }}
@@ -159,6 +162,10 @@ spec:
     {{- end }}
     {{- with $v.affinity }}
       affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with $v.podSecurityContext }}
+      securityContext:
 {{ toYaml . | indent 8 }}
     {{- end }}
     {{- with $v.tolerations }}
