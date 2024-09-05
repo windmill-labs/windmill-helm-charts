@@ -39,6 +39,10 @@ spec:
       {{ end }}       
       containers:
       - name: windmill-hub
+        securityContext:
+      {{- with .Values.hub.containerSecurityContext }}
+      {{- toYaml . | nindent 10 }}
+      {{- end }}
         image: {{ default "ghcr.io/windmill-labs/windmillhub-ee-public" .Values.hub.image }}:{{ default "main" .Values.hub.tag }}
         imagePullPolicy: Always
         ports:

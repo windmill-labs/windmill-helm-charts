@@ -38,6 +38,10 @@ spec:
       {{ end }}       
       containers:
       - name: windmill-lsp
+        securityContext:
+      {{- with .Values.windmill.lsp.containerSecurityContext }}
+      {{- toYaml . | nindent 10 }}
+      {{- end }}
         image: {{ default "ghcr.io/windmill-labs/windmill-lsp" .Values.windmill.lsp.image }}:{{ default "latest" .Values.windmill.lsp.tag }}
         imagePullPolicy: Always
         ports:

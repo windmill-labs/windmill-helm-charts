@@ -39,6 +39,10 @@ spec:
       {{ end }}  
       containers:
       - name: windmill-multiplayer
+        securityContext:
+      {{- with .Values.windmill.multiplayer.containerSecurityContext }}
+      {{- toYaml . | nindent 10 }}
+      {{- end }}
         image: {{ default "ghcr.io/windmill-labs/windmill-multiplayer" .Values.windmill.multiplayer.image }}:{{ default "latest" .Values.windmill.multiplayer.tag }}
         imagePullPolicy: Always
         ports:
