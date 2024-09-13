@@ -265,6 +265,18 @@ windmill:
       # -- target CPU utilization
       targetCPUUtilizationPercentage: 80
 
+    # app service configuration
+    service:
+      # -- Annotations to apply to the service
+      annotations: {}
+
+    # -- smtp service configuration for email triggers
+    smtpService:
+      # -- whether to expose the smtp port of the app using a load balancer service
+      enabled: false
+      # -- annotations to apply to the service
+      annotations: {}
+
 
   # lsp configuration
   lsp:
@@ -308,6 +320,11 @@ windmill:
       maxReplicas: 10
       # -- target CPU utilization
       targetCPUUtilizationPercentage: 80
+
+    # lsp service configuration
+    service:
+      # -- Annotations to apply to the service
+      annotations: {}
 
   # multiplayer configuration
   multiplayer:
