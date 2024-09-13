@@ -391,6 +391,8 @@ enterprise:
 
 ## Kubernetes Hosting Tips
 
+### Ingress configuration
+
 The helm chart does have an ingress configuration included. It's enabled by
 default. The ingress uses the `windmill.baseDomain` variable for its hostname
 configuration. Here are example configurations for a few cloud providers.
@@ -544,5 +546,46 @@ accessible included in the chart:
 If you are using Prometheus and if the enterprise edition is enabled, you can
 scrape the windmill-app-metrics service on port 8001 at /metrics endpoint to
 gather stats about the Windmill application.
+
+### Docker dind configruation
+
+If you don't want to run Docker using the host's Docker engine, you can use
+Docker-in-Docker (dind). Below is the configuration:
+
+```yaml
+windmill:
+  workerGroups:
+  - name: "native"
+    replicas: 2
+    volumes:
+    - emptyDir: {}
+      name: sock-dir
+    - emptyDir: {}
+      name: windmill-workspace
+    volumeMounts:
+    - mountPath: /var/run
+      name: sock-dir
+    - mountPath: /opt/windmill
+      name: windmill-workspace
+    extraContainers:
+    - args:
+      - --mtu=1450
+      image: docker:27.2.1-dind
+      imagePullPolicy: IfNotPresent
+      name: dind
+      resources: {}
+      securityContext:
+        privileged: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /opt/windmill
+        name: windmill-workspace
+      - mountPath: /var/run
+        name: sock-dir
+    mode: "worker"
+```
+NOTE: the `windmill-workspace` volumeMount is used to share files between the dind
+container and the worker container.
 
 <!--

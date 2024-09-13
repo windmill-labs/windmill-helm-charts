@@ -78,6 +78,9 @@ windmill:
       # -- Annotations to apply to the pods
       annotations: {}
 
+      # -- If a job is being ran, the container will wait for it to finish before terminating until this grace period
+      terminationGracePeriodSeconds: 300
+
       # -- Labels to apply to the pods
       labels: {}
 
@@ -87,12 +90,15 @@ windmill:
       # -- Tolerations to apply to the pods
       tolerations: []
 
-      # -- Security context to apply to the pods
-      securityContext:
+      # -- Security context to apply to the container
+      podSecurityContext:
         # -- run as user. The default is 0 for root user
         runAsUser: 0
         # -- run explicitly as a non-root user. The default is false.
         runAsNonRoot: false
+      # -- Security context to apply to the pod
+      containerSecurityContext: {}
+
 
       # -- Affinity rules to apply to the pods
       affinity: {}
@@ -131,12 +137,15 @@ windmill:
       # -- Tolerations to apply to the pods
       tolerations: []
 
-      # -- Security context to apply to the pods
-      securityContext:
+      # -- Security context to apply to the container
+      podSecurityContext:
         # -- run as user. The default is 0 for root user
         runAsUser: 0
         # -- run explicitly as a non-root user. The default is false.
         runAsNonRoot: false
+      # -- Security context to apply to the pod
+      containerSecurityContext: {}
+
 
       # -- Affinity rules to apply to the pods
       affinity: {}
@@ -175,12 +184,15 @@ windmill:
       # -- Tolerations to apply to the pods
       tolerations: []
 
-      # -- Security context to apply to the pods
-      securityContext:
+      # -- Security context to apply to the container
+      podSecurityContext:
         # -- run as user. The default is 0 for root user
         runAsUser: 0
         # -- run explicitly as a non-root user. The default is false.
         runAsNonRoot: false
+      # -- Security context to apply to the pod
+      containerSecurityContext: {}
+
 
       # -- Affinity rules to apply to the pods
       affinity: {}
@@ -214,12 +226,15 @@ windmill:
     # -- Tolerations to apply to the pods
     tolerations: []
 
+    # -- legacy, use podSecurityContext instead
+    securityContext: {}
     # -- Security context to apply to the pods
-    securityContext:
+    podSecurityContext:
       # -- run as user. The default is 0 for root user
       runAsUser: 0
       # -- run explicitly as a non-root user. The default is false.
       runAsNonRoot: false
+    containerSecurityContext: {}
 
     # -- Affinity rules to apply to the pods
     affinity: {}
@@ -278,12 +293,15 @@ windmill:
     # -- Tolerations to apply to the pods
     tolerations: []
 
-    # -- Security context to apply to the pods
+    # -- legacy, use podSecurityContext instead
     securityContext:
+    # -- Security context to apply to the pods
+    podSecurityContext:
       # -- run as user. The default is 0 for root user
       runAsUser: 0
       # -- run explicitly as a non-root user. The default is false.
       runAsNonRoot: false
+    containerSecurityContext: {}
 
     # -- Affinity rules to apply to the pods
     affinity: {}
@@ -323,12 +341,15 @@ windmill:
     # -- Tolerations to apply to the pods
     tolerations: []
 
-    # -- Security context to apply to the pods
+    # -- legacy, use podSecurityContext instead
     securityContext:
+    # -- Security context to apply to the pods
+    podSecurityContext:
       # -- run as user. The default is 0 for root user
       runAsUser: 0
       # -- run explicitly as a non-root user. The default is false.
       runAsNonRoot: false
+    containerSecurityContext: {}
 
     # -- Affinity rules to apply to the pods
     affinity: {}
@@ -413,12 +434,16 @@ hub:
   nodeSelector: {}
   # -- Tolerations to apply to the pods
   tolerations: []
-  # -- Security context to apply to the pods
+  # -- legacy, use podSecurityContext instead
   securityContext:
+  # -- Security context to apply to the pods
+  podSecurityContext:
     # -- run as user. The default is 0 for root user
     runAsUser: 0
     # -- run explicitly as a non-root user. The default is false.
     runAsNonRoot: false
+  containerSecurityContext: {}
+
   # -- Affinity rules to apply to the pods
   affinity: {}
   # -- Resource limits and requests for the pods

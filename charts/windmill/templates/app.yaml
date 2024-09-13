@@ -49,6 +49,10 @@ spec:
       {{- toYaml . | nindent 6 }}
       {{- end }}
       - name: windmill-app
+        securityContext:
+      {{- with .Values.windmill.app.containerSecurityContext }}
+      {{- toYaml . | nindent 10 }}
+      {{- end }}
         lifecycle:
           preStop:
             exec:
@@ -154,9 +158,13 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
+    {{- with .Values.windmill.app.podSecurityContext }}
+      securityContext:
+{{ toYaml . | indent 8 }}
+    {{- end }}
     {{- with .Values.windmill.app.securityContext }}
       securityContext:
-{{ toYaml . | indent 12 }}
+{{ toYaml . | indent 8 }}
     {{- end }}
 ---
 apiVersion: v1
