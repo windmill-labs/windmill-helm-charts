@@ -1,8 +1,9 @@
 {{- range $v := .Values.windmill.workerGroups }}
 {{ if and $v.replicas (gt (int $v.replicas) 0)}}
 ---
+{{- $controllerType := include "validateControllerKind" $v.controller }}
 apiVersion: apps/v1
-kind: Deployment
+kind: {{ $controllerType }}
 metadata:
   name: windmill-workers-{{ $v.name }}
   labels:
@@ -14,11 +15,19 @@ metadata:
     workerGroup: {{ $v.name }}
 spec:
   replicas: {{ $v.replicas }}
+  {{- if eq $controllerType "Deployment" }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 3
       maxUnavailable: 0
+  {{- else if eq $controllerType "StatefulSet" }}
+  serviceName: windmill-workers-{{ $v.name }}
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  {{- end }}
   selector:
     matchLabels:
       app: windmill-workers
@@ -183,6 +192,12 @@ spec:
     {{- with $v.tolerations }}
       tolerations:
 {{ toYaml . | indent 8 }}
+{{- end }}
+{{- if eq $controllerType "StatefulSet" }}
+  {{- if $v.volumeClaimTemplates }}
+  volumeClaimTemplates:
+    {{- toYaml $v.volumeClaimTemplates | nindent 2 }}
+  {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

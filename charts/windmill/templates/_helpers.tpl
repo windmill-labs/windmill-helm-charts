@@ -60,3 +60,16 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Validate controller kind, defaulting to "Deployment"
+*/}}
+{{- define "validateControllerKind" -}}
+{{- $validTypes := list "Deployment" "StatefulSet" -}}
+{{- $inputType := default "Deployment" . -}}
+{{- if has $inputType $validTypes -}}
+{{ $inputType }}
+{{- else -}}
+{{- fail (printf "Invalid controller type: %s. Must be either Deployment or StatefulSet" $inputType) -}}
+{{- end -}}
+{{- end -}}

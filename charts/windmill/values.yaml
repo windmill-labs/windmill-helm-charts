@@ -73,6 +73,9 @@ windmill:
     # workers configuration
     # The default worker group
     - name: "default"
+      # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
+      controller: "Deployment"
+
       replicas: 3
       # -- Annotations to apply to the pods
       annotations: {}
@@ -98,7 +101,6 @@ windmill:
       # -- Security context to apply to the pod
       containerSecurityContext: {}
 
-
       # -- Affinity rules to apply to the pods
       affinity: {}
 
@@ -118,6 +120,9 @@ windmill:
       volumes: []
       volumeMounts: []
 
+      # -- Volume claim templates. Only applies when controller is "StatefulSet"
+      volumeClaimTemplates: []
+
       # -- command override
       command: []
 
@@ -125,6 +130,9 @@ windmill:
       exposeHostDocker: false
 
     - name: "native"
+      # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
+      controller: "Deployment"
+
       replicas: 1
       # -- Annotations to apply to the pods
       annotations: {}
@@ -146,7 +154,6 @@ windmill:
         runAsNonRoot: false
       # -- Security context to apply to the pod
       containerSecurityContext: {}
-
 
       # -- Affinity rules to apply to the pods
       affinity: {}
@@ -173,7 +180,13 @@ windmill:
       # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
       exposeHostDocker: false
 
+      # -- Volume claim templates. Only applies when controller is "StatefulSet"
+      volumeClaimTemplates: []
+
     - name: "gpu"
+      # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
+      controller: "Deployment"
+
       replicas: 0
       # -- Annotations to apply to the pods
       annotations: {}
@@ -196,7 +209,6 @@ windmill:
       # -- Security context to apply to the pod
       containerSecurityContext: {}
 
-
       # -- Affinity rules to apply to the pods
       affinity: {}
 
@@ -218,6 +230,9 @@ windmill:
 
       # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
       exposeHostDocker: false
+
+      # -- Volume claim templates. Only applies when controller is "StatefulSet"
+      volumeClaimTemplates: []
   # app configuration
   app:
     # -- Annotations to apply to the pods
@@ -263,7 +278,7 @@ windmill:
     volumes: []
 
     volumeMounts: []
-    
+
     # app autoscaling configuration
     autoscaling:
       # -- enable or disable autoscaling
@@ -284,7 +299,6 @@ windmill:
       enabled: false
       # -- annotations to apply to the service
       annotations: {}
-
 
   # lsp configuration
   lsp:
