@@ -380,6 +380,10 @@ ingress:
 enterprise:
   # -- enable Windmill Enterprise, requires license key.
   enabled: false
+  # -- name of the secret storing the enterprise license key, take precedence over licenseKey string.
+  licenseKeySecretName: ""
+  # -- name of the key in secret storing the enterprise license key. The default key is 'licenseKey'
+  licenseKeySecretKey: licenseKey
   # -- enterprise license key. (Recommended to avoid: It is recommended to pass it from the Instance settings UI instead)
   licenseKey: ""
   enabledS3DistributedCache: false
