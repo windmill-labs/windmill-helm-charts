@@ -65,8 +65,21 @@ spec:
           value: "true"
         - name: PUBLIC_APP_URL
           value: "{{ .Values.windmill.baseProtocol }}://{{ .Values.windmill.baseDomain }}"
-        - name: LICENSE_KEY
-          value: "{{ .Values.hub.licenseKey }}"
+        {{ if .Values.enterprise.enabled }}
+        {{ if .Values.enterprise.licenseKeySecretName }}
+        - name: "LICENSE_KEY"
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.enterprise.licenseKeySecretName }}
+              key: {{ .Values.enterprise.licenseKeySecretKey }}
+        {{ else if .Values.enterprise.licenseKey }}
+        - name: "LICENSE_KEY"
+          value: "{{ .Values.enterprise.licenseKey }}"
+        {{ else }}
+        - name: "LICENSE_KEY"
+          value: "{{ .Values.hub.licenseKey }}" #DEPRECATED
+        {{ end }}
+        {{ end }}
         resources:
 {{ toYaml .Values.hub.resources | indent 12 }}
     {{- with .Values.hub.nodeSelector }}

@@ -111,6 +111,13 @@ spec:
           value: "true"
         {{ end }}
         {{ if .Values.enterprise.enabled }}
+        {{ if .Values.enterprise.licenseKeySecretName }}
+        - name: "LICENSE_KEY"
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.enterprise.licenseKeySecretName }}
+              key: {{ .Values.enterprise.licenseKeySecretKey }}
+        {{ else }}
         - name: "LICENSE_KEY"
           value: "{{ .Values.enterprise.licenseKey }}"
         {{ end }}
@@ -131,6 +138,7 @@ spec:
         {{ else if .Values.enterprise.scimToken}}
         - name: "SCIM_TOKEN"
           value: "{{ .Values.enterprise.scimToken }}"
+        {{ end }}
         {{ end }}
         {{ if .Values.windmill.openaiAzureBasePath}}
         - name: OPENAI_AZURE_BASE_PATH
