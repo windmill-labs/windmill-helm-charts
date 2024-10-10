@@ -74,6 +74,9 @@ windmill:
     # workers configuration
     # The default worker group
     - name: "default"
+      # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
+      controller: "Deployment"
+
       replicas: 3
       # -- Annotations to apply to the pods
       annotations: {}
@@ -99,7 +102,6 @@ windmill:
       # -- Security context to apply to the pod
       containerSecurityContext: {}
 
-
       # -- Affinity rules to apply to the pods
       affinity: {}
 
@@ -120,10 +122,16 @@ windmill:
       volumes: []
       volumeMounts: []
 
+      # -- Volume claim templates. Only applies when controller is "StatefulSet"
+      volumeClaimTemplates: []
+
       # -- command override
       command: []
 
     - name: "native"
+      # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
+      controller: "Deployment"
+
       replicas: 1
       # -- Annotations to apply to the pods
       annotations: {}
@@ -145,7 +153,6 @@ windmill:
         runAsNonRoot: false
       # -- Security context to apply to the pod
       containerSecurityContext: {}
-
 
       # -- Affinity rules to apply to the pods
       affinity: {}
@@ -170,7 +177,13 @@ windmill:
       volumes: []
       volumeMounts: []
 
+      # -- Volume claim templates. Only applies when controller is "StatefulSet"
+      volumeClaimTemplates: []
+
     - name: "gpu"
+      # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
+      controller: "Deployment"
+
       replicas: 0
       # -- Annotations to apply to the pods
       annotations: {}
@@ -193,7 +206,6 @@ windmill:
       # -- Security context to apply to the pod
       containerSecurityContext: {}
 
-
       # -- Affinity rules to apply to the pods
       affinity: {}
 
@@ -210,8 +222,12 @@ windmill:
       volumes: []
       volumeMounts: []
 
+      # -- Volume claim templates. Only applies when controller is "StatefulSet"
+      volumeClaimTemplates: []
+
       # -- command override
       command: []
+
   # app configuration
   app:
     # -- Annotations to apply to the pods
