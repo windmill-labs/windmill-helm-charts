@@ -43,6 +43,18 @@ spec:
                 name: windmill-multiplayer
                 port:
                   number: 3002
+    {{ if .Values.windmill.indexer.enabled }}
+    - host: {{ .Values.windmill.baseDomain | quote }}
+      http:
+        paths:
+          - path: /api/srch/
+            pathType: Prefix
+            backend:
+              service:
+                name: windmill-indexer
+                port:
+                  number: 8000
+    {{ end }}
     {{ if .Values.hub.enabled }}
     - host: {{ .Values.hub.baseDomain | quote }}
       http:
