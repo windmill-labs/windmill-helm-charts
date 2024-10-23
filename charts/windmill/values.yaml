@@ -369,6 +369,56 @@ windmill:
       # -- target CPU utilization
       targetCPUUtilizationPercentage: 80
 
+  # indexer configuration
+  indexer:
+    tag: "latest"
+
+    enabled: true
+
+    # -- Annotations to apply to the pods
+    annotations: {}
+
+    # -- Annotations to apply to the pods
+    labels: {}
+
+    # -- Node selector to use for scheduling the pods
+    nodeSelector: {}
+
+    # -- Tolerations to apply to the pods
+    tolerations: []
+
+    # -- legacy, use podSecurityContext instead
+    securityContext:
+    # -- Security context to apply to the pods
+    podSecurityContext:
+      # -- run as user. The default is 0 for root user
+      runAsUser: 0
+      # -- run explicitly as a non-root user. The default is false.
+      runAsNonRoot: false
+    containerSecurityContext: {}
+
+    # -- Affinity rules to apply to the pods
+    affinity: {}
+
+    # -- Resource limits and requests for the pods
+    resources: {}
+
+    # -- job logs bigger than this will be truncated before indexing
+    tantivyMaxIndexedJobLogSize__mb: 1
+    # -- how often to backup the index into object storage in seconds
+    tantivyS3BackupPeriod__s: 3600
+    # -- higher budget for higher indexing throughput
+    tantivyIndexWriterMemoryBudget__mb: 500
+    # -- how often to start indexing new jobs
+    tantivyRefreshIndexPeriod__s: 300
+    # -- how many documents to batch in one commit
+    tantivyDocCommitMaxBatchSize: 100000
+    # -- log memory usage and progress every so many documents indexed
+    tantivyShowMemoryEvery: 10000
+
+    # -- Extra environment variables to apply to the pods
+    extraEnv: []
+
 ingress:
   # -- enable/disable included ingress resource
   enabled: true
