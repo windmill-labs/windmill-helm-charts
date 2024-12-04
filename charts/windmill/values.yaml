@@ -403,19 +403,6 @@ windmill:
     # -- Resource limits and requests for the pods
     resources: {}
 
-    # -- job logs bigger than this will be truncated before indexing
-    tantivyMaxIndexedJobLogSize__mb: 1
-    # -- how often to backup the index into object storage in seconds
-    tantivyS3BackupPeriod__s: 3600
-    # -- higher budget for higher indexing throughput
-    tantivyIndexWriterMemoryBudget__mb: 500
-    # -- how often to start indexing new jobs
-    tantivyRefreshIndexPeriod__s: 300
-    # -- how many documents to batch in one commit
-    tantivyDocCommitMaxBatchSize: 100000
-    # -- log memory usage and progress every so many documents indexed
-    tantivyShowMemoryEvery: 10000
-
     # -- Extra environment variables to apply to the pods
     extraEnv: []
 
