@@ -129,31 +129,7 @@ spec:
         - name: "COOKIE_DOMAIN"
           value: "{{ .Values.windmill.cookieDomain }}"
         {{ end }}
-        {{ if .Values.windmill.indexer.tantivyMaxIndexedJobLogSize__mb }}
-        - name: "TANTIVY_MAX_INDEXED_JOB_LOG_SIZE__MB"
-          value: "{{ .Values.windmill.indexer.tantivyMaxIndexedJobLogSize__mb }}"
-        {{ end }}
-        {{ if .Values.windmill.indexer.tantivyS3BackupPeriod__s }}
-        - name: "TANTIVY_S3_BACKUP_PERIOD__S"
-          value: "{{ .Values.windmill.indexer.tantivyS3BackupPeriod__s }}"
-        {{ end }}
-        {{ if .Values.windmill.indexer.tantivyIndexWriterMemoryBudget__mb }}
-        - name: "TANTIVY_INDEX_WRITER_MEMORY_BUDGET__MB"
-          value: "{{ .Values.windmill.indexer.tantivyIndexWriterMemoryBudget__mb }}"
-        {{ end }}
-        {{ if .Values.windmill.indexer.tantivyRefreshIndexPeriod__s }}
-        - name: "TANTIVY_REFRESH_INDEX_PERIOD__S"
-          value: "{{ .Values.windmill.indexer.tantivyRefreshIndexPeriod__s }}"
-        {{ end }}
-        {{ if .Values.windmill.indexer.tantivyDocCommitMaxBatchSize }}
-        - name: "TANTIVY_DOC_COMMIT_MAX_BATCH_SIZE"
-          value: "{{ .Values.windmill.indexer.tantivyDocCommitMaxBatchSize }}"
-        {{ end }}
-        {{ if .Values.windmill.indexer.tantivyShowMemoryEvery }}
-        - name: "TANTIVY_SHOW_MEMORY_EVERY"
-          value: "{{ .Values.windmill.indexer.tantivyShowMemoryEvery }}"
-        {{ end }}
-
+        
         resources:
 {{ toYaml .Values.windmill.indexer.resources | indent 12 }}
     {{- with .Values.windmill.indexer.nodeSelector }}
