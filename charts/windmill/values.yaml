@@ -369,6 +369,43 @@ windmill:
       # -- target CPU utilization
       targetCPUUtilizationPercentage: 80
 
+  # indexer configuration
+  indexer:
+    tag: "latest"
+
+    enabled: true
+
+    # -- Annotations to apply to the pods
+    annotations: {}
+
+    # -- Annotations to apply to the pods
+    labels: {}
+
+    # -- Node selector to use for scheduling the pods
+    nodeSelector: {}
+
+    # -- Tolerations to apply to the pods
+    tolerations: []
+
+    # -- legacy, use podSecurityContext instead
+    securityContext:
+    # -- Security context to apply to the pods
+    podSecurityContext:
+      # -- run as user. The default is 0 for root user
+      runAsUser: 0
+      # -- run explicitly as a non-root user. The default is false.
+      runAsNonRoot: false
+    containerSecurityContext: {}
+
+    # -- Affinity rules to apply to the pods
+    affinity: {}
+
+    # -- Resource limits and requests for the pods
+    resources: {}
+
+    # -- Extra environment variables to apply to the pods
+    extraEnv: []
+
 ingress:
   # -- enable/disable included ingress resource
   enabled: true

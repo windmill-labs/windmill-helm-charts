@@ -1,0 +1,150 @@
+{{- if and .Values.enterprise.enabled .Values.windmill.indexer.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: windmill-indexer
+  labels:
+    app: windmill-indexer
+    app.kubernetes.io/name: windmill-indexer
+    chart: {{ template "windmill.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: windmill-indexer
+  template:
+    metadata:
+      labels:
+        app: windmill-indexer
+        app.kubernetes.io/name: windmill-indexer
+        container: windmill-indexer
+{{- with .Values.windmill.indexer.labels }}
+{{ toYaml . | indent 8 }}
+{{- end }}
+{{- with .Values.windmill.indexer.annotations }}
+      annotations:
+{{ toYaml . | indent 8 }}
+  {{- end }}
+    spec:
+      {{ if .Values.windmill.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.windmill.imagePullSecrets }}
+      {{ end }}
+      containers:
+      - name: windmill-indexer
+        securityContext:
+      {{- with .Values.windmill.indexer.containerSecurityContext }}
+      {{- toYaml . | nindent 10 }}
+      {{- end }}
+        image: {{ default "ghcr.io/windmill-labs/windmill-ee" .Values.windmill.image }}:{{ default "latest" .Values.windmill.tag }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        readinessProbe:
+          timeoutSeconds: 1
+          successThreshold: 1
+          failureThreshold: 1
+          httpGet:
+            host:
+            scheme: HTTP
+            path: /
+            httpHeaders:
+            - name: Host
+              value: localhost
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        env:
+        {{- with .Values.windmill.indexer.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{ if .Values.enterprise.enabled }}
+        - name : "METRICS_ADDR"
+          value: "true"
+        {{ end }}
+        {{ if .Values.windmill.databaseUrlSecretName }}
+        - name: "DATABASE_URL"
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.windmill.databaseUrlSecretName }}"
+              key: "{{ .Values.windmill.databaseUrlSecretKey }}"
+        {{ else }}
+        - name: "DATABASE_URL"
+          value: "{{ .Values.windmill.databaseUrl }}"
+        {{ end }}
+        - name: "BASE_URL"
+          value: "{{ .Values.windmill.baseProtocol }}://{{ .Values.windmill.baseDomain }}"
+        - name: "RUST_LOG"
+          value: "{{ .Values.windmill.rustLog }}"
+        - name: "MODE"
+          value: "indexer"
+        - name: "JSON_FMT"
+          value: "true"
+        {{ if .Values.windmill.instanceEventsWebhook }}
+        - name: "INSTANCE_EVENTS_WEBHOOK"
+          value: "true"
+        {{ end }}
+        {{ if .Values.enterprise.enabled }}
+        {{ if .Values.enterprise.licenseKeySecretName }}
+        - name: "LICENSE_KEY"
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.enterprise.licenseKeySecretName }}
+              key: {{ .Values.enterprise.licenseKeySecretKey }}
+        {{ else }}
+        - name: "LICENSE_KEY"
+          value: "{{ .Values.enterprise.licenseKey }}"
+        {{ end }}
+        {{ if .Values.enterprise.samlMetadata }}
+        - name: "SAML_METADATA"
+          value: "{{ .Values.enterprise.samlMetadata }}"
+        {{ end }}
+        {{ if $.Values.enterprise.enabledS3DistributedCache }}
+        - name: "S3_CACHE_BUCKET"
+          value: "{{ $.Values.enterprise.s3CacheBucket }}"
+        {{ end }}
+        {{ end }}
+        resources:
+{{ toYaml .Values.windmill.indexer.resources | indent 12 }}
+    {{- with .Values.windmill.indexer.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.indexer.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.indexer.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.indexer.podSecurityContext }}
+      securityContext:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.indexer.securityContext }}
+      securityContext:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: windmill-indexer
+spec:
+  ports:
+    - port: 8000
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    app.kubernetes.io/name: windmill-indexer
+  sessionAffinity: ClientIP
+  type: ClusterIP
+{{- end -}}
