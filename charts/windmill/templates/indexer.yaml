@@ -14,7 +14,7 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 3
+      maxSurge: 1
       maxUnavailable: 0
   selector:
     matchLabels:
@@ -110,26 +110,7 @@ spec:
         - name: "S3_CACHE_BUCKET"
           value: "{{ $.Values.enterprise.s3CacheBucket }}"
         {{ end }}
-        {{if .Values.enterprise.scimTokenSecretName}}
-        - name: "SCIM_TOKEN"
-          valueFrom:
-            secretKeyRef:
-              name: "{{ .Values.enterprise.scimTokenSecretName }}"
-              key: "{{ .Values.enterprise.scimTokenSecretKey }}"
-        {{ else if .Values.enterprise.scimToken}}
-        - name: "SCIM_TOKEN"
-          value: "{{ .Values.enterprise.scimToken }}"
-        {{ end }}
-        {{ end }}
-        {{ if .Values.windmill.openaiAzureBasePath}}
-        - name: OPENAI_AZURE_BASE_PATH
-          value: "{{ .Values.windmill.openaiAzureBasePath }}"
-        {{ end }}
-        {{ if .Values.windmill.cookieDomain }}
-        - name: "COOKIE_DOMAIN"
-          value: "{{ .Values.windmill.cookieDomain }}"
-        {{ end }}
-        
+
         resources:
 {{ toYaml .Values.windmill.indexer.resources | indent 12 }}
     {{- with .Values.windmill.indexer.nodeSelector }}
