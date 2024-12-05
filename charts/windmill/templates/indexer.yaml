@@ -110,7 +110,7 @@ spec:
         - name: "S3_CACHE_BUCKET"
           value: "{{ $.Values.enterprise.s3CacheBucket }}"
         {{ end }}
-
+        {{ end }}
         resources:
 {{ toYaml .Values.windmill.indexer.resources | indent 12 }}
     {{- with .Values.windmill.indexer.nodeSelector }}
