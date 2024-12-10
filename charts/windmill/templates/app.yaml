@@ -63,6 +63,12 @@ spec:
         image: {{ default "ghcr.io/windmill-labs/windmill" .Values.windmill.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
         {{ end }}
         imagePullPolicy: Always
+        {{ if .Values.windmill.app.volumeMounts }}
+        volumeMounts:
+        {{- with .Values.windmill.app.volumeMounts }}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
+        {{ end }}
         ports:
         - containerPort: 8000
         - containerPort: 8001
