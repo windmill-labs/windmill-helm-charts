@@ -7,7 +7,6 @@ postgresql:
       enabled: true
     resources:
       limits:
-        cpu: "1"
         memory: "2Gi"
       requests:
         cpu: "250m"
@@ -106,7 +105,6 @@ windmill:
       # -- Resource limits and requests for the pods
       resources:
         limits:
-          cpu: "1"
           memory: "2Gi"
 
       # -- Extra environment variables to apply to the pods
@@ -153,7 +151,6 @@ windmill:
       # -- Resource limits and requests for the pods
       resources:
         limits:
-          cpu: "1"
           memory: "2Gi"
 
       # -- Extra environment variables to apply to the pods
@@ -242,7 +239,6 @@ windmill:
     # -- Resource limits and requests for the pods
     resources:
       limits:
-        cpu: "1"
         memory: "2Gi"
 
     # -- Extra environment variables to apply to the pods
@@ -501,10 +497,9 @@ hub-postgresql:
       enabled: true
     resources:
       limits:
-        cpu: "1"
         memory: "2Gi"
       requests:
-        cpu: "250m"
+        cpu: "1"
         memory: "1024Mi"
   auth:
     postgresPassword: windmill
