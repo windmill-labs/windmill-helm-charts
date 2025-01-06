@@ -82,8 +82,12 @@ spec:
         {{ end }}
         ports:
         - containerPort: 8001
-        {{ if $v.volumeMounts }}
         volumeMounts:
+        {{ if or $.Values.windmill.exposeHostDocker $v.exposeHostDocker }}
+        - name: docker-sock
+          mountPath: "/var/run/docker.sock"
+        {{ end }}
+        {{ if $v.volumeMounts }}
         {{- with $v.volumeMounts }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -155,11 +159,11 @@ spec:
         resources:
 {{ toYaml $v.resources | indent 12 }}
       volumes:
-    {{ if $.Values.windmill.exposeHostDocker }}
+    {{ if or $.Values.windmill.exposeHostDocker $v.exposeHostDocker }}
       - name: docker-sock
         hostPath:
           path: "/var/run/docker.sock"
-          type: File
+          type: Socket
     {{ end }}
     {{- with $v.volumes }}
     {{ toYaml . | nindent 8 }}

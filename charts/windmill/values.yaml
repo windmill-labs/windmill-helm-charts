@@ -121,6 +121,9 @@ windmill:
       # -- command override
       command: []
 
+      # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
+      exposeHostDocker: false
+
     - name: "native"
       replicas: 1
       # -- Annotations to apply to the pods
@@ -167,6 +170,9 @@ windmill:
       volumes: []
       volumeMounts: []
 
+      # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
+      exposeHostDocker: false
+
     - name: "gpu"
       replicas: 0
       # -- Annotations to apply to the pods
@@ -209,6 +215,9 @@ windmill:
 
       # -- command override
       command: []
+
+      # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
+      exposeHostDocker: false 
   # app configuration
   app:
     # -- Annotations to apply to the pods
