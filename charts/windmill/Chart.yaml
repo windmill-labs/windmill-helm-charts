@@ -1,8 +1,8 @@
 apiVersion: v2
 name: windmill
 type: application
-version: 2.0.336
-appVersion: 1.443.0
+version: 2.0.337
+appVersion: 1.444.0
 dependencies:
   - condition: postgresql.enabled
     name: postgresql
