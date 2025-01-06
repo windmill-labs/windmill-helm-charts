@@ -217,7 +217,7 @@ windmill:
       command: []
 
       # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
-      exposeHostDocker: false 
+      exposeHostDocker: false
   # app configuration
   app:
     # -- Annotations to apply to the pods
