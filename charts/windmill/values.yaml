@@ -261,6 +261,9 @@ windmill:
 
     # -- volumes
     volumes: []
+
+    volumeMounts: []
+    
     # app autoscaling configuration
     autoscaling:
       # -- enable or disable autoscaling
