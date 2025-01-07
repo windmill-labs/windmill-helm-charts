@@ -49,6 +49,18 @@ automatically when using a super-user role for the databaseUrl.
 Follow those
 [instructions](https://docs.windmill.dev/docs/advanced/self_host#run-windmill-without-using-a-postgres-superuser)
 
+### Running windmill pods as non-root user
+
+By default the windmill pods run as `root`. You can opt to run the pods as non-root by setting uid: 1000
+
+```
+windmill
+  app
+    podSecurityContext:
+      runAsUser: 1000
+      runAsNonRoot: true
+```
+
 ### Test it on minikube
 
 To make it work on a local minkube to test. Get the ip address of the ingress:
