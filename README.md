@@ -51,7 +51,8 @@ Follow those
 
 ### Running windmill pods as non-root user
 
-By default the windmill pods run as `root`. You can opt to run the pods as non-root by setting uid: 1000
+By default the windmill pods run as `root`. You can opt to run the pods as
+non-root by setting uid: 1000
 
 ```
 windmill
@@ -195,7 +196,7 @@ enterprise:
 | enterprise.enabled                                              | bool   | `false`                                                                                    | enable Windmill Enterprise , requires license key.                                                                                                                                                               |
 | enterprise.enabledS3DistributedCache                            | bool   | `false`                                                                                    |                                                                                                                                                                                                                  |
 | enterprise.licenseKey                                           | string | `"123456F"`                                                                                | Windmill provided Enterprise license key. Sets LICENSE_KEY environment variable in app and worker container.                                                                                                     |
-| enterprise.licenseKeySecretName                                  | string | `""`                                                                                       | name of the secret storing the Enterprise license key, take precedence over licenseKey. The default key is `"licenseKey"`                                                                                                       |
+| enterprise.licenseKeySecretName                                 | string | `""`                                                                                       | name of the secret storing the Enterprise license key, take precedence over licenseKey. The default key is `"licenseKey"`                                                                                        |
 | enterprise.nsjail                                               | bool   | `false`                                                                                    | use nsjail for sandboxing                                                                                                                                                                                        |
 | enterprise.s3CacheBucket                                        | string | `"mybucketname"`                                                                           | S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container                                                                                                             |
 | enterprise.samlMetadata                                         | string | `""`                                                                                       | SAML Metadata URL to enable SAML SSO (Can be set in the Instance Settings UI, which is the recommended method)                                                                                                   |
@@ -272,39 +273,39 @@ enterprise:
 | windmill.workerGroups[0].affinity                               | object | `{}`                                                                                       | Affinity rules to apply to the pods                                                                                                                                                                              |
 | windmill.workerGroups[0].annotations                            | object | `{}`                                                                                       | Annotations to apply to the pods                                                                                                                                                                                 |
 | windmill.workerGroups[0].extraEnv                               | list   | `[]`                                                                                       | Extra environment variables to apply to the pods                                                                                                                                                                 |
-| windmill.workerGroups[0].extraContainers                        | list   | `[]`                                                                                       | Extra containers as sidecars
+| windmill.workerGroups[0].extraContainers                        | list   | `[]`                                                                                       | Extra containers as sidecars                                                                                                                                                                                     |
 | windmill.workerGroups[0].labels                                 | object | `{}`                                                                                       | Labels to apply to the pods                                                                                                                                                                                      |
 | windmill.workerGroups[0].name                                   | string | `"default"`                                                                                |                                                                                                                                                                                                                  |
 | windmill.workerGroups[0].nodeSelector                           | object | `{}`                                                                                       | Node selector to use for scheduling the pods                                                                                                                                                                     |
 | windmill.workerGroups[0].replicas                               | int    | `3`                                                                                        |                                                                                                                                                                                                                  |
 | windmill.workerGroups[0].resources                              | object | `{"limits":{"cpu":"1000m","memory":"2048Mi"},"requests":{"cpu":"500m","memory":"1028Mi"}}` | Resource limits and requests for the pods                                                                                                                                                                        |
 | windmill.workerGroups[0].tolerations                            | list   | `[]`                                                                                       | Tolerations to apply to the pods                                                                                                                                                                                 |
-| windmill.workerGroups[0].mode                                   | string | `"worker"`                                                                                 | Mode for workers, "worker" or "agent", agent requires Enterprise
-| windmill.workerGroups[0].command                                | list   | `[]`                                                                                       | Command to run, overrides image default command
+| windmill.workerGroups[0].mode                                   | string | `"worker"`                                                                                 | Mode for workers, "worker" or "agent", agent requires Enterprise                                                                                                                                                 |
+| windmill.workerGroups[0].command                                | list   | `[]`                                                                                       | Command to run, overrides image default command                                                                                                                                                                  |
 | windmill.workerGroups[1].affinity                               | object | `{}`                                                                                       | Affinity rules to apply to the pods                                                                                                                                                                              |
 | windmill.workerGroups[1].annotations                            | object | `{}`                                                                                       | Annotations to apply to the pods                                                                                                                                                                                 |
 | windmill.workerGroups[1].extraEnv                               | list   | `[]`                                                                                       | Extra environment variables to apply to the pods                                                                                                                                                                 |
-| windmill.workerGroups[1].extraContainers                        | list   | `[]`                                                                                       | Extra containers as sidecars
+| windmill.workerGroups[1].extraContainers                        | list   | `[]`                                                                                       | Extra containers as sidecars                                                                                                                                                                                     |
 | windmill.workerGroups[1].labels                                 | object | `{}`                                                                                       | Labels to apply to the pods                                                                                                                                                                                      |
 | windmill.workerGroups[1].name                                   | string | `"gpu"`                                                                                    |                                                                                                                                                                                                                  |
 | windmill.workerGroups[1].nodeSelector                           | object | `{}`                                                                                       | Node selector to use for scheduling the pods                                                                                                                                                                     |
 | windmill.workerGroups[1].replicas                               | int    | `0`                                                                                        |                                                                                                                                                                                                                  |
 | windmill.workerGroups[1].resources                              | object | `{}`                                                                                       | Resource limits and requests for the pods                                                                                                                                                                        |
 | windmill.workerGroups[1].tolerations                            | list   | `[]`                                                                                       | Tolerations to apply to the pods                                                                                                                                                                                 |
-| windmill.workerGroups[1].mode                                   | string | `"worker"`                                                                                 | Mode for workers, "worker" or "agent", agent requires Enterprise
-| windmill.workerGroups[1].command                                | list   | `[]`                                                                                       | Command to run, overrides image default command
+| windmill.workerGroups[1].mode                                   | string | `"worker"`                                                                                 | Mode for workers, "worker" or "agent", agent requires Enterprise                                                                                                                                                 |
+| windmill.workerGroups[1].command                                | list   | `[]`                                                                                       | Command to run, overrides image default command                                                                                                                                                                  |
 | windmill.workerGroups[2].affinity                               | object | `{}`                                                                                       | Affinity rules to apply to the pods                                                                                                                                                                              |
 | windmill.workerGroups[2].annotations                            | object | `{}`                                                                                       | Annotations to apply to the pods                                                                                                                                                                                 |
 | windmill.workerGroups[2].extraEnv                               | list   | `[]`                                                                                       | Extra environment variables to apply to the pods                                                                                                                                                                 |
-| windmill.workerGroups[2].extraContainers                        | list   | `[]`                                                                                       | Extra containers as sidecars
+| windmill.workerGroups[2].extraContainers                        | list   | `[]`                                                                                       | Extra containers as sidecars                                                                                                                                                                                     |
 | windmill.workerGroups[2].labels                                 | object | `{}`                                                                                       | Labels to apply to the pods                                                                                                                                                                                      |
 | windmill.workerGroups[2].name                                   | string | `"native"`                                                                                 |                                                                                                                                                                                                                  |
 | windmill.workerGroups[2].nodeSelector                           | object | `{}`                                                                                       | Node selector to use for scheduling the pods                                                                                                                                                                     |
 | windmill.workerGroups[2].replicas                               | int    | `4`                                                                                        |                                                                                                                                                                                                                  |
 | windmill.workerGroups[2].resources                              | object | `{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}`    | Resource limits and requests for the pods                                                                                                                                                                        |
 | windmill.workerGroups[2].tolerations                            | list   | `[]`                                                                                       | Tolerations to apply to the pods                                                                                                                                                                                 |
-| windmill.workerGroups[2].mode                                   | string | `"worker"`                                                                                 | Mode for workers, "worker" or "agent", agent requires Enterprise
-| windmill.workerGroups[2].command                                | list   | `[]`                                                                                       | Command to run, overrides image default command
+| windmill.workerGroups[2].mode                                   | string | `"worker"`                                                                                 | Mode for workers, "worker" or "agent", agent requires Enterprise                                                                                                                                                 |
+| windmill.workerGroups[2].command                                | list   | `[]`                                                                                       | Command to run, overrides image default command                                                                                                                                                                  |
 
 ## Local S3
 
@@ -410,10 +411,11 @@ The helm chart does have an ingress configuration included. It's enabled by
 default. The ingress uses the `windmill.baseDomain` variable for its hostname
 configuration. Here are example configurations for a few cloud providers.
 
-It configures the HTTP ingress for the app, lsp and multiplayer containers.
-The configuration (except for plain nginx ingress) also exposes the windmill app SMTP service for email triggers on a separate IP address/domain name. 
-This is the IP address/domain name you need to point your MX/A records to, learn more [here](https://www.windmill.dev/docs/advanced/email_triggers).
-
+It configures the HTTP ingress for the app, lsp and multiplayer containers. The
+configuration (except for plain nginx ingress) also exposes the windmill app
+SMTP service for email triggers on a separate IP address/domain name. This is
+the IP address/domain name you need to point your MX/A records to, learn more
+[here](https://www.windmill.dev/docs/advanced/email_triggers).
 
 ### AWS ALB
 
@@ -465,7 +467,7 @@ windmill:
     service:
       annotations:
         cloud.google.com/backend-config: '{"default": "session-config"}'
-        
+
 ingress:
   annotations:
     kubernetes.io/ingress.class: "gce"
@@ -473,9 +475,11 @@ ingress:
     networking.gke.io/managed-certificates: managed-cert
 ```
 
-Replace `<GLOBAL_IP_NAME>` with the name of a global static IP address you've created in GCP.
+Replace `<GLOBAL_IP_NAME>` with the name of a global static IP address you've
+created in GCP.
 
-In addition to the above, you will need to apply the following resources for session affinity and managed certificates:
+In addition to the above, you will need to apply the following resources for
+session affinity and managed certificates:
 
 ```yaml
 apiVersion: cloud.google.com/v1
@@ -515,11 +519,12 @@ ingress:
   className: webapprouting.kubernetes.azure.com
   tls:
     - hosts:
-      - "windmill.example.com"
+        - "windmill.example.com"
       secretName: keyvault-windmill
 ```
 
-You can find more details about SSL certificates with webapprouting in Azure [here](https://learn.microsoft.com/en-us/azure/aks/app-routing-dns-ssl).
+You can find more details about SSL certificates with webapprouting in Azure
+[here](https://learn.microsoft.com/en-us/azure/aks/app-routing-dns-ssl).
 
 ### NGINX ingress + cert-manager:
 
@@ -542,7 +547,10 @@ ingress:
 ...
 ```
 
-You will also need to install cert-manager and configure an issuer. More details [here](https://cert-manager.io/docs/installation/#default-static-install) and [here](https://cert-manager.io/docs/tutorials/acme/nginx-ingress/#step-6---configure-a-lets-encrypt-issuer). Cert-manager can also be used with the other cloud providers.
+You will also need to install cert-manager and configure an issuer. More details
+[here](https://cert-manager.io/docs/installation/#default-static-install) and
+[here](https://cert-manager.io/docs/tutorials/acme/nginx-ingress/#step-6---configure-a-lets-encrypt-issuer).
+Cert-manager can also be used with the other cloud providers.
 
 ### Generic
 
@@ -554,7 +562,8 @@ accessible included in the chart:
 - windmill app on port 8000
 - lsp application on port 3001
 - metrics endpoints on port 8001 for the app and workers (ee only)
-- windmill app smtp service on port 2525 for email triggers (need to be exposed on port 25)
+- windmill app smtp service on port 2525 for email triggers (need to be exposed
+  on port 25)
 
 If you are using Prometheus and if the enterprise edition is enabled, you can
 scrape the windmill-app-metrics service on port 8001 at /metrics endpoint to
@@ -568,37 +577,41 @@ Docker-in-Docker (dind). Below is the configuration:
 ```yaml
 windmill:
   workerGroups:
-  - name: "native"
-    replicas: 2
-    volumes:
-    - emptyDir: {}
-      name: sock-dir
-    - emptyDir: {}
-      name: windmill-workspace
-    volumeMounts:
-    - mountPath: /var/run
-      name: sock-dir
-    - mountPath: /opt/windmill
-      name: windmill-workspace
-    extraContainers:
-    - args:
-      - --mtu=1450
-      image: docker:27.2.1-dind
-      imagePullPolicy: IfNotPresent
-      name: dind
-      resources: {}
-      securityContext:
-        privileged: true
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: File
+    - name: "docker"
+      replicas: 2
+      volumes:
+        - emptyDir: {}
+          name: sock-dir
+        - emptyDir: {}
+          name: windmill-workspace
       volumeMounts:
-      - mountPath: /opt/windmill
-        name: windmill-workspace
-      - mountPath: /var/run
-        name: sock-dir
-    mode: "worker"
+        - mountPath: /var/run
+          name: sock-dir
+        - mountPath: /opt/windmill
+          name: windmill-workspace
+      extraContainers:
+        - args:
+            - --mtu=1450
+          image: docker:27.2.1-dind
+          imagePullPolicy: IfNotPresent
+          name: dind
+          resources:
+            requests:
+              cpu: "1000m"
+            limits:
+              memory: "2Gi"
+          securityContext:
+            privileged: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /opt/windmill
+              name: windmill-workspace
+            - mountPath: /var/run
+              name: sock-dir
 ```
-NOTE: the `windmill-workspace` volumeMount is used to share files between the dind
-container and the worker container.
+
+NOTE: the `windmill-workspace` volumeMount is used to share files between the
+dind container and the worker container.
 
 <!--
