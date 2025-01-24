@@ -33,6 +33,7 @@ spec:
 {{ toYaml . | indent 8 }}
   {{- end }}
     spec:
+      serviceAccountName: {{ template "windmill.serviceAccountName" . }}
       {{ if .Values.windmill.imagePullSecrets }}
       imagePullSecrets:
       - name: {{ .Values.windmill.imagePullSecrets }}
