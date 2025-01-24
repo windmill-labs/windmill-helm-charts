@@ -175,7 +175,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].podSecurityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
 | windmill.workerGroups[0].replicas | int | `3` |  |
 | windmill.workerGroups[0].resources | object | `{"limits":{"cpu":"1","memory":"2Gi"}}` | Resource limits and requests for the pods |
-| windmill.workerGroups[0].terminationGracePeriodSeconds | int | `300` | If a job is being ran, the container will wait for it to finish before terminating until this grace period |
+| windmill.workerGroups[0].terminationGracePeriodSeconds | int | `604800` | If a job is being ran, the container will wait for it to finish before terminating until this grace period |
 | windmill.workerGroups[0].tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.workerGroups[0].volumeMounts | list | `[]` |  |
 | windmill.workerGroups[0].volumes | list | `[]` |  |

@@ -49,7 +49,7 @@ spec:
       {{- toYaml . | nindent 6 }}
       {{- end }}
       {{ end }}
-      terminationGracePeriodSeconds: {{ default 300 $v.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ default 604800 $v.terminationGracePeriodSeconds }}
       containers:
       {{- with $v.extraContainers }}
       {{- toYaml . | nindent 6 }}
