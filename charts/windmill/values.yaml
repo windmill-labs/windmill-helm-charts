@@ -303,6 +303,10 @@ windmill:
   # lsp configuration
   lsp:
     tag: "latest"
+
+    # -- enable or disable lsp
+    enabled: true
+
     # -- Annotations to apply to the pods
     annotations: {}
 
@@ -351,6 +355,10 @@ windmill:
   # multiplayer configuration
   multiplayer:
     tag: "latest"
+
+    # -- enable or disable multiplayer
+    enabled: true
+
     # -- Annotations to apply to the pods
     annotations: {}
 

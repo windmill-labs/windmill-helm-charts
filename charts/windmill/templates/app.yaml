@@ -1,3 +1,4 @@
+{{- if and .Values.windmill.appReplicas (gt (int .Values.windmill.appReplicas) 0) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -233,6 +234,7 @@ spec:
       targetPort: 2525
       protocol: TCP
   type: LoadBalancer
+{{- end }}
 {{- end }}
 # ---
 # apiVersion: monitoring.coreos.com/v1
