@@ -403,6 +403,7 @@ windmill:
   indexer:
     tag: "latest"
 
+    # -- enable or disable indexer
     enabled: true
 
     # -- Annotations to apply to the pods
