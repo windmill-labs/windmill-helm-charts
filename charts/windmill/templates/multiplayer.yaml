@@ -1,4 +1,4 @@
-{{- if .Values.enterprise.enabled -}}
+{{- if and .Values.enterprise.enabled .Values.windmill.multiplayer.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
