@@ -39,12 +39,14 @@ windmill:
   lspReplicas: 2
   # -- replicas for the multiplayer containers used by the app (ee only and ignored if enterprise not enabled)
   multiplayerReplicas: 1
-  # -- name of the secret storing the database URI, take precedence over databaseUrl.
+  # -- name of the existing secret storing the database URI, take precedence over databaseUrl.
   databaseUrlSecretName: ""
-  # -- name of the key in secret storing the database URI. The default key of the url is 'url'
+  # -- name of the key in existing secret storing the database URI. The default key of the url is 'url'
   databaseUrlSecretKey: url
   # -- Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container
   databaseUrl: postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable
+  # -- whether to create a secret containing the value of databaseUrl
+  databaseSecret: false
   # -- domain as shown in browser. url of ths service is at: {baseProtocol}://{baseDomain}
   baseDomain: windmill
   # -- protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container
