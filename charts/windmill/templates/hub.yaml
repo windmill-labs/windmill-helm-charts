@@ -51,7 +51,13 @@ spec:
         {{- with .Values.hub.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{ if .Values.hub.databaseUrlSecretName }}
+        {{ if .Values.hub.databaseSecret }}
+        - name: "DATABASE_URL"
+          valueFrom:
+            secretKeyRef:
+              name: "windmill-database"
+              key: "url"
+        {{ else if .Values.hub.databaseUrlSecretName }}
         - name: "DATABASE_URL"
           valueFrom:
             secretKeyRef:
