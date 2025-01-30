@@ -70,7 +70,7 @@ spec:
         - name : "METRICS_ADDR"
           value: "true"
         {{ end }}
-        {{- if and .Values.windmill.createSecret .Values.windmill.databaseUrl -}}
+        {{ if .Values.windmill.databaseSecret }}
         - name: "DATABASE_URL"
           valueFrom:
             secretKeyRef:
