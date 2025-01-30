@@ -484,6 +484,8 @@ hub:
   databaseUrlSecretKey: url
   # -- Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container
   databaseUrl: postgres://postgres:windmill@windmill-hub-postgresql/windmillhub?sslmode=disable
+  # -- whether to create a secret containing the value of databaseUrl
+  databaseSecret: false
   # -- domain as shown in browser. url of ths service is at: {baseProtocol}://{baseDomain}
   # -- should be a subdomain of the app domain so that cookies can be shared
   # -- you also need to set the cookieDomain to the root domain in the app configuration
