@@ -403,8 +403,6 @@ windmill:
 
   # indexer configuration
   indexer:
-    tag: "latest"
-
     # -- enable or disable indexer
     enabled: true
 
