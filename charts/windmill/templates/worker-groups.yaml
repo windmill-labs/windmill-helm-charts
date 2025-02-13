@@ -19,7 +19,7 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 3
+      maxSurge: 2
       maxUnavailable: 0
   {{- else if eq $controllerType "StatefulSet" }}
   serviceName: windmill-workers-{{ $v.name }}
