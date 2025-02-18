@@ -91,6 +91,19 @@ spec:
         {{ end }}
         ports:
         - containerPort: 8001
+        {{ if $.Values.enterprise.enabled }}
+        readinessProbe:
+          initialDelaySeconds: 1
+          periodSeconds: 5
+          timeoutSeconds: 1
+          successThreshold: 1
+          failureThreshold: 1
+          httpGet:
+            host:
+            scheme: HTTP
+            path: /ready
+            port: 8001
+        {{ end }}
         volumeMounts:
         {{ if or $.Values.windmill.exposeHostDocker $v.exposeHostDocker }}
         - name: docker-sock
