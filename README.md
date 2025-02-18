@@ -553,6 +553,53 @@ You will also need to install cert-manager and configure an issuer. More details
 [here](https://cert-manager.io/docs/tutorials/acme/nginx-ingress/#step-6---configure-a-lets-encrypt-issuer).
 Cert-manager can also be used with the other cloud providers.
 
+### Tailscale with TLS
+
+```yaml
+ingress:
+  enabled: false
+windmill:
+  baseDomain: "mywindmill.example.ts.net"
+  ...
+```
+
+You will also need to install the [tailscale operator](https://tailscale.com/kb/1236/kubernetes-operator)
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: windmill
+  namespace: windmill
+spec:
+  ingressClassName: tailscale
+  rules:
+
+  - host: mywindmill
+    http:
+      paths:
+      - backend:
+          service:
+            name: windmill-lsp
+            port:
+              number: 3001
+        path: /ws/
+        pathType: Prefix
+  - host: mywindmill
+    http:
+      paths:
+      - backend:
+          service:
+            name: windmill-app
+            port:
+              number: 8000
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - mywindmill
+```
+
 ### Generic
 
 There are many ways to expose an app and it will depend on the requirements of
