@@ -194,7 +194,7 @@ spec:
           type: Socket
     {{ end }}
     {{- with $v.volumes }}
-    {{ toYaml . | nindent 8 }}
+    {{ toYaml . | nindent 6 }}
     {{- end }}
     {{- with $v.nodeSelector }}
       nodeSelector:
