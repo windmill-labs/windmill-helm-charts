@@ -68,6 +68,18 @@ spec:
                   number: 3003
     {{ end }}
     {{ end }}
+    {{ if .Values.windmill.mcpEnabled }}
+    - host: {{ .Values.windmill.baseDomain | quote }}
+      http:
+        paths:
+          - path: /api/mcp/
+            pathType: Prefix
+            backend:
+              service:
+                name: windmill-mcp
+                port:
+                  number: 8000
+    {{ end }}
     - host: {{ .Values.windmill.baseDomain | quote }}
       http:
         paths:

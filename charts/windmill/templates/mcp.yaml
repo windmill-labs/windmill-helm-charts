@@ -209,3 +209,4 @@ spec:
     app.kubernetes.io/name: windmill-mcp
   sessionAffinity: None
   type: ClusterIP
+{{- end }}
