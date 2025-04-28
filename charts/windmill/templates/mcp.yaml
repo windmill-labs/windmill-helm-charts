@@ -1,0 +1,211 @@
+# later this won't be needed as MCP will be available with the app service/container but for now mcp is stateful and can't be scaled to more than 1
+{{- if and .Values.windmill.appReplicas .Values.windmill.mcpEnabled (gt (int .Values.windmill.appReplicas) 0) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: windmill-mcp
+  labels:
+    app: windmill-mcp
+    app.kubernetes.io/name: windmill-mcp
+    chart: {{ template "windmill.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: windmill-mcp
+  template:
+    metadata:
+      labels:
+        app: windmill-mcp
+        app.kubernetes.io/name: windmill-mcp
+        release: {{ .Release.Name }}
+{{- with .Values.windmill.app.labels }}
+{{ toYaml . | indent 8 }}
+{{- end }}
+{{- with .Values.windmill.app.annotations }}
+      annotations:
+{{ toYaml . | indent 8 }}
+{{- end }}
+    spec:
+      terminationGracePeriodSeconds: 40
+      serviceAccountName: {{ template "windmill.serviceAccountName" . }}
+      {{ if .Values.windmill.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.windmill.imagePullSecrets }}
+      {{ end }}
+      {{ if .Values.windmill.app.initContainers}}
+      initContainers:
+      {{- with .Values.windmill.app.initContainers }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{ end }}
+      containers:
+      {{- with .Values.windmill.app.extraContainers }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      - name: windmill-mcp
+        securityContext:
+      {{- with .Values.windmill.app.containerSecurityContext }}
+      {{- toYaml . | nindent 10 }}
+      {{- end }}
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 30"]
+        {{ if .Values.enterprise.enabled }}
+        image: {{ default "ghcr.io/windmill-labs/windmill-ee" .Values.windmill.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
+        {{ else }}
+        image: {{ default "ghcr.io/windmill-labs/windmill" .Values.windmill.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
+        {{ end }}
+        imagePullPolicy: Always
+        {{ if .Values.windmill.app.volumeMounts }}
+        volumeMounts:
+        {{- with .Values.windmill.app.volumeMounts }}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
+        {{ end }}
+        ports:
+        - containerPort: 8000
+        - containerPort: 8001
+        readinessProbe:
+          timeoutSeconds: 1
+          successThreshold: 1
+          failureThreshold: 1
+          httpGet:
+            host:
+            scheme: HTTP
+            path: /
+            httpHeaders:
+            - name: Host
+              value: localhost
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        env:
+        {{- with .Values.windmill.app.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{ if .Values.enterprise.enabled }}
+        - name : "METRICS_ADDR"
+          value: "true"
+        {{ end }}
+        {{ if .Values.windmill.databaseSecret }}
+        - name: "DATABASE_URL"
+          valueFrom:
+            secretKeyRef:
+              name: "windmill-database"
+              key: "url"
+        {{ else if .Values.windmill.databaseUrlSecretName }}
+        - name: "DATABASE_URL"
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.windmill.databaseUrlSecretName }}"
+              key: "{{ .Values.windmill.databaseUrlSecretKey }}"
+        {{ else }}
+        - name: "DATABASE_URL"
+          value: "{{ .Values.windmill.databaseUrl }}"
+        {{ end }}
+        - name: "BASE_URL"
+          value: "{{ .Values.windmill.baseProtocol }}://{{ .Values.windmill.baseDomain }}"
+        - name: "RUST_LOG"
+          value: "{{ .Values.windmill.rustLog }}"
+        - name: "MODE"
+          value: "mcp"
+        - name: "JSON_FMT"
+          value: "true"
+        {{ if .Values.windmill.instanceEventsWebhook }}
+        - name: "INSTANCE_EVENTS_WEBHOOK"
+          value: "true"
+        {{ end }}
+        {{ if .Values.enterprise.enabled }}
+        {{ if .Values.enterprise.licenseKeySecretName }}
+        - name: "LICENSE_KEY"
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.enterprise.licenseKeySecretName }}
+              key: {{ .Values.enterprise.licenseKeySecretKey }}
+        {{ else }}
+        - name: "LICENSE_KEY"
+          value: "{{ .Values.enterprise.licenseKey }}"
+        {{ end }}
+        {{ if .Values.enterprise.samlMetadata }}
+        - name: "SAML_METADATA"
+          value: "{{ .Values.enterprise.samlMetadata }}"
+        {{ end }}
+        {{ if $.Values.enterprise.enabledS3DistributedCache }}
+        - name: "S3_CACHE_BUCKET"
+          value: "{{ $.Values.enterprise.s3CacheBucket }}"
+        {{ end }}
+        {{ end }}
+        {{ if .Values.windmill.cookieDomain }}
+        - name: "COOKIE_DOMAIN"
+          value: "{{ .Values.windmill.cookieDomain }}"
+        {{ end }}
+        resources:
+{{ toYaml .Values.windmill.app.resources | indent 12 }}
+{{- with .Values.windmill.app.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.app.volumes }}
+      volumes:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.app.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.app.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.app.podSecurityContext }}
+      securityContext:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.app.securityContext }}
+      securityContext:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: windmill-mcp
+{{- with .Values.windmill.app.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  ports:
+  - port: 8000
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    app.kubernetes.io/name: windmill-mcp
+  sessionAffinity: ClientIP
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: windmill-mcp-metrics
+  labels:
+    operated-prometheus: "true"
+spec:
+  clusterIP: None
+  ports:
+  - port: 8001
+    name: metrics
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: windmill-mcp
+  sessionAffinity: None
+  type: ClusterIP
