@@ -39,6 +39,14 @@ spec:
       imagePullSecrets:
       - name: {{ .Values.windmill.imagePullSecrets }}
       {{ end }}
+      {{- if or .Values.windmill.hostAliases .Values.windmill.app.hostAliases }}
+      hostAliases:
+      {{- if .Values.windmill.app.hostAliases }}
+      {{- toYaml .Values.windmill.app.hostAliases | nindent 8 }}
+      {{- else }}
+      {{- toYaml .Values.windmill.hostAliases | nindent 8 }}
+      {{- end }}
+      {{- end }}
       {{ if .Values.windmill.app.initContainers}}
       initContainers:
       {{- with .Values.windmill.app.initContainers }}
