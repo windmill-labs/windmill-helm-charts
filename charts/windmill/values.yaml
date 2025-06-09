@@ -71,6 +71,8 @@ windmill:
   exposeHostDocker: false
   # -- rust log level, set to debug for more information etc, sets RUST_LOG environment variable in app and worker container
   rustLog: info
+  # -- host aliases for all pods (can be overridden by individual worker groups)
+  hostAliases: []
 
   # extra worker groups
   workerGroups:
@@ -95,6 +97,9 @@ windmill:
 
       # -- Tolerations to apply to the pods
       tolerations: []
+
+      # -- Host aliases to apply to the pods (overrides global hostAliases if set)
+      hostAliases: []
 
       # -- Security context to apply to the container
       podSecurityContext:
@@ -150,6 +155,9 @@ windmill:
       # -- Tolerations to apply to the pods
       tolerations: []
 
+      # -- Host aliases to apply to the pods (overrides global hostAliases if set)
+      hostAliases: []
+
       # -- Security context to apply to the container
       podSecurityContext:
         # -- run as user. The default is 0 for root user
@@ -204,6 +212,9 @@ windmill:
       # -- Tolerations to apply to the pods
       tolerations: []
 
+      # -- Host aliases to apply to the pods (overrides global hostAliases if set)
+      hostAliases: []
+
       # -- Security context to apply to the container
       podSecurityContext:
         # -- run as user. The default is 0 for root user
@@ -250,6 +261,9 @@ windmill:
 
     # -- Tolerations to apply to the pods
     tolerations: []
+
+    # -- Host aliases to apply to the pods (overrides global hostAliases if set)
+    hostAliases: []
 
     # -- legacy, use podSecurityContext instead
     securityContext: {}
