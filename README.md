@@ -105,6 +105,14 @@ windmill:
   appReplicas: 2
   # replicas for the workers, jobs are executed on the workers
   lspReplicas: 2
+  # host aliases for all pods (can be overridden by individual components)
+  hostAliases: []
+  # Example:
+  # hostAliases:
+  #   - ip: "10.0.0.100"
+  #     hostnames:
+  #       - "gitlab-private.company.com"
+  #       - "nexus.company.com"
   workerGroups:
     # The default worker group is the one that will execute jobs with any taggs  except the native ones. Windmill has a default worker group configuration for it
     - name: "default"
@@ -120,6 +128,9 @@ windmill:
 
       # -- Tolerations to apply to the pods
       tolerations: []
+
+      # -- Host aliases to apply to the pods (overrides global hostAliases if set)
+      hostAliases: []
 
       # -- Affinity rules to apply to the pods
       affinity: {}
@@ -225,6 +236,7 @@ enterprise:
 | windmill.app.autoscaling.maxReplicas                            | int    | `10`                                                                                       | maximum autoscaler replicas                                                                                                                                                                                      |
 | windmill.app.autoscaling.targetCPUUtilizationPercentage         | int    | `80`                                                                                       | target CPU utilization                                                                                                                                                                                           |
 | windmill.app.extraEnv                                           | list   | `[]`                                                                                       | Extra environment variables to apply to the pods                                                                                                                                                                 |
+| windmill.app.hostAliases                                        | list   | `[]`                                                                                       | Host aliases to apply to the pods (overrides global hostAliases if set)                                                                                                                                         |
 | windmill.app.labels                                             | object | `{}`                                                                                       | Labels to apply to the pods                                                                                                                                                                                      |
 | windmill.app.nodeSelector                                       | object | `{}`                                                                                       | Node selector to use for scheduling the pods                                                                                                                                                                     |
 | windmill.app.resources                                          | object | `{}`                                                                                       | Resource limits and requests for the pods                                                                                                                                                                        |
@@ -239,6 +251,7 @@ enterprise:
 | windmill.denoExtraImportMap                                     | string | `""`                                                                                       | custom deno extra import maps (syntax: `key1=value1,key2=value2`)                                                                                                                                                |
 | windmill.exposeHostDocker                                       | bool   | `false`                                                                                    | mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon                                                                                         |
 | windmill.globalErrorHandlerPath                                 | string | `""`                                                                                       | if set, the path to a script in the admins workspace that will be triggered upon any jobs failure                                                                                                                |
+| windmill.hostAliases                                            | list   | `[]`                                                                                       | host aliases for all pods (can be overridden by individual components)                                                                                                                                           |
 | windmill.image                                                  | string | `""`                                                                                       | windmill image tag, will use the Acorresponding ee or ce image from ghcr if not defined. Do not include tag in the image name.                                                                                   |
 | windmill.instanceEventsWebhook                                  | string | `""`                                                                                       | send instance events to a webhook. Can be hooked back to windmill                                                                                                                                                |
 | windmill.lsp.affinity                                           | object | `{}`                                                                                       | Affinity rules to apply to the pods                                                                                                                                                                              |
@@ -275,6 +288,7 @@ enterprise:
 | windmill.workerGroups[0].annotations                            | object | `{}`                                                                                       | Annotations to apply to the pods                                                                                                                                                                                 |
 | windmill.workerGroups[0].extraEnv                               | list   | `[]`                                                                                       | Extra environment variables to apply to the pods                                                                                                                                                                 |
 | windmill.workerGroups[0].extraContainers                        | list   | `[]`                                                                                       | Extra containers as sidecars                                                                                                                                                                                     |
+| windmill.workerGroups[0].hostAliases                            | list   | `[]`                                                                                       | Host aliases to apply to the pods (overrides global hostAliases if set)                                                                                                                                         |
 | windmill.workerGroups[0].labels                                 | object | `{}`                                                                                       | Labels to apply to the pods                                                                                                                                                                                      |
 | windmill.workerGroups[0].name                                   | string | `"default"`                                                                                |                                                                                                                                                                                                                  |
 | windmill.workerGroups[0].nodeSelector                           | object | `{}`                                                                                       | Node selector to use for scheduling the pods                                                                                                                                                                     |
@@ -287,6 +301,7 @@ enterprise:
 | windmill.workerGroups[1].annotations                            | object | `{}`                                                                                       | Annotations to apply to the pods                                                                                                                                                                                 |
 | windmill.workerGroups[1].extraEnv                               | list   | `[]`                                                                                       | Extra environment variables to apply to the pods                                                                                                                                                                 |
 | windmill.workerGroups[1].extraContainers                        | list   | `[]`                                                                                       | Extra containers as sidecars                                                                                                                                                                                     |
+| windmill.workerGroups[1].hostAliases                            | list   | `[]`                                                                                       | Host aliases to apply to the pods (overrides global hostAliases if set)                                                                                                                                         |
 | windmill.workerGroups[1].labels                                 | object | `{}`                                                                                       | Labels to apply to the pods                                                                                                                                                                                      |
 | windmill.workerGroups[1].name                                   | string | `"gpu"`                                                                                    |                                                                                                                                                                                                                  |
 | windmill.workerGroups[1].nodeSelector                           | object | `{}`                                                                                       | Node selector to use for scheduling the pods                                                                                                                                                                     |
@@ -299,6 +314,7 @@ enterprise:
 | windmill.workerGroups[2].annotations                            | object | `{}`                                                                                       | Annotations to apply to the pods                                                                                                                                                                                 |
 | windmill.workerGroups[2].extraEnv                               | list   | `[]`                                                                                       | Extra environment variables to apply to the pods                                                                                                                                                                 |
 | windmill.workerGroups[2].extraContainers                        | list   | `[]`                                                                                       | Extra containers as sidecars                                                                                                                                                                                     |
+| windmill.workerGroups[2].hostAliases                            | list   | `[]`                                                                                       | Host aliases to apply to the pods (overrides global hostAliases if set)                                                                                                                                         |
 | windmill.workerGroups[2].labels                                 | object | `{}`                                                                                       | Labels to apply to the pods                                                                                                                                                                                      |
 | windmill.workerGroups[2].name                                   | string | `"native"`                                                                                 |                                                                                                                                                                                                                  |
 | windmill.workerGroups[2].nodeSelector                           | object | `{}`                                                                                       | Node selector to use for scheduling the pods                                                                                                                                                                     |
@@ -661,5 +677,28 @@ windmill:
 
 NOTE: the `windmill-workspace` volumeMount is used to share files between the
 dind container and the worker container.
+
+### Host Aliases
+
+You can configure custom DNS mappings for pods to access internal services or resolve domain issues:
+
+```yaml
+windmill:
+  # Global for all pods
+  hostAliases:
+    - ip: "10.0.0.100"
+      hostnames:
+        - "internal-registry.company.com"
+  
+  # Per worker group
+  workerGroups:
+    - name: "default"
+      hostAliases:
+        - ip: "10.0.0.101"
+          hostnames:
+            - "private-pypi.company.com"
+```
+
+See [Kubernetes hostAliases documentation](https://kubernetes.io/docs/tasks/network/customize-hosts-file-for-pods/) for more details.
 
 <!--
