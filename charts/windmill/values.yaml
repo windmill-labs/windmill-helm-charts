@@ -228,7 +228,9 @@ windmill:
       affinity: {}
 
       # -- Resource limits and requests for the pods
-      resources: {}
+      resources:
+        limits:
+          memory: "2Gi"
 
       # -- Extra environment variables to apply to the pods
       extraEnv: []
@@ -351,7 +353,9 @@ windmill:
     affinity: {}
 
     # -- Resource limits and requests for the pods
-    resources: {}
+    resources:
+      limits:
+        memory: "1Gi"
 
     # -- Extra environment variables to apply to the pods
     extraEnv: []
@@ -403,7 +407,9 @@ windmill:
     affinity: {}
 
     # -- Resource limits and requests for the pods
-    resources: {}
+    resources:
+      limits:
+        memory: "1Gi"
 
     # -- Extra environment variables to apply to the pods
     extraEnv: []
@@ -448,7 +454,9 @@ windmill:
     affinity: {}
 
     # -- Resource limits and requests for the pods
-    resources: {}
+    resources:
+      limits:
+        memory: "2Gi"
 
     # -- Extra environment variables to apply to the pods
     extraEnv: []
@@ -537,7 +545,9 @@ hub:
   # -- Affinity rules to apply to the pods
   affinity: {}
   # -- Resource limits and requests for the pods
-  resources: {}
+  resources:
+    limits:
+      memory: "2Gi"
   # -- Extra environment variables to apply to the pods
   extraEnv: []
 
