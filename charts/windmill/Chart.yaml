@@ -1,8 +1,8 @@
 apiVersion: v2
 name: windmill
 type: application
-version: 2.0.455
-appVersion: 1.514.0
+version: 2.0.456
+appVersion: 1.513.1
 dependencies:
   - condition: postgresql.enabled
     name: postgresql
@@ -18,8 +18,7 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     version: 12.4.2
 deprecated: false
-description:
-  Windmill - Turn scripts into endpoints, workflows and UIs in minutes
+description: Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 home: https://www.windmill.dev/
 icon: https://www.windmill.dev/img/windmill.svg
 keywords:
