@@ -72,7 +72,7 @@ NAME       CLASS    HOSTS                        ADDRESS        PORTS   AGE
 windmill   <none>   windmill,windmill,windmill   192.168.49.2   80      13m
 ```
 
-If not ip address is displayed, enable the ingress addon:
+If no ip address is displayed, enable the ingress addon:
 
 ```
 minikube addons enable ingress
