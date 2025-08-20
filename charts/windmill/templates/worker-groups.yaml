@@ -1,5 +1,5 @@
 {{- range $v := .Values.windmill.workerGroups }}
-{{ if and $v.replicas (gt (int $v.replicas) 0)}}
+{{ if and $v.replicas (ge (int $v.replicas) 0)}}
 ---
 {{- $controllerType := include "validateControllerKind" $v.controller }}
 apiVersion: apps/v1
