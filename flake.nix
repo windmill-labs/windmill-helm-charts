@@ -19,7 +19,15 @@
         }).claude-code;
       in {
         devShell = pkgs.mkShell {
-          buildInputs = with pkgs; [ yaml-language-server ] ++ [ claude-code ];
+          buildInputs = with pkgs;
+            [
+              #
+              yaml-language-server
+              helm-ls
+              kubernetes-helm
+              minikube
+              kubectl
+            ] ++ [ claude-code ];
         };
       });
 }
