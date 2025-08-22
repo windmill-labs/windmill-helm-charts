@@ -1,0 +1,25 @@
+{{- if and .Values.enterprise.createKubernetesAutoscalingRolesAndBindings .Values.enterprise.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: windmill-deployment-scaler-role
+  namespace: {{ .Release.Namespace }}
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["patch","get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: windmill-deployment-scaler-rb
+  namespace: {{ .Release.Namespace }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "windmill.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: windmill-deployment-scaler-role
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}
