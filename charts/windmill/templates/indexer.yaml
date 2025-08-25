@@ -39,6 +39,9 @@ spec:
       - name: {{ .Values.windmill.imagePullSecrets }}
       {{ end }}
       containers:
+      {{- with .Values.windmill.indexer.extraContainers }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
       - name: windmill-indexer
         securityContext:
       {{- with .Values.windmill.indexer.containerSecurityContext }}

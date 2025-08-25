@@ -459,6 +459,9 @@ windmill:
         memory: "2Gi"
         ephemeral-storage: "50Gi"
 
+    # -- Extra sidecar containers
+    extraContainers: []
+    
     # -- Extra environment variables to apply to the pods
     extraEnv: []
 
