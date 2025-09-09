@@ -461,7 +461,7 @@ windmill:
 
     # -- Extra sidecar containers
     extraContainers: []
-    
+
     # -- Extra environment variables to apply to the pods
     extraEnv: []
 
@@ -509,7 +509,7 @@ serviceAccount:
 hub:
   # -- enable Windmill Hub, requires Windmill Enterprise and license key
   enabled: false
-  # -- enterprise license key
+  # -- enterprise license key, deprecated use the enterprise values instead
   licenseKey: ""
   # -- replicas for the hub
   replicas: 1
