@@ -35,8 +35,6 @@ windmill:
   imagePullSecrets: ""
   # -- replica for the application app
   appReplicas: 2
-  # -- enable mcp using an additional dedicated mcp server (only 1 replica)
-  mcpEnabled: true
   # -- replicas for the lsp smart assistant (not required but useful for the web IDE)
   lspReplicas: 2
   # -- replicas for the multiplayer containers used by the app (ee only and ignored if enterprise not enabled)
