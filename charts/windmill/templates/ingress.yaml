@@ -67,7 +67,7 @@ spec:
                 port:
                   number: 3003
     {{ end }}
-    {{ end }
+    {{ end }}
     - host: {{ .Values.windmill.baseDomain | quote }}
       http:
         paths:
