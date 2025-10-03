@@ -5,11 +5,11 @@ version: 2.0.509
 appVersion: 1.555.0
 dependencies:
   - condition: postgresql.enabled
-    name: postgresql
+    name: cnpg
     repository: https://cloudnative-pg.github.io/charts
     version: 0.26.0  # Latest stable version
   - condition: hub-postgresql.enabled
-    name: postgresql
+    name: cnpg
     alias: hub-postgresql
     repository: https://cloudnative-pg.github.io/charts
     version: 0.26.0  # Latest stable version
