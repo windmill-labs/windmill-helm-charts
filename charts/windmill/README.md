@@ -16,14 +16,6 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
 * <https://github.com/windmill-labs/windmill-helm-charts.git>
 
-## Requirements
-
-| Repository | Name | Version |
-|------------|------|---------|
-| https://charts.bitnami.com/bitnami | minio | 12.4.2 |
-| https://charts.bitnami.com/bitnami | postgresql | 12.3.1 |
-| https://charts.bitnami.com/bitnami | hub-postgresql(postgresql) | 12.3.1 |
-
 ## Values
 
 | Key | Type | Default | Description |
@@ -39,7 +31,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | enterprise.scimTokenSecretName | string | `""` | name of the secret storing the SCIM token, takes precedence over SCIM token string. |
 | hub-postgresql.auth.database | string | `"windmillhub"` |  |
 | hub-postgresql.auth.postgresPassword | string | `"windmill"` |  |
-| hub-postgresql.enabled | bool | `false` | enabled included Postgres container for demo purposes only using bitnami |
+| hub-postgresql.enabled | bool | `false` | enabled included Postgres container for demo purposes only |
 | hub-postgresql.fullnameOverride | string | `"windmill-hub-postgresql"` |  |
 | hub-postgresql.primary.persistence.enabled | bool | `true` |  |
 | hub-postgresql.primary.resources.limits.cpu | string | `"1"` |  |
@@ -80,7 +72,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | minio.primary.enabled | bool | `true` |  |
 | postgresql.auth.database | string | `"windmill"` |  |
 | postgresql.auth.postgresPassword | string | `"windmill"` |  |
-| postgresql.enabled | bool | `true` | enabled included Postgres container for demo purposes only using bitnami |
+| postgresql.enabled | bool | `true` | enabled included Postgres container for demo purposes only |
 | postgresql.fullnameOverride | string | `"windmill-postgresql"` |  |
 | postgresql.primary.persistence.enabled | bool | `true` |  |
 | postgresql.primary.resources.limits.cpu | string | `"1"` |  |
