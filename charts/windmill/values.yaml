@@ -553,7 +553,7 @@ hub:
   extraEnv: []
 
 hub-postgresql:
-  # -- enabled included Postgres container for demo purposes 
+  # -- enabled included Postgres container for demo purposes
   enabled: false
   fullnameOverride: windmill-hub-postgresql
   primary:
@@ -562,9 +562,6 @@ hub-postgresql:
     resources:
       limits:
         memory: "2Gi"
-      requests:
-        cpu: "1"
-        memory: "1024Mi"
   auth:
     postgresPassword: windmill
     database: windmillhub
