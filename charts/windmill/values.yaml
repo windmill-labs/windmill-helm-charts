@@ -1,17 +1,12 @@
 postgresql:
-  # -- enabled included Postgres container for demo purposes only using bitnami
+  # -- enabled included Postgres container for demo purposes only using cloudnative-pg
   enabled: true
-  fullnameOverride: windmill-postgresql
-  primary:
-    persistence:
-      enabled: true
-    resources:
-      limits:
-        memory: "2Gi"
-      requests:
-        cpu: "250m"
-        memory: "1024Mi"
+  resources:
+    limits:
+      memory: "2Gi"
+      ephemeral-storage: "50Gi"
   auth:
+    postgresUser: postgres
     postgresPassword: windmill
     database: windmill
 
@@ -556,18 +551,13 @@ hub:
   extraEnv: []
 
 hub-postgresql:
-  # -- enabled included Postgres container for demo purposes only using bitnami
+  # -- enabled included Postgres container for demo purposes
   enabled: false
-  fullnameOverride: windmill-hub-postgresql
-  primary:
-    persistence:
-      enabled: true
-    resources:
-      limits:
-        memory: "2Gi"
-      requests:
-        cpu: "1"
-        memory: "1024Mi"
+  resources:
+    limits:
+      memory: "2Gi"
+      ephemeral-storage: "20Gi"
   auth:
+    postgresUser: postgres
     postgresPassword: windmill
     database: windmillhub

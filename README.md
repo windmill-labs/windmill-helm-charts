@@ -41,6 +41,16 @@ helm upgrade mywindmill windmill/windmill -n windmill --values values.yaml
 You do not need to provide a values.yaml to be able to test it on minikube.
 Follow the steps below.
 
+> **⚠️ Note:**  
+> The 3.X release introduces a breaking change due to the migration of the demo PostgreSQL and demo MinIO from Bitnami subcharts to the vanilla MinIO subchart and vanilla non-persistent PostgreSQL pods.  
+> These demo services are intended **only for testing or demo purposes** and should **not** be used in production environments under any circumstances and are not made persistent
+
+
+
+### Postgres instance
+
+The default helm charts enable a postgresql database by default. It should only be used for **demo** or **testing** purposes. It's not persistent, you should use a managed database instance like RDS or have experience managing a real postgres setup on Kubernetes and point the databaseUrl to that.
+
 ### When using a non super-user role for postgresql in databaseUrl
 
 You will need to setup some required roles which would otherwise be done
@@ -182,11 +192,11 @@ windmill:
   #tag: "mytag"
   #image: "ghcr.io/windmill-labs/windmill"
 
-# enable postgres (bitnami) on kubernetes
+# enable postgres on kubernetes, only for testing purposes
 postgresql:
   enabled: true
 
-# enable minio (bitnami) on kubernetes
+# enable minio on kubernetes
 minio:
   enabled: false
 

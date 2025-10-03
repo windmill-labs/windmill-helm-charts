@@ -1,0 +1,42 @@
+{{- if index .Values "hub-postgresql" "enabled" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: windmill-postgresql-demo-hub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: windmill-postgresql-demo-hub
+  template:
+    metadata:
+      labels:
+        app: windmill-postgresql-demo-hub
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:18
+        env:
+        - name: POSTGRES_USER
+          value: {{ index .Values "hub-postgresql" "auth" "postgresUser" }}
+        - name: POSTGRES_PASSWORD
+          value: {{ index .Values "hub-postgresql" "auth" "postgresPassword" }}
+        - name: POSTGRES_DB
+          value: windmillhub
+        ports:
+        - containerPort: 5432
+      resources:
+      {{ toYaml .Values.postgresql.resources | nindent 12 }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: windmill-hub-postgresql
+spec:
+  selector:
+    app: windmill-postgresql-demo-hub
+  ports:
+  - port: 5432
+    targetPort: 5432
+{{- end -}}
