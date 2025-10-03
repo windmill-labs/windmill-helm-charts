@@ -40,7 +40,8 @@ jobs:
 
       - name: Add Dependencies
         run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add cloudnative-pg https://cloudnative-pg.github.io/charts
+          helm repo add minio https://charts.min.io/
           helm repo update
 
       - name: Run chart-testing (lint)
