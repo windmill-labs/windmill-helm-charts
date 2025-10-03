@@ -1,0 +1,12 @@
+dependencies:
+- name: cloudnative-pg
+  repository: https://cloudnative-pg.github.io/charts
+  version: 0.26.0
+- name: cloudnative-pg
+  repository: https://cloudnative-pg.github.io/charts
+  version: 0.26.0
+- name: minio
+  repository: https://charts.min.io/
+  version: 5.4.0
+digest: sha256:e4d1d8fe8ee30e7a50d4e9dec9e258b7db698a01e791a19a252605ecdb63e056
+generated: "2025-10-03T19:36:59.122841016Z"
