@@ -222,6 +222,7 @@ enterprise:
 | enterprise.s3CacheBucket                                        | string | `"mybucketname"`                                                                           | S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container                                                                                                             |
 | enterprise.samlMetadata                                         | string | `""`                                                                                       | SAML Metadata URL to enable SAML SSO (Can be set in the Instance Settings UI, which is the recommended method)                                                                                                   |
 | enterprise.scimToken                                            | string | `""`                                                                                       |                                                                                                                                                                                                                  |
+| extraDeploy                                                     | list   | `[]`                                                                                       | Support for deploying additional arbitrary resources. Use for External Secrets, ConfigMaps, etc.                                                                                                                 |
 | ingress.annotations                                             | object | `{}`                                                                                       |                                                                                                                                                                                                                  |
 | ingress.className                                               | string | `""`                                                                                       |                                                                                                                                                                                                                  |
 | ingress.enabled                                                 | bool   | `true`                                                                                     | enable/disable included ingress resource                                                                                                                                                                         |
@@ -578,6 +579,42 @@ You will also need to install cert-manager and configure an issuer. More details
 [here](https://cert-manager.io/docs/installation/#default-static-install) and
 [here](https://cert-manager.io/docs/tutorials/acme/nginx-ingress/#step-6---configure-a-lets-encrypt-issuer).
 Cert-manager can also be used with the other cloud providers.
+
+## Extra Deploy
+
+The `extraDeploy` parameter allows you to deploy additional arbitrary Kubernetes resources alongside Windmill. This is particularly useful for deploying External Secrets, ConfigMaps, custom Services, or any other Kubernetes resources that your Windmill deployment might need.
+
+Add the `extraDeploy` array to your values.yaml file with the Kubernetes resources you want to deploy:
+
+```yaml
+extraDeploy:
+  - apiVersion: external-secrets.io/v1beta1
+    kind: ExternalSecret
+    metadata:
+      name: windmill-database-secret
+      namespace: windmill
+    spec:
+      refreshInterval: 1h
+      secretStoreRef:
+        name: vault-backend
+        kind: SecretStore
+      target:
+        name: windmill-db-credentials
+        creationPolicy: Owner
+      data:
+      - secretKey: DATABASE_URL
+        remoteRef:
+          key: database/windmill
+          property: url
+```
+
+Then reference the created secret in your Windmill configuration:
+
+```yaml
+windmill:
+  databaseUrlSecretName: windmill-db-credentials
+  databaseUrlSecretKey: DATABASE_URL
+```
 
 ### Tailscale with TLS
 
