@@ -71,6 +71,16 @@ spec:
           value: "true"
         - name: PUBLIC_APP_URL
           value: "{{ .Values.windmill.baseProtocol }}://{{ .Values.windmill.baseDomain }}"
+        {{ if .Values.hub.apiSecretSecretName }}
+        - name: "API_SECRET"
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.hub.apiSecretSecretName }}"
+              key: "{{ .Values.hub.apiSecretSecretKey }}"
+        {{ else if .Values.hub.apiSecret }}
+        - name: "API_SECRET"
+          value: "{{ .Values.hub.apiSecret }}"
+        {{ end }}
         {{ if .Values.enterprise.enabled }}
         {{ if .Values.enterprise.licenseKeySecretName }}
         - name: "LICENSE_KEY"
