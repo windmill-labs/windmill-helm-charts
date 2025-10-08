@@ -73,3 +73,16 @@ Validate controller kind, defaulting to "Deployment"
 {{- fail (printf "Invalid controller type: %s. Must be either Deployment or StatefulSet" $inputType) -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Renders a value that contains a template, with scope if present.
+Usage:
+{{ include "common.tplvalues.render" (dict "value" . "context" $) }}
+*/}}
+{{- define "common.tplvalues.render" -}}
+    {{- if typeIs "string" .value }}
+        {{- tpl .value .context }}
+    {{- else }}
+        {{- tpl (.value | toYaml) .context }}
+    {{- end }}
+{{- end -}}

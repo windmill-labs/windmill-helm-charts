@@ -561,3 +561,12 @@ hub-postgresql:
     postgresUser: postgres
     postgresPassword: windmill
     database: windmillhub
+
+# -- Support for deploying additional arbitrary resources. Use for External Secrets, etc.
+extraDeploy: []
+# - apiVersion: v1
+#   kind: ExternalSecret
+#   metadata:
+#     name: foo1
+#   data:
+#     bar: baz
