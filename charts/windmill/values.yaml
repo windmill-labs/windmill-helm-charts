@@ -522,6 +522,12 @@ hub:
   baseDomain: hub.windmill
   # -- protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container
   baseProtocol: http
+  # -- name of the secret storing the API secret, take precedence over apiSecret
+  apiSecretSecretName: ""
+  # -- name of the key in secret storing the API secret. The default key of the api secret is 'apiSecret'
+  apiSecretSecretKey: apiSecret
+  # -- API secret for the hub. Optional, only set if you want to restrict access to the hub.
+  apiSecret: ""
 
   # -- Annotations to apply to the pods
   annotations: {}
