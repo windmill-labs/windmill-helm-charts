@@ -124,9 +124,73 @@ windmill:
   #       - "gitlab-private.company.com"
   #       - "nexus.company.com"
   workerGroups:
-    # The default worker group is the one that will execute jobs with any taggs  except the native ones. Windmill has a default worker group configuration for it
+    # workers configuration
+    # The default worker group
     - name: "default"
+      # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
+      controller: "Deployment"
+
       replicas: 3
+      # -- Annotations to apply to the pods
+      annotations: {}
+
+      # -- If a job is being ran, the container will wait for it to finish before terminating until this grace period
+      terminationGracePeriodSeconds: 604800
+
+      # -- Labels to apply to the pods
+      labels: {}
+
+      # -- Node selector to use for scheduling the pods
+      nodeSelector: {}
+
+      # -- Tolerations to apply to the pods
+      tolerations: []
+
+      # -- Host aliases to apply to the pods (overrides global hostAliases if set)
+      hostAliases: []
+
+      # -- Security context to apply to the container
+      podSecurityContext:
+        # -- run as user. The default is 0 for root user
+        runAsUser: 0
+        # -- run explicitly as a non-root user. The default is false.
+        runAsNonRoot: false
+      # -- Security context to apply to the pod
+      containerSecurityContext: {}
+
+      # -- Affinity rules to apply to the pods
+      affinity: {}
+
+      # -- Resource limits and requests for the pods
+      resources:
+        limits:
+          memory: "2Gi"
+
+      # -- Extra environment variables to apply to the pods
+      extraEnv: []
+      # -- Extra sidecar containers
+      extraContainers: []
+      mode: "worker"
+
+      # -- Init containers
+      initContainers: []
+      volumes: []
+      volumeMounts: []
+
+      # -- Volume claim templates. Only applies when controller is "StatefulSet"
+      volumeClaimTemplates: []
+
+      # -- command override
+      command: []
+
+      # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
+      exposeHostDocker: false
+
+    - name: "native"
+      # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
+      controller: "Deployment"
+
+      replicas: 1
       # -- Annotations to apply to the pods
       annotations: {}
 
@@ -142,50 +206,43 @@ windmill:
       # -- Host aliases to apply to the pods (overrides global hostAliases if set)
       hostAliases: []
 
+      # -- Security context to apply to the container
+      podSecurityContext:
+        # -- run as user. The default is 0 for root user
+        runAsUser: 0
+        # -- run explicitly as a non-root user. The default is false.
+        runAsNonRoot: false
+      # -- Security context to apply to the pod
+      containerSecurityContext: {}
+
       # -- Affinity rules to apply to the pods
       affinity: {}
 
       # -- Resource limits and requests for the pods
       resources:
-        requests:
-          memory: "1028Mi"
-          cpu: "500m"
         limits:
-          memory: "2048Mi"
-          cpu: "1000m"
+          memory: "2Gi"
 
       # -- Extra environment variables to apply to the pods
-      extraEnv: []
-
+      extraEnv:
+        - name: "NUM_WORKERS"
+          value: "8"
+        - name: "SLEEP_QUEUE"
+          value: "200"
       # -- Extra sidecar containers
       extraContainers: []
 
-      # -- Mode for workers, defaults to "worker" - alternative "agent" requires Enterprise license
       mode: "worker"
 
-    # Thenative worker group will only execute native jobs. Windmill has a default worker group configuration for it
-    - name: "native"
-      replicas: 4
-      # -- Resource limits and requests for the pods
-      resources:
-        requests:
-          memory: "128Mi"
-          cpu: "100m"
-        limits:
-          memory: "256Mi"
-          cpu: "200m"
+      volumes: []
+      volumeMounts: []
 
-      # -- Extra environment variables to apply to the pods
-      extraEnv: []
+      # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
+      exposeHostDocker: false
 
-      # -- Extra sidecar containers
-      extraContainers: []
+      # -- Volume claim templates. Only applies when controller is "StatefulSet"
+      volumeClaimTemplates: []
 
-      # -- Mode for workers, defaults to "worker" - alternative "agent" requires Enterprise license
-      mode: "worker"
-
-    - name: "gpu"
-      replicas: 0
 
   # Use those to override the tag or image used for the app and worker containers. Windmill uses the same image for both.
   # By default, if enterprise is enable, the image is set to ghcr.io/windmill-labs/windmill-ee, otherwise the image is set to ghcr.io/windmill-labs/windmill

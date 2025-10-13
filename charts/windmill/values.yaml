@@ -67,7 +67,7 @@ windmill:
   # -- host aliases for all pods (can be overridden by individual worker groups)
   hostAliases: []
 
-  # extra worker groups
+  # worker groups
   workerGroups:
     # workers configuration
     # The default worker group
