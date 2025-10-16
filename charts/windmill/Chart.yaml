@@ -1,13 +1,13 @@
 apiVersion: v2
 name: windmill
 type: application
-version: 3.0.7
-appVersion: 1.561.0
+version: 3.0.8
+appVersion: 1.560.0
 dependencies:
   - condition: minio.enabled
     name: minio
     repository: https://charts.min.io/
-    version: 5.4.0  # Latest stable version
+    version: 5.4.0 # Latest stable version
 deprecated: false
 description: Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 home: https://www.windmill.dev/
