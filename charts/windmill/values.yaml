@@ -509,6 +509,7 @@ hub:
   replicas: 1
   # -- image
   image: ""
+  tag: "1.0.4"
   # -- name of the secret storing the database URI, take precedence over databaseUrl.
   databaseUrlSecretName: ""
   # -- name of the key in secret storing the database URI. The default key of the url is 'url'
