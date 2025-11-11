@@ -66,6 +66,8 @@ windmill:
   rustLog: info
   # -- host aliases for all pods (can be overridden by individual worker groups)
   hostAliases: []
+  # -- domain to use for the public app. Use it for extra security so that custom apps cannot force the user to do custom api call on the main app
+  publicAppDomain: ""
 
   # worker groups
   workerGroups:

@@ -68,6 +68,18 @@ spec:
                   number: 3003
     {{ end }}
     {{ end }}
+    {{ if .Values.windmill.publicAppDomain }}
+    - host: {{ .Values.windmill.publicAppDomain | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: windmill-app
+                port:
+                  number: 8000
+    {{ end }}
     - host: {{ .Values.windmill.baseDomain | quote }}
       http:
         paths:
