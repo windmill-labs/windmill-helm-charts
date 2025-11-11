@@ -101,7 +101,7 @@ spec:
         {{- end }}
         {{ if .Values.windmill.publicAppDomain }}
         - name: "PUBLIC_APP_DOMAIN"
-          value: "{{ .Values.windmill.baseProtocol }}://{{ .Values.windmill.publicAppDomain }}"
+          value: "{{ .Values.windmill.publicAppDomain }}"
         {{ end }}
         {{ if .Values.enterprise.enabled }}
         - name : "METRICS_ADDR"
