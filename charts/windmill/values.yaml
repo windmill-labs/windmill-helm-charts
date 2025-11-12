@@ -104,6 +104,10 @@ windmill:
         runAsNonRoot: false
       # -- Security context to apply to the pod
       containerSecurityContext: {}
+        # Uncomment to enable PID namespace isolation (recommended for security)
+        # Requires privileged mode for --mount-proc flag
+        # See: https://www.windmill.dev/docs/advanced/security_isolation
+        # privileged: true
 
       # -- Affinity rules to apply to the pods
       affinity: {}
@@ -115,6 +119,9 @@ windmill:
 
       # -- Extra environment variables to apply to the pods
       extraEnv: []
+        # Uncomment to enable PID namespace isolation (requires privileged: true above)
+        # - name: ENABLE_UNSHARE_PID
+        #   value: "true"
       # -- Extra sidecar containers
       extraContainers: []
       mode: "worker"
@@ -161,6 +168,10 @@ windmill:
         runAsNonRoot: false
       # -- Security context to apply to the pod
       containerSecurityContext: {}
+        # Uncomment to enable PID namespace isolation (recommended for security)
+        # Requires privileged mode for --mount-proc flag
+        # See: https://www.windmill.dev/docs/advanced/security_isolation
+        # privileged: true
 
       # -- Affinity rules to apply to the pods
       affinity: {}
@@ -176,6 +187,9 @@ windmill:
           value: "8"
         - name: "SLEEP_QUEUE"
           value: "200"
+        # Uncomment to enable PID namespace isolation (requires privileged: true above)
+        # - name: ENABLE_UNSHARE_PID
+        #   value: "true"
       # -- Extra sidecar containers
       extraContainers: []
 
