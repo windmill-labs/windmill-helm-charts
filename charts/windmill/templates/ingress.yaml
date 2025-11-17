@@ -84,7 +84,7 @@ spec:
     - host: {{ .Values.windmill.secondaryApiDomain | quote }}
       http:
         paths:
-          - path: /
+          - path: /api/*
             pathType: Prefix
             backend:
               service:
