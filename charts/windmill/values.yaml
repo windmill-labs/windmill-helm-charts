@@ -68,6 +68,8 @@ windmill:
   hostAliases: []
   # -- domain to use for the public app. Use it for extra security so that custom apps cannot force the user to do custom api call on the main app
   publicAppDomain: ""
+  # -- domain to use for the secondary api. Can be useful to have a secondary api domain that bypass a CDN like Cloudflare or similar.
+  secondaryApiDomain: ""
 
   # worker groups
   workerGroups:

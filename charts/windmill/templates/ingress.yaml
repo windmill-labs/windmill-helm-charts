@@ -80,6 +80,18 @@ spec:
                 port:
                   number: 8000
     {{ end }}
+    {{ if .Values.windmill.secondaryApiDomain }}
+    - host: {{ .Values.windmill.secondaryApiDomain | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: windmill-app
+                port:
+                  number: 8000
+    {{ end }}
     - host: {{ .Values.windmill.baseDomain | quote }}
       http:
         paths:
