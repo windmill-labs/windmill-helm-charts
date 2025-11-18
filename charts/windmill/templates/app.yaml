@@ -47,12 +47,14 @@ spec:
       {{- toYaml .Values.windmill.hostAliases | nindent 8 }}
       {{- end }}
       {{- end }}
-      {{ if .Values.windmill.app.initContainers}}
+      {{- if .Values.windmill.app.initContainers }}
       initContainers:
-      {{- with .Values.windmill.app.initContainers }}
-      {{- toYaml . | nindent 6 }}
+      {{- toYaml .Values.windmill.app.initContainers | nindent 6 }}
       {{- end }}
-      {{ end }}
+      {{- if .Values.windmill.app.topologySpreadConstraints }}
+      topologySpreadConstraints:
+      {{- toYaml .Values.windmill.app.topologySpreadConstraints | nindent 6 }}
+      {{- end }}
       containers:
       {{- with .Values.windmill.app.extraContainers }}
       {{- toYaml . | nindent 6 }}

@@ -135,6 +135,8 @@ windmill:
       # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
       exposeHostDocker: false
 
+      topologySpreadConstraints: []
+
     - name: "native"
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
       controller: "Deployment"
@@ -192,6 +194,8 @@ windmill:
       # -- Volume claim templates. Only applies when controller is "StatefulSet"
       volumeClaimTemplates: []
 
+      topologySpreadConstraints: []
+
     - name: "gpu"
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
       controller: "Deployment"
@@ -247,6 +251,9 @@ windmill:
 
       # -- Volume claim templates. Only applies when controller is "StatefulSet"
       volumeClaimTemplates: []
+
+      topologySpreadConstraints: []
+
   # app configuration
   app:
     # -- Annotations to apply to the pods
@@ -316,6 +323,9 @@ windmill:
       enabled: false
       # -- annotations to apply to the service
       annotations: {}
+
+    # -- Topology spread constraints
+    topologySpreadConstraints: []
 
   # lsp configuration
   lsp:

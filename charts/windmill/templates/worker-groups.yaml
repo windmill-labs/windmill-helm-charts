@@ -60,12 +60,14 @@ spec:
       {{- toYaml $.Values.windmill.hostAliases | nindent 8 }}
       {{- end }}
       {{- end }}
-      {{ if $v.initContainers }}
+      {{- if $v.initContainers }}
       initContainers:
-      {{- with $v.initContainers }}
-      {{- toYaml . | nindent 6 }}
+      {{- toYaml $v.initContainers | nindent 6 }}
       {{- end }}
-      {{ end }}
+      {{- if $v.topologySpreadConstraints }}
+      topologySpreadConstraints:
+      {{- toYaml $v.topologySpreadConstraints | nindent 6 }}
+      {{- end }}
       terminationGracePeriodSeconds: {{ default 604800 $v.terminationGracePeriodSeconds }}
       containers:
       {{- with $v.extraContainers }}
@@ -216,6 +218,7 @@ spec:
       securityContext:
 {{ toYaml . | indent 8 }}
     {{- end }}
+
     {{- with $v.tolerations }}
       tolerations:
 {{ toYaml . | indent 8 }}
