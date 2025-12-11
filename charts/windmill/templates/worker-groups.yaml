@@ -92,7 +92,7 @@ spec:
         {{ else }}
         image: {{ default "ghcr.io/windmill-labs/windmill" $.Values.windmill.image }}:{{ default $.Chart.AppVersion $.Values.windmill.tag }}
         {{ end }}
-        imagePullPolicy: Always
+        imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
         {{ if $v.command }}
         command:
         {{- with $v.command }}

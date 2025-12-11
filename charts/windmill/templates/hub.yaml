@@ -44,7 +44,7 @@ spec:
       {{- toYaml . | nindent 10 }}
       {{- end }}
         image: {{ default "ghcr.io/windmill-labs/windmillhub-ee-public" .Values.hub.image }}:{{ default "main" .Values.hub.tag }}
-        imagePullPolicy: Always
+        imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
         ports:
         - containerPort: 3000
         env:

@@ -70,6 +70,8 @@ windmill:
   publicAppDomain: ""
   # -- domain to use for the secondary api. Can be useful to have a secondary api domain that bypass a CDN like Cloudflare or similar.
   secondaryApiDomain: ""
+  # -- image pull policy for the app, worker, lsp and multiplayer containers
+  imagePullPolicy: Always
 
   # worker groups
   workerGroups:
@@ -329,7 +331,8 @@ windmill:
 
   # lsp configuration
   lsp:
-    tag: "latest"
+    # -- image tag
+    tag: ""
 
     # -- enable or disable lsp
     enabled: true
@@ -383,7 +386,8 @@ windmill:
 
   # multiplayer configuration
   multiplayer:
-    tag: "latest"
+    # -- image tag
+    tag: "main"
 
     # -- enable or disable multiplayer
     enabled: true

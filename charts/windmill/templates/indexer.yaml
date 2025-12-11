@@ -48,7 +48,7 @@ spec:
       {{- toYaml . | nindent 10 }}
       {{- end }}
         image: {{ default "ghcr.io/windmill-labs/windmill-ee" .Values.windmill.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
-        imagePullPolicy: Always
+        imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
         ports:
         - containerPort: 8000
         readinessProbe:

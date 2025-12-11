@@ -43,8 +43,8 @@ spec:
       {{- with .Values.windmill.lsp.containerSecurityContext }}
       {{- toYaml . | nindent 10 }}
       {{- end }}
-        image: {{ default "ghcr.io/windmill-labs/windmill-lsp" .Values.windmill.lsp.image }}:{{ default "latest" .Values.windmill.lsp.tag }}
-        imagePullPolicy: Always
+        image: {{ default "ghcr.io/windmill-labs/windmill-lsp" .Values.windmill.lsp.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
+        imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
         ports:
         - containerPort: 3001
         {{- with .Values.windmill.lsp.extraEnv }}

@@ -44,7 +44,7 @@ spec:
       {{- toYaml . | nindent 10 }}
       {{- end }}
         image: {{ default "ghcr.io/windmill-labs/windmill-multiplayer" .Values.windmill.multiplayer.image }}:{{ default "latest" .Values.windmill.multiplayer.tag }}
-        imagePullPolicy: Always
+        imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
         ports:
         - containerPort: 3002
         resources:
