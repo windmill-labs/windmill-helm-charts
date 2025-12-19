@@ -73,6 +73,10 @@ windmill:
   # -- image pull policy for the app, worker, lsp and multiplayer containers
   imagePullPolicy: Always
 
+  # -- Disable PID namespace isolation (unshare). Set to true for nodes where user namespaces are disabled.
+  # -- Some systems like Bottlerocket AMI have max_user_namespaces=0 which prevents unshare from working.
+  disableUnsharePid: false
+
   # worker groups
   workerGroups:
     # workers configuration
@@ -100,9 +104,13 @@ windmill:
       # -- Host aliases to apply to the pods (overrides global hostAliases if set)
       hostAliases: []
 
-      # -- Whether to run the container as privileged (true by default). 
+      # -- Whether to run the container as privileged (true by default).
       # -- Needed to use proper OOM killer on k8s v1.32+ and use unshare pid for security reasons.
       privileged: true
+
+      # -- Disable PID namespace isolation (unshare) for this worker group.
+      # -- Set to true for nodes where user namespaces are disabled (e.g., Bottlerocket AMI with max_user_namespaces=0).
+      disableUnsharePid: false
 
       # -- Security context to apply to the container
       podSecurityContext:
@@ -163,10 +171,14 @@ windmill:
       # -- Host aliases to apply to the pods (overrides global hostAliases if set)
       hostAliases: []
 
-      # -- Whether to run the container as privileged (false by default). 
+      # -- Whether to run the container as privileged (false by default).
       # -- Not needed for native workers as they use a different memory management and isolation mechanism.
       privileged: false
-      
+
+      # -- Disable PID namespace isolation (unshare) for this worker group.
+      # -- Set to true for nodes where user namespaces are disabled (e.g., Bottlerocket AMI with max_user_namespaces=0).
+      disableUnsharePid: false
+
       # -- Security context to apply to the container
       podSecurityContext:
         # -- run as user. The default is 0 for root user
@@ -226,9 +238,13 @@ windmill:
       # -- Host aliases to apply to the pods (overrides global hostAliases if set)
       hostAliases: []
 
-      # -- Whether to run the container as privileged (true by default). 
+      # -- Whether to run the container as privileged (true by default).
       # -- Needed to use proper OOM killer on k8s v1.32+ and use unshare pid for security reasons.
       privileged: true
+
+      # -- Disable PID namespace isolation (unshare) for this worker group.
+      # -- Set to true for nodes where user namespaces are disabled (e.g., Bottlerocket AMI with max_user_namespaces=0).
+      disableUnsharePid: false
 
       # -- Security context to apply to the container
       podSecurityContext:
