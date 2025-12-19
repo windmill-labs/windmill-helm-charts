@@ -100,6 +100,10 @@ windmill:
       # -- Host aliases to apply to the pods (overrides global hostAliases if set)
       hostAliases: []
 
+      # -- Whether to run the container as privileged (true by default). 
+      # -- Needed to use proper OOM killer on k8s v1.32+ and use unshare pid for security reasons.
+      privileged: true
+
       # -- Security context to apply to the container
       podSecurityContext:
         # -- run as user. The default is 0 for root user
@@ -159,6 +163,10 @@ windmill:
       # -- Host aliases to apply to the pods (overrides global hostAliases if set)
       hostAliases: []
 
+      # -- Whether to run the container as privileged (false by default). 
+      # -- Not needed for native workers as they use a different memory management and isolation mechanism.
+      privileged: false
+      
       # -- Security context to apply to the container
       podSecurityContext:
         # -- run as user. The default is 0 for root user
@@ -217,6 +225,10 @@ windmill:
 
       # -- Host aliases to apply to the pods (overrides global hostAliases if set)
       hostAliases: []
+
+      # -- Whether to run the container as privileged (true by default). 
+      # -- Needed to use proper OOM killer on k8s v1.32+ and use unshare pid for security reasons.
+      privileged: true
 
       # -- Security context to apply to the container
       podSecurityContext:

@@ -45,6 +45,7 @@ Follow the steps below.
 > The 3.X release introduces a breaking change due to the migration of the demo PostgreSQL and demo MinIO from Bitnami subcharts to the vanilla MinIO subchart and vanilla non-persistent PostgreSQL pods.  
 > These demo services are intended **only for testing or demo purposes** and should **not** be used in production environments under any circumstances and are not made persistent
 
+> The 4.x make workers run with privileged secure context by default and  use UNSHARE_PID by default (https://www.windmill.dev/docs/advanced/security_isolation#pid-namespace-isolation-recommended-for-production). The privileged secure context allow to override cgroup v2 behavior to disable oom.group so that jobs can be killed without killing the entire container. By default cgroup v2 on k8s 1.32+ uses oom.group=1 which result in killing the whole worker instead of the job whenever the job exceed memory. In most cases, that would be the proper behavior but not for Windmill which has proper oom_adj_score priority and handle oom kill on jobs gracefully.
 
 
 ### Postgres instance
@@ -149,6 +150,10 @@ windmill:
       # -- Host aliases to apply to the pods (overrides global hostAliases if set)
       hostAliases: []
 
+      # -- Whether to run the container as privileged (true by default). 
+      # -- Needed to use proper OOM killer on k8s v1.32+ and use unshare pid for security reasons.
+      privileged: true
+
       # -- Security context to apply to the container
       podSecurityContext:
         # -- run as user. The default is 0 for root user
@@ -205,6 +210,10 @@ windmill:
 
       # -- Host aliases to apply to the pods (overrides global hostAliases if set)
       hostAliases: []
+
+      # -- Whether to run the container as privileged (false by default). 
+      # -- Not needed for native workers as they use a different memory management and isolation mechanism.
+      privileged: false
 
       # -- Security context to apply to the container
       podSecurityContext:
