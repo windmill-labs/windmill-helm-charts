@@ -194,6 +194,10 @@ spec:
         {{ end }}
         - name: "WORKER_GROUP"
           value: "{{ $v.name }}"
+        {{- if not (or (default false $.Values.windmill.disableUnsharePid) (default false $v.disableUnsharePid)) }}
+        - name: "ENABLE_UNSHARE_PID"
+          value: "true"
+        {{- end }}
         resources:
 {{ toYaml $v.resources | indent 12 }}
       volumes:
