@@ -156,10 +156,6 @@ spec:
           value: {{ default "worker" $v.mode }}
         - name: "JSON_FMT"
           value: "true"
-        {{ if and (not $.Values.enterprise.nsjail) (default true $v.privileged) }}
-        - name: "ENABLE_UNSHARE_PID"
-          value: "true"
-        {{ end }}
         {{ if $.Values.windmill.pipIndexUrl }}
         - name: "PIP_INDEX_URL"
           value: "{{ $.Values.windmill.pipIndexUrl }}"
