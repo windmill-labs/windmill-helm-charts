@@ -156,7 +156,7 @@ spec:
           value: {{ default "worker" $v.mode }}
         - name: "JSON_FMT"
           value: "true"
-        {{ if $v.privileged }}
+        {{ if and (not $.Values.enterprise.nsjail) (default true $v.privileged) }}
         - name: "ENABLE_UNSHARE_PID"
           value: "true"
         {{ end }}
