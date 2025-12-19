@@ -187,6 +187,10 @@ spec:
         - name: "S3_CACHE_BUCKET"
           value: "{{ $.Values.enterprise.s3CacheBucket }}"
         {{ end }}
+        {{ if and (not $.Values.enterprise.nsjail) (default true $v.privileged) }}
+        - name: "ENABLE_UNSHARE_PID"
+          value: "true"
+        {{ end }}
         {{ if $.Values.enterprise.nsjail }}
         - name: "DISABLE_NSJAIL"
           value: "false"
