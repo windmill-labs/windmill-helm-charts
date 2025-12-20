@@ -4,11 +4,20 @@ postgresql:
   resources:
     limits:
       memory: "2Gi"
-      ephemeral-storage: "50Gi"
   auth:
     postgresUser: postgres
     postgresPassword: windmill
     database: windmill
+  # -- persistence configuration for PostgreSQL data
+  persistence:
+    # -- enable persistence using PVC
+    enabled: false
+    # -- storage class for the PVC (leave empty for default)
+    storageClass: ""
+    # -- access mode for the PVC
+    accessMode: ReadWriteOnce
+    # -- size of the PVC
+    size: 50Gi
 
 minio:
   # -- enabled included Minio operator for s3 resource demo purposes
@@ -610,11 +619,20 @@ hub-postgresql:
   resources:
     limits:
       memory: "2Gi"
-      ephemeral-storage: "20Gi"
   auth:
     postgresUser: postgres
     postgresPassword: windmill
     database: windmillhub
+  # -- persistence configuration for PostgreSQL data
+  persistence:
+    # -- enable persistence using PVC
+    enabled: false
+    # -- storage class for the PVC (leave empty for default)
+    storageClass: ""
+    # -- access mode for the PVC
+    accessMode: ReadWriteOnce
+    # -- size of the PVC
+    size: 50Gi
 
 # -- Support for deploying additional arbitrary resources. Use for External Secrets, etc.
 extraDeploy: []

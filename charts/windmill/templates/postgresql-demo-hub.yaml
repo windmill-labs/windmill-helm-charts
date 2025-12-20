@@ -1,4 +1,52 @@
 {{- if index .Values "hub-postgresql" "enabled" -}}
+{{- if index .Values "hub-postgresql" "persistence" "enabled" }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: windmill-hub-postgresql
+spec:
+  serviceName: windmill-hub-postgresql
+  replicas: 1
+  selector:
+    matchLabels:
+      app: windmill-postgresql-demo-hub
+  template:
+    metadata:
+      labels:
+        app: windmill-postgresql-demo-hub
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:18
+        env:
+        - name: POSTGRES_USER
+          value: {{ index .Values "hub-postgresql" "auth" "postgresUser" }}
+        - name: POSTGRES_PASSWORD
+          value: {{ index .Values "hub-postgresql" "auth" "postgresPassword" }}
+        - name: POSTGRES_DB
+          value: windmillhub
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        ports:
+        - containerPort: 5432
+        resources:
+{{ toYaml (index .Values "hub-postgresql" "resources") | nindent 10 }}
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - {{ index .Values "hub-postgresql" "persistence" "accessMode" }}
+      {{- if index .Values "hub-postgresql" "persistence" "storageClass" }}
+      storageClassName: {{ index .Values "hub-postgresql" "persistence" "storageClass" }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ index .Values "hub-postgresql" "persistence" "size" }}
+{{- else }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -25,9 +73,9 @@ spec:
           value: windmillhub
         ports:
         - containerPort: 5432
-      resources:
-      {{ toYaml .Values.postgresql.resources | nindent 12 }}
-
+        resources:
+{{ toYaml (index .Values "hub-postgresql" "resources") | nindent 10 }}
+{{- end }}
 ---
 apiVersion: v1
 kind: Service

@@ -1,4 +1,52 @@
 {{- if .Values.postgresql.enabled }}
+{{- if .Values.postgresql.persistence.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: windmill-postgresql
+spec:
+  serviceName: windmill-postgresql
+  replicas: 1
+  selector:
+    matchLabels:
+      app: windmill-postgresql-demo-app
+  template:
+    metadata:
+      labels:
+        app: windmill-postgresql-demo-app
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:18
+        env:
+        - name: POSTGRES_USER
+          value: {{ .Values.postgresql.auth.postgresUser }}
+        - name: POSTGRES_PASSWORD
+          value: {{ .Values.postgresql.auth.postgresPassword }}
+        - name: POSTGRES_DB
+          value: windmill
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        ports:
+        - containerPort: 5432
+        resources:
+{{ toYaml .Values.postgresql.resources | nindent 10 }}
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - {{ .Values.postgresql.persistence.accessMode }}
+      {{- if .Values.postgresql.persistence.storageClass }}
+      storageClassName: {{ .Values.postgresql.persistence.storageClass }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.postgresql.persistence.size }}
+{{- else }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -27,6 +75,7 @@ spec:
         - containerPort: 5432
         resources:
 {{ toYaml .Values.postgresql.resources | nindent 10 }}
+{{- end }}
 ---
 apiVersion: v1
 kind: Service
