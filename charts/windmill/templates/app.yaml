@@ -250,10 +250,12 @@ spec:
   selector:
     app.kubernetes.io/name: windmill-app
   ports:
-    - port: 25
+    - name: smtp
+      port: 25
       targetPort: 2525
       protocol: TCP
-    - port: 80
+    - name: http
+      port: 80
       targetPort: 8000
       protocol: TCP
   type: LoadBalancer
