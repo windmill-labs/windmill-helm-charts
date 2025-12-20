@@ -254,10 +254,6 @@ spec:
       port: 25
       targetPort: 2525
       protocol: TCP
-    - name: http
-      port: 80
-      targetPort: 8000
-      protocol: TCP
   type: LoadBalancer
 {{- end }}
 {{- end }}
