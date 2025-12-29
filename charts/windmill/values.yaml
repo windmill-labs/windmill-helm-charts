@@ -139,6 +139,9 @@ windmill:
           memory: "2Gi"
 
       # -- Extra environment variables to apply to the pods
+      # -- If running with arbitrary non-root UIDs (not root or UID 1000),
+      # -- add: - name: HOME
+      # --        value: "/tmp"
       extraEnv: []
       # -- Extra sidecar containers
       extraContainers: []
