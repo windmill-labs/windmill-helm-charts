@@ -86,3 +86,8 @@ Usage:
         {{- tpl (.value | toYaml) .context }}
     {{- end }}
 {{- end -}}
+
+{{/*   Routing exclusivity check   */}}
+{{- if and .Values.httproute.enabled .Values.ingress.enabled }}
+{{- fail "Both ingress.enabled and httproute.enabled are true. Disable one to avoid conflicts." }}
+{{- end }}
