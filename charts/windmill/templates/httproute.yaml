@@ -1,0 +1,113 @@
+{{- if .Values.httproute.enabled }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: windmill
+spec:
+{{- with .Values.httproute.parentRefs }}
+  parentRefs:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  hostnames:
+  - {{ .Values.windmill.baseDomain | quote }}
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/ws/"
+    backendRefs:
+    - name: windmill-lsp
+      port: 3001
+  {{ if .Values.enterprise.enabled }}
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/ws_mp/"
+    backendRefs:
+    - name: windmill-multiplayer
+      port: 3002
+  {{ if .Values.windmill.indexer.enabled }}
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/api/srch/"
+    backendRefs:
+    - name: windmill-indexer
+      port: 8000
+  {{ end }}
+  {{ end }}
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/"
+    backendRefs:
+    - name: windmill-app
+      port: 8000
+
+{{ if .Values.windmill.secondaryApiDomain }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: windmill-secondaryApiDomain
+spec:
+{{- with .Values.httproute.parentRefs }}
+  parentRefs:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  hostnames:
+  - {{ .Values.windmill.secondaryApiDomain | quote }}
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/api/"
+    backendRefs:
+    - name: windmill-app
+      port: 8000
+{{- end }}
+{{ if .Values.hub.enabled }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: windmill-hub
+spec:
+{{- with .Values.httproute.parentRefs }}
+  parentRefs:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  hostnames:
+  - {{ .Values.hub.baseDomain | quote }}
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/"
+    backendRefs:
+    - name: windmill-hub
+      port: 8000
+{{- end }}
+{{ if .Values.windmill.publicAppDomain }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: windmill-publicAppDomain
+spec:
+{{- with .Values.httproute.parentRefs }}
+  parentRefs:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  hostnames:
+  - {{ .Values.windmill.publicAppDomain | quote }}
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/"
+    backendRefs:
+    - name: windmill-app
+      port: 8000
+{{- end }}
+{{- end }}

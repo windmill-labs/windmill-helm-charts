@@ -524,6 +524,11 @@ ingress:
   # -- TLS config for the ingress resource. Useful when using cert-manager and nginx-ingress
   tls: []
 
+httproute:
+  # -- enable/disable creation of a httproute resource (experimental)
+  enabled: false
+  parentRefs: []
+
 enterprise:
   # -- enable Windmill Enterprise, requires license key.
   enabled: false
