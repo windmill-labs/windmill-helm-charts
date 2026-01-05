@@ -74,7 +74,7 @@ spec:
       {{- toYaml . | nindent 6 }}
       {{- end }}
       - name: windmill-worker
-       {{ if or $.Values.enterprise.nsjail (default true $v.privileged) }}
+       {{ if or $.Values.enterprise.nsjail (ternary $v.privileged true (and (hasKey $v "privileged") (kindIs "bool" $v.privileged))) }}
        #because nsjail requires privileged access
         securityContext:
           privileged: true
