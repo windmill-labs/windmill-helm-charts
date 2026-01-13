@@ -53,6 +53,8 @@ spec:
         - containerPort: 3003
           name: debugger
         env:
+        - name: DEBUGGER_PORT
+          value: "3003"
         - name: ENABLE_LSP
           value: {{ .Values.windmill.windmillExtra.enableLsp | quote }}
         - name: ENABLE_MULTIPLAYER
