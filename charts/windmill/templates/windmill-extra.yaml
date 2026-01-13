@@ -1,0 +1,120 @@
+{{- if .Values.windmill.windmillExtra.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: windmill-extra
+  labels:
+    app: windmill-extra
+    app.kubernetes.io/name: windmill-extra
+    chart: {{ template "windmill.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.windmill.windmillExtra.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 3
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: windmill-extra
+  template:
+    metadata:
+      labels:
+        app: windmill-extra
+        app.kubernetes.io/name: windmill-extra
+        container: windmill-extra
+{{- with .Values.windmill.windmillExtra.labels }}
+{{ toYaml . | indent 8 }}
+{{- end }}
+{{- with .Values.windmill.windmillExtra.annotations }}
+      annotations:
+{{ toYaml . | indent 8 }}
+{{- end }}
+    spec:
+      {{ if .Values.windmill.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.windmill.imagePullSecrets }}
+      {{ end }}
+      containers:
+      - name: windmill-extra
+        securityContext:
+      {{- with .Values.windmill.windmillExtra.containerSecurityContext }}
+      {{- toYaml . | nindent 10 }}
+      {{- end }}
+        image: {{ default "ghcr.io/windmill-labs/windmill-extra" .Values.windmill.windmillExtra.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
+        imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
+        ports:
+        - containerPort: 3001
+          name: lsp
+        - containerPort: 3002
+          name: multiplayer
+        - containerPort: 5679
+          name: debugger
+        env:
+        - name: ENABLE_LSP
+          value: {{ .Values.windmill.windmillExtra.enableLsp | quote }}
+        - name: ENABLE_MULTIPLAYER
+          value: {{ .Values.enterprise.enabled | quote }}
+        - name: ENABLE_DEBUGGER
+          value: {{ .Values.windmill.windmillExtra.enableDebugger | quote }}
+        - name: ENABLE_NSJAIL
+          value: {{ .Values.enterprise.nsjail | quote }}
+        - name: REQUIRE_SIGNED_DEBUG_REQUESTS
+          value: {{ .Values.windmill.windmillExtra.requireSignedDebugRequests | quote }}
+        - name: WINDMILL_BASE_URL
+          value: {{ .Values.windmill.baseProtocol }}://windmill-app:8000
+        {{- with .Values.windmill.windmillExtra.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        resources:
+{{ toYaml .Values.windmill.windmillExtra.resources | indent 12 }}
+    {{- with .Values.windmill.windmillExtra.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.windmillExtra.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.windmillExtra.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.windmillExtra.podSecurityContext }}
+      securityContext:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.windmillExtra.securityContext }}
+      securityContext:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: windmill-extra
+{{- with .Values.windmill.windmillExtra.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  ports:
+    - port: 3001
+      protocol: TCP
+      targetPort: 3001
+      name: lsp
+    - port: 3002
+      protocol: TCP
+      targetPort: 3002
+      name: multiplayer
+    - port: 5679
+      protocol: TCP
+      targetPort: 5679
+      name: debugger
+  selector:
+    app.kubernetes.io/name: windmill-extra
+  sessionAffinity: ClientIP
+  type: ClusterIP
+{{- end }}

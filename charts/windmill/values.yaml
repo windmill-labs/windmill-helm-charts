@@ -516,6 +516,65 @@ windmill:
     # -- Extra environment variables to apply to the pods
     extraEnv: []
 
+  # windmill-extra configuration (unified LSP, Multiplayer, and Debugger container)
+  windmillExtra:
+    # -- enable or disable windmill-extra
+    enabled: false
+
+    # -- replicas for the windmill-extra container
+    replicas: 1
+
+    # -- custom image (defaults to ghcr.io/windmill-labs/windmill-extra)
+    image: ""
+
+    # -- Annotations to apply to the pods
+    annotations: {}
+
+    # -- Labels to apply to the pods
+    labels: {}
+
+    # -- Node selector to use for scheduling the pods
+    nodeSelector: {}
+
+    # -- Tolerations to apply to the pods
+    tolerations: []
+
+    # -- Security context to apply to the pods
+    podSecurityContext:
+      runAsUser: 0
+      runAsNonRoot: false
+
+    # -- Security context to apply to the container
+    containerSecurityContext: {}
+
+    # -- legacy, use podSecurityContext instead
+    securityContext: {}
+
+    # -- Affinity rules to apply to the pods
+    affinity: {}
+
+    # -- Resource limits and requests for the pods
+    resources:
+      limits:
+        memory: "1Gi"
+
+    # -- enable LSP (Language Server Protocol) for code completion
+    enableLsp: true
+
+    # -- enable Debugger for debugging scripts
+    enableDebugger: true
+
+    # -- require signed debug requests (JWT tokens for debug sessions)
+    requireSignedDebugRequests: true
+
+    # -- Extra environment variables to apply to the pods
+    extraEnv: []
+
+    # service configuration
+    service:
+      # -- Annotations to apply to the service
+      annotations: {}
+
 ingress:
   # -- enable/disable included ingress resource
   enabled: true

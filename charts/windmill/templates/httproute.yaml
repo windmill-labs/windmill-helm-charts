@@ -11,6 +11,24 @@ spec:
   hostnames:
   - {{ .Values.windmill.baseDomain | quote }}
   rules:
+  {{- if .Values.windmill.windmillExtra.enabled }}
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/ws/"
+    backendRefs:
+    - name: windmill-extra
+      port: 3001
+  {{ if .Values.enterprise.enabled }}
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/ws_mp/"
+    backendRefs:
+    - name: windmill-extra
+      port: 3002
+  {{ end }}
+  {{- else }}
   - matches:
     - path:
         type: PathPrefix
@@ -26,6 +44,9 @@ spec:
     backendRefs:
     - name: windmill-multiplayer
       port: 3002
+  {{ end }}
+  {{- end }}
+  {{ if .Values.enterprise.enabled }}
   {{ if .Values.windmill.indexer.enabled }}
   - matches:
     - path:
