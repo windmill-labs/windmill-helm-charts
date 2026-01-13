@@ -33,6 +33,13 @@ spec:
                 name: windmill-extra
                 port:
                   number: 3001
+          - path: /ws_debug/
+            pathType: Prefix
+            backend:
+              service:
+                name: windmill-extra
+                port:
+                  number: 3003
     {{ if .Values.enterprise.enabled }}
     - host: {{ .Values.windmill.baseDomain | quote }}
       http:

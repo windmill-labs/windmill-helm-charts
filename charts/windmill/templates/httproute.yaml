@@ -19,6 +19,13 @@ spec:
     backendRefs:
     - name: windmill-extra
       port: 3001
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/ws_debug/"
+    backendRefs:
+    - name: windmill-extra
+      port: 5679
   {{ if .Values.enterprise.enabled }}
   - matches:
     - path:

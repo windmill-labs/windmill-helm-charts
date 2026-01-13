@@ -109,7 +109,7 @@ spec:
       protocol: TCP
       targetPort: 3002
       name: multiplayer
-    - port: 5679
+    - port: 3003
       protocol: TCP
       targetPort: 5679
       name: debugger
