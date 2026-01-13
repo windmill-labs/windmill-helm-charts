@@ -519,7 +519,7 @@ windmill:
   # windmill-extra configuration (unified LSP, Multiplayer, and Debugger container)
   windmillExtra:
     # -- enable or disable windmill-extra
-    enabled: false
+    enabled: true
 
     # -- replicas for the windmill-extra container
     replicas: 1
