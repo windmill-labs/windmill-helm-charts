@@ -50,7 +50,7 @@ spec:
           name: lsp
         - containerPort: 3002
           name: multiplayer
-        - containerPort: 5679
+        - containerPort: 3003
           name: debugger
         env:
         - name: ENABLE_LSP
