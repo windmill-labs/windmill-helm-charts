@@ -111,7 +111,7 @@ spec:
       name: multiplayer
     - port: 3003
       protocol: TCP
-      targetPort: 5679
+      targetPort: 3003
       name: debugger
   selector:
     app.kubernetes.io/name: windmill-extra
