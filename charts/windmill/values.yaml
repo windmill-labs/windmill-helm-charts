@@ -680,6 +680,12 @@ hub:
   # -- Extra environment variables to apply to the pods
   extraEnv: []
 
+  # -- volumes
+  volumes: []
+
+  # -- volumeMounts
+  volumeMounts: []
+
 hub-postgresql:
   # -- enabled included Postgres container for demo purposes
   enabled: false
