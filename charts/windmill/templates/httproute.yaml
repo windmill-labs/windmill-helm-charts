@@ -72,6 +72,82 @@ spec:
     - name: windmill-app
       port: 8000
 
+{{ if .Values.windmill.secondaryBaseDomain }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: windmill-secondaryBaseDomain
+spec:
+{{- with .Values.httproute.parentRefs }}
+  parentRefs:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  hostnames:
+  - {{ .Values.windmill.secondaryBaseDomain | quote }}
+  rules:
+  {{- if .Values.windmill.windmillExtra.enabled }}
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/ws/"
+    backendRefs:
+    - name: windmill-extra
+      port: 3001
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/ws_debug/"
+    backendRefs:
+    - name: windmill-extra
+      port: 3003
+  {{ if .Values.enterprise.enabled }}
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/ws_mp/"
+    backendRefs:
+    - name: windmill-extra
+      port: 3002
+  {{ end }}
+  {{- else }}
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/ws/"
+    backendRefs:
+    - name: windmill-lsp
+      port: 3001
+  {{ if .Values.enterprise.enabled }}
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/ws_mp/"
+    backendRefs:
+    - name: windmill-multiplayer
+      port: 3002
+  {{ end }}
+  {{- end }}
+  {{ if .Values.enterprise.enabled }}
+  {{ if .Values.windmill.indexer.enabled }}
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/api/srch/"
+    backendRefs:
+    - name: windmill-indexer
+      port: 8000
+  {{ end }}
+  {{ end }}
+  - matches:
+    - path:
+        type: PathPrefix
+        value: "/"
+    backendRefs:
+    - name: windmill-app
+      port: 8000
+{{- end }}
+
 {{ if .Values.windmill.secondaryApiDomain }}
 ---
 apiVersion: gateway.networking.k8s.io/v1

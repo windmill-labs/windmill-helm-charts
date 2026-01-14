@@ -109,13 +109,13 @@ instance & accounts and give yourself admin privileges.
 windmill:
   # domain as shown in browser, this is used together with `baseProtocol` as part of the BASE_URL environment variable in app and worker container and in the ingress resource, if enabled
   baseDomain: windmill
+  # secondary domain that duplicates all ingress routes from baseDomain (useful for multiple domains pointing to same services)
+  secondaryBaseDomain: ""
   baseProtocol: http
   # postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container
   databaseUrl: postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable
   # replica for the application app
   appReplicas: 2
-  # replicas for the workers, jobs are executed on the workers
-  lspReplicas: 2
   # host aliases for all pods (can be overridden by individual components)
   hostAliases: []
   # Example:
@@ -252,6 +252,18 @@ windmill:
       # -- Volume claim templates. Only applies when controller is "StatefulSet"
       volumeClaimTemplates: []
 
+  # windmill-extra configuration (unified LSP, Multiplayer, and Debugger container)
+  windmillExtra:
+    # -- enable or disable windmill-extra
+    enabled: true
+    # -- replicas for the windmill-extra container
+    replicas: 1
+    # -- enable LSP (Language Server Protocol) for code completion
+    enableLsp: true
+    # -- enable Debugger for debugging scripts
+    enableDebugger: true
+    # -- require signed debug requests (JWT tokens for debug sessions)
+    requireSignedDebugRequests: true
 
   # Use those to override the tag or image used for the app and worker containers. Windmill uses the same image for both.
   # By default, if enterprise is enable, the image is set to ghcr.io/windmill-labs/windmill-ee, otherwise the image is set to ghcr.io/windmill-labs/windmill
@@ -322,6 +334,7 @@ enterprise:
 | windmill.app.tolerations                                        | list   | `[]`                                                                                       | Tolerations to apply to the pods                                                                                                                                                                                 |
 | windmill.appReplicas                                            | int    | `2`                                                                                        | replica for the application app                                                                                                                                                                                  |
 | windmill.baseDomain                                             | string | `"windmill"`                                                                               | domain as shown in browser, this variable and `baseProtocol` are used as part of the BASE_URL environment variable in app and worker container and in the ingress resource, if enabled                           |
+| windmill.secondaryBaseDomain                                    | string | `""`                                                                                       | secondary domain that duplicates all ingress routes from baseDomain. Useful for having multiple domains point to the same services                                                                                |
 | windmill.baseProtocol                                           | string | `"http"`                                                                                   | protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container |
 | windmill.cookieDomain                                           | string | `""`                                                                                       | domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance                                                                           |
 | windmill.databaseUrl                                            | string | `"postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable"`              | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container                                                                                 |
@@ -333,30 +346,18 @@ enterprise:
 | windmill.hostAliases                                            | list   | `[]`                                                                                       | host aliases for all pods (can be overridden by individual components)                                                                                                                                           |
 | windmill.image                                                  | string | `""`                                                                                       | windmill image tag, will use the Acorresponding ee or ce image from ghcr if not defined. Do not include tag in the image name.                                                                                   |
 | windmill.instanceEventsWebhook                                  | string | `""`                                                                                       | send instance events to a webhook. Can be hooked back to windmill                                                                                                                                                |
-| windmill.lsp.affinity                                           | object | `{}`                                                                                       | Affinity rules to apply to the pods                                                                                                                                                                              |
-| windmill.lsp.annotations                                        | object | `{}`                                                                                       | Annotations to apply to the pods                                                                                                                                                                                 |
-| windmill.lsp.autoscaling.enabled                                | bool   | `false`                                                                                    | enable or disable autoscaling                                                                                                                                                                                    |
-| windmill.lsp.autoscaling.maxReplicas                            | int    | `10`                                                                                       | maximum autoscaler replicas                                                                                                                                                                                      |
-| windmill.lsp.autoscaling.targetCPUUtilizationPercentage         | int    | `80`                                                                                       | target CPU utilization                                                                                                                                                                                           |
-| windmill.lsp.extraEnv                                           | list   | `[]`                                                                                       | Extra environment variables to apply to the pods                                                                                                                                                                 |
-| windmill.lsp.labels                                             | object | `{}`                                                                                       | Labels to apply to the pods                                                                                                                                                                                      |
-| windmill.lsp.nodeSelector                                       | object | `{}`                                                                                       | Node selector to use for scheduling the pods                                                                                                                                                                     |
-| windmill.lsp.resources                                          | object | `{}`                                                                                       | Resource limits and requests for the pods                                                                                                                                                                        |
-| windmill.lsp.tag                                                | string | `"latest"`                                                                                 |                                                                                                                                                                                                                  |
-| windmill.lsp.tolerations                                        | list   | `[]`                                                                                       | Tolerations to apply to the pods                                                                                                                                                                                 |
-| windmill.lspReplicas                                            | int    | `2`                                                                                        | replicas for the workers, jobs are executed on the workers                                                                                                                                                       |
-| windmill.multiplayer.affinity                                   | object | `{}`                                                                                       | Affinity rules to apply to the pods                                                                                                                                                                              |
-| windmill.multiplayer.annotations                                | object | `{}`                                                                                       | Annotations to apply to the pods                                                                                                                                                                                 |
-| windmill.multiplayer.autoscaling.enabled                        | bool   | `false`                                                                                    | enable or disable autoscaling                                                                                                                                                                                    |
-| windmill.multiplayer.autoscaling.maxReplicas                    | int    | `10`                                                                                       | maximum autoscaler replicas                                                                                                                                                                                      |
-| windmill.multiplayer.autoscaling.targetCPUUtilizationPercentage | int    | `80`                                                                                       | target CPU utilization                                                                                                                                                                                           |
-| windmill.multiplayer.extraEnv                                   | list   | `[]`                                                                                       | Extra environment variables to apply to the pods                                                                                                                                                                 |
-| windmill.multiplayer.labels                                     | object | `{}`                                                                                       | Labels to apply to the pods                                                                                                                                                                                      |
-| windmill.multiplayer.nodeSelector                               | object | `{}`                                                                                       | Node selector to use for scheduling the pods                                                                                                                                                                     |
-| windmill.multiplayer.resources                                  | object | `{}`                                                                                       | Resource limits and requests for the pods                                                                                                                                                                        |
-| windmill.multiplayer.tag                                        | string | `"latest"`                                                                                 |                                                                                                                                                                                                                  |
-| windmill.multiplayer.tolerations                                | list   | `[]`                                                                                       | Tolerations to apply to the pods                                                                                                                                                                                 |
-| windmill.multiplayerReplicas                                    | int    | `1`                                                                                        | replicas for the lsp containers used by the app                                                                                                                                                                  |
+| windmill.windmillExtra.enabled                                  | bool   | `true`                                                                                     | enable or disable windmill-extra (unified LSP, Multiplayer, and Debugger container)                                                                                                                              |
+| windmill.windmillExtra.replicas                                 | int    | `1`                                                                                        | replicas for the windmill-extra container                                                                                                                                                                        |
+| windmill.windmillExtra.enableLsp                                | bool   | `true`                                                                                     | enable LSP (Language Server Protocol) for code completion                                                                                                                                                        |
+| windmill.windmillExtra.enableDebugger                           | bool   | `true`                                                                                     | enable Debugger for debugging scripts                                                                                                                                                                            |
+| windmill.windmillExtra.requireSignedDebugRequests               | bool   | `true`                                                                                     | require signed debug requests (JWT tokens for debug sessions)                                                                                                                                                    |
+| windmill.windmillExtra.affinity                                 | object | `{}`                                                                                       | Affinity rules to apply to the pods                                                                                                                                                                              |
+| windmill.windmillExtra.annotations                              | object | `{}`                                                                                       | Annotations to apply to the pods                                                                                                                                                                                 |
+| windmill.windmillExtra.labels                                   | object | `{}`                                                                                       | Labels to apply to the pods                                                                                                                                                                                      |
+| windmill.windmillExtra.nodeSelector                             | object | `{}`                                                                                       | Node selector to use for scheduling the pods                                                                                                                                                                     |
+| windmill.windmillExtra.tolerations                              | list   | `[]`                                                                                       | Tolerations to apply to the pods                                                                                                                                                                                 |
+| windmill.windmillExtra.resources                                | object | `{"limits":{"memory":"1Gi"}}`                                                              | Resource limits and requests for the pods                                                                                                                                                                        |
+| windmill.windmillExtra.extraEnv                                 | list   | `[]`                                                                                       | Extra environment variables to apply to the pods                                                                                                                                                                 |
 | windmill.npmConfigRegistry                                      | string | `""`                                                                                       | pass the npm for private registries                                                                                                                                                                              |
 | windmill.pipExtraIndexUrl                                       | string | `""`                                                                                       | pass the extra index url to pip for private registries                                                                                                                                                           |
 | windmill.pipIndexUrl                                            | string | `""`                                                                                       | pass the index url to pip for private registries                                                                                                                                                                 |
@@ -507,7 +508,7 @@ The helm chart does have an ingress configuration included. It's enabled by
 default. The ingress uses the `windmill.baseDomain` variable for its hostname
 configuration. Here are example configurations for a few cloud providers.
 
-It configures the HTTP ingress for the app, lsp and multiplayer containers. The
+It configures the HTTP ingress for the app and windmill-extra containers (LSP, Multiplayer, Debugger). The
 configuration (except for plain nginx ingress) also exposes the windmill app
 SMTP service for email triggers on a separate IP address/domain name. This is
 the IP address/domain name you need to point your MX/A records to, learn more
@@ -559,7 +560,7 @@ windmill:
         cloud.google.com/l4-rbs: "enabled"
         # # for static ip (more info on https://cloud.google.com/kubernetes-engine/docs/concepts/service-load-balancer-parameters#spd-static-ip-parameters):
         # networking.gke.io/load-balancer-ip-addresses: <REGIONAL_IP_NAME>
-  lsp:
+  windmillExtra:
     service:
       annotations:
         cloud.google.com/backend-config: '{"default": "session-config"}'
@@ -711,10 +712,17 @@ spec:
       paths:
       - backend:
           service:
-            name: windmill-lsp
+            name: windmill-extra
             port:
               number: 3001
         path: /ws/
+        pathType: Prefix
+      - backend:
+          service:
+            name: windmill-extra
+            port:
+              number: 3003
+        path: /ws_debug/
         pathType: Prefix
   - host: mywindmill
     http:
@@ -739,7 +747,7 @@ own, you can just disable it. Overall, you want the following endpoints
 accessible included in the chart:
 
 - windmill app on port 8000
-- lsp application on port 3001
+- windmill-extra on port 3001 (LSP), port 3002 (Multiplayer, enterprise only), port 3003 (Debugger)
 - metrics endpoints on port 8001 for the app and workers (ee only)
 - windmill app smtp service on port 2525 for email triggers (need to be exposed
   on port 25)

@@ -53,6 +53,8 @@ windmill:
   databaseSecret: false
   # -- domain as shown in browser. url of ths service is at: {baseProtocol}://{baseDomain}
   baseDomain: windmill
+  # -- secondary domain that duplicates all ingress routes from baseDomain. Useful for having multiple domains point to the same services.
+  secondaryBaseDomain: ""
   # -- protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container
   baseProtocol: http
   # -- domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance

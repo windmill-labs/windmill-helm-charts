@@ -136,4 +136,85 @@ spec:
                 name: windmill-app
                 port:
                   number: 8000
+    {{- if .Values.windmill.secondaryBaseDomain }}
+    # Secondary base domain routes (duplicate of baseDomain routes)
+    {{- if .Values.windmill.windmillExtra.enabled }}
+    - host: {{ .Values.windmill.secondaryBaseDomain | quote }}
+      http:
+        paths:
+          - path: /ws/
+            pathType: Prefix
+            backend:
+              service:
+                name: windmill-extra
+                port:
+                  number: 3001
+          - path: /ws_debug/
+            pathType: Prefix
+            backend:
+              service:
+                name: windmill-extra
+                port:
+                  number: 3003
+    {{ if .Values.enterprise.enabled }}
+    - host: {{ .Values.windmill.secondaryBaseDomain | quote }}
+      http:
+        paths:
+          - path: /ws_mp/
+            pathType: Prefix
+            backend:
+              service:
+                name: windmill-extra
+                port:
+                  number: 3002
+    {{ end }}
+    {{- else }}
+    - host: {{ .Values.windmill.secondaryBaseDomain | quote }}
+      http:
+        paths:
+          - path: /ws/
+            pathType: Prefix
+            backend:
+              service:
+                name: windmill-lsp
+                port:
+                  number: 3001
+    {{ if .Values.enterprise.enabled }}
+    - host: {{ .Values.windmill.secondaryBaseDomain | quote }}
+      http:
+        paths:
+          - path: /ws_mp/
+            pathType: Prefix
+            backend:
+              service:
+                name: windmill-multiplayer
+                port:
+                  number: 3002
+    {{ end }}
+    {{- end }}
+    {{ if .Values.enterprise.enabled }}
+    {{ if .Values.windmill.indexer.enabled }}
+    - host: {{ .Values.windmill.secondaryBaseDomain | quote }}
+      http:
+        paths:
+          - path: /api/srch/
+            pathType: Prefix
+            backend:
+              service:
+                name: windmill-indexer
+                port:
+                  number: 8000
+    {{ end }}
+    {{ end }}
+    - host: {{ .Values.windmill.secondaryBaseDomain | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: windmill-app
+                port:
+                  number: 8000
+    {{- end }}
 {{- end }}
