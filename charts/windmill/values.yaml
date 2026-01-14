@@ -40,7 +40,7 @@ windmill:
   # -- replica for the application app
   appReplicas: 2
   # -- replicas for the lsp smart assistant (not required but useful for the web IDE)
-  lspReplicas: 2
+  extraReplicas: 1
   # -- replicas for the multiplayer containers used by the app (ee only and ignored if enterprise not enabled)
   multiplayerReplicas: 1
   # -- name of the existing secret storing the database URI, take precedence over databaseUrl.
@@ -371,111 +371,6 @@ windmill:
     # -- Topology spread constraints
     topologySpreadConstraints: []
 
-  # lsp configuration
-  lsp:
-    # -- image tag
-    tag: ""
-
-    # -- enable or disable lsp
-    enabled: true
-
-    # -- Annotations to apply to the pods
-    annotations: {}
-
-    # -- Annotations to apply to the pods
-    labels: {}
-
-    # -- Node selector to use for scheduling the pods
-    nodeSelector: {}
-
-    # -- Tolerations to apply to the pods
-    tolerations: []
-
-    # -- legacy, use podSecurityContext instead
-    securityContext:
-    # -- Security context to apply to the pods
-    podSecurityContext:
-      # -- run as user. The default is 0 for root user
-      runAsUser: 0
-      # -- run explicitly as a non-root user. The default is false.
-      runAsNonRoot: false
-    containerSecurityContext: {}
-
-    # -- Affinity rules to apply to the pods
-    affinity: {}
-
-    # -- Resource limits and requests for the pods
-    resources:
-      limits:
-        memory: "1Gi"
-
-    # -- Extra environment variables to apply to the pods
-    extraEnv: []
-
-    # lsp autoscaling configuration
-    autoscaling:
-      # -- enable or disable autoscaling
-      enabled: false
-      # -- maximum autoscaler replicas
-      maxReplicas: 10
-      # -- target CPU utilization
-      targetCPUUtilizationPercentage: 80
-
-    # lsp service configuration
-    service:
-      # -- Annotations to apply to the service
-      annotations: {}
-
-  # multiplayer configuration
-  multiplayer:
-    # -- image tag
-    tag: "main"
-
-    # -- enable or disable multiplayer
-    enabled: true
-
-    # -- Annotations to apply to the pods
-    annotations: {}
-
-    # -- Annotations to apply to the pods
-    labels: {}
-
-    # -- Node selector to use for scheduling the pods
-    nodeSelector: {}
-
-    # -- Tolerations to apply to the pods
-    tolerations: []
-
-    # -- legacy, use podSecurityContext instead
-    securityContext:
-    # -- Security context to apply to the pods
-    podSecurityContext:
-      # -- run as user. The default is 0 for root user
-      runAsUser: 0
-      # -- run explicitly as a non-root user. The default is false.
-      runAsNonRoot: false
-    containerSecurityContext: {}
-
-    # -- Affinity rules to apply to the pods
-    affinity: {}
-
-    # -- Resource limits and requests for the pods
-    resources:
-      limits:
-        memory: "1Gi"
-
-    # -- Extra environment variables to apply to the pods
-    extraEnv: []
-
-    # lsp autoscaling configuration
-    autoscaling:
-      # -- enable or disable autoscaling
-      enabled: false
-      # -- maximum autoscaler replicas
-      maxReplicas: 10
-      # -- target CPU utilization
-      targetCPUUtilizationPercentage: 80
-
   # indexer configuration
   indexer:
     # -- enable or disable indexer
@@ -520,14 +415,11 @@ windmill:
 
   # windmill-extra configuration (unified LSP, Multiplayer, and Debugger container)
   windmillExtra:
-    # -- enable or disable windmill-extra
-    enabled: true
-
-    # -- replicas for the windmill-extra container
-    replicas: 1
-
     # -- custom image (defaults to ghcr.io/windmill-labs/windmill-extra)
     image: ""
+
+    # -- custom image tag (defaults to the App version)
+    tag: ""
 
     # -- Annotations to apply to the pods
     annotations: {}

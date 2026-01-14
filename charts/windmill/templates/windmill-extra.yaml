@@ -10,7 +10,7 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
-  replicas: {{ .Values.windmill.windmillExtra.replicas }}
+  replicas: {{ .Values.windmill.extraReplicas }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -43,7 +43,7 @@ spec:
       {{- with .Values.windmill.windmillExtra.containerSecurityContext }}
       {{- toYaml . | nindent 10 }}
       {{- end }}
-        image: {{ default "ghcr.io/windmill-labs/windmill-extra" .Values.windmill.windmillExtra.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
+        image: {{ default "ghcr.io/windmill-labs/windmill-extra" .Values.windmill.windmillExtra.image }}:{{ default .Chart.AppVersion .Values.windmill.windmillExtra.tag }}
         imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
         ports:
         - containerPort: 3001
