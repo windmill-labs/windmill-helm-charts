@@ -1,4 +1,4 @@
-{{- if .Values.windmill.windmillExtra.enabled }}
+{{- if gt (int .Values.windmill.extraReplicas) 0 }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

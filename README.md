@@ -252,12 +252,11 @@ windmill:
       # -- Volume claim templates. Only applies when controller is "StatefulSet"
       volumeClaimTemplates: []
 
+  # replicas for windmill-extra (set to 0 to disable)
+  extraReplicas: 1
+
   # windmill-extra configuration (unified LSP, Multiplayer, and Debugger container)
   windmillExtra:
-    # -- enable or disable windmill-extra
-    enabled: true
-    # -- replicas for the windmill-extra container
-    replicas: 1
     # -- enable LSP (Language Server Protocol) for code completion
     enableLsp: true
     # -- enable Debugger for debugging scripts
@@ -346,8 +345,7 @@ enterprise:
 | windmill.hostAliases                                            | list   | `[]`                                                                                       | host aliases for all pods (can be overridden by individual components)                                                                                                                                           |
 | windmill.image                                                  | string | `""`                                                                                       | windmill image tag, will use the Acorresponding ee or ce image from ghcr if not defined. Do not include tag in the image name.                                                                                   |
 | windmill.instanceEventsWebhook                                  | string | `""`                                                                                       | send instance events to a webhook. Can be hooked back to windmill                                                                                                                                                |
-| windmill.windmillExtra.enabled                                  | bool   | `true`                                                                                     | enable or disable windmill-extra (unified LSP, Multiplayer, and Debugger container)                                                                                                                              |
-| windmill.windmillExtra.replicas                                 | int    | `1`                                                                                        | replicas for the windmill-extra container                                                                                                                                                                        |
+| windmill.extraReplicas                                          | int    | `1`                                                                                        | replicas for windmill-extra (set to 0 to disable)                                                                                                                                                                |
 | windmill.windmillExtra.image                                    | string | `""`                                                                                       | custom image (defaults to ghcr.io/windmill-labs/windmill-extra)                                                                                                                                                  |
 | windmill.windmillExtra.tag                                      | string | `""`                                                                                       | custom image tag (defaults to the App version)                                                                                                                                                                   |
 | windmill.windmillExtra.enableLsp                                | bool   | `true`                                                                                     | enable LSP (Language Server Protocol) for code completion                                                                                                                                                        |

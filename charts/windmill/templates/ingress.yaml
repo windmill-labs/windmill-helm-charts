@@ -22,7 +22,7 @@ spec:
   {{- end }}
 {{- end }}
   rules:
-    {{- if .Values.windmill.windmillExtra.enabled }}
+    {{- if gt (int .Values.windmill.extraReplicas) 0 }}
     - host: {{ .Values.windmill.baseDomain | quote }}
       http:
         paths:
@@ -138,7 +138,7 @@ spec:
                   number: 8000
     {{- if .Values.windmill.secondaryBaseDomain }}
     # Secondary base domain routes (duplicate of baseDomain routes)
-    {{- if .Values.windmill.windmillExtra.enabled }}
+    {{- if gt (int .Values.windmill.extraReplicas) 0 }}
     - host: {{ .Values.windmill.secondaryBaseDomain | quote }}
       http:
         paths:

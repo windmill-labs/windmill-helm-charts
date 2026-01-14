@@ -39,7 +39,7 @@ windmill:
   imagePullSecrets: ""
   # -- replica for the application app
   appReplicas: 2
-  # -- replicas for the lsp smart assistant (not required but useful for the web IDE)
+  # -- replicas for windmill-extra (LSP, Multiplayer, Debugger). Set to 0 to disable.
   extraReplicas: 1
   # -- replicas for the multiplayer containers used by the app (ee only and ignored if enterprise not enabled)
   multiplayerReplicas: 1

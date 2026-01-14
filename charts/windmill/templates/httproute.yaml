@@ -11,7 +11,7 @@ spec:
   hostnames:
   - {{ .Values.windmill.baseDomain | quote }}
   rules:
-  {{- if .Values.windmill.windmillExtra.enabled }}
+  {{- if gt (int .Values.windmill.extraReplicas) 0 }}
   - matches:
     - path:
         type: PathPrefix
@@ -86,7 +86,7 @@ spec:
   hostnames:
   - {{ .Values.windmill.secondaryBaseDomain | quote }}
   rules:
-  {{- if .Values.windmill.windmillExtra.enabled }}
+  {{- if gt (int .Values.windmill.extraReplicas) 0 }}
   - matches:
     - path:
         type: PathPrefix
