@@ -1,0 +1,102 @@
+# Example: Complete workspace setup
+# Shows how to set up a full Windmill workspace with IaC
+---
+# First, create the workspace itself
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillWorkspace
+metadata:
+  name: data-platform
+  namespace: windmill-system  # Workspaces can be cluster-wide
+spec:
+  id: data-platform
+  name: Data Platform
+  owner: admin
+  settings:
+    defaultApp: f/apps/dashboard
+    codeCompletionEnabled: true
+    errorHandler: f/common/error_handler
+    errorHandlerMutedOnCancel: true
+
+---
+# Create folders for organization
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillFolder
+metadata:
+  name: data-team-folder
+  namespace: data-platform
+spec:
+  name: data_team
+  displayName: Data Team
+  owners:
+    - "g/data-engineers"
+  extraPerms:
+    "g/data-analysts": false  # read-only
+
+---
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillFolder
+metadata:
+  name: common-folder
+  namespace: data-platform
+spec:
+  name: common
+  displayName: Common Utilities
+  owners:
+    - "g/platform-team"
+  extraPerms:
+    "g/all": false  # everyone can read
+
+---
+# Create groups
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillGroup
+metadata:
+  name: data-engineers
+  namespace: data-platform
+spec:
+  name: data-engineers
+  summary: Data Engineering Team
+  members:
+    - alice@example.com
+    - bob@example.com
+    - carol@example.com
+
+---
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillGroup
+metadata:
+  name: data-analysts
+  namespace: data-platform
+spec:
+  name: data-analysts
+  summary: Data Analysts with read access
+  members:
+    - dan@example.com
+    - eve@example.com
+
+---
+# Custom resource type for internal APIs
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillResourceType
+metadata:
+  name: internal-api
+  namespace: data-platform
+spec:
+  name: internal_api
+  description: Internal API service connection
+  schema:
+    type: object
+    properties:
+      base_url:
+        type: string
+        description: Base URL of the API
+      api_key:
+        type: string
+        description: API key for authentication
+      timeout:
+        type: integer
+        description: Request timeout in seconds
+        default: 30
+    required:
+      - base_url
+      - api_key

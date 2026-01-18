@@ -1,0 +1,75 @@
+# Example: WindmillSchedule
+# Defines scheduled execution of scripts and flows
+---
+# Daily ETL pipeline schedule
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillSchedule
+metadata:
+  name: daily-etl
+  namespace: production
+spec:
+  path: f/schedules/daily_etl
+  schedule: "0 2 * * *"  # 2 AM UTC daily
+  timezone: "UTC"
+  scriptPath: f/data_team/etl_pipeline
+  isFlow: true
+  enabled: true
+  args:
+    # No args needed, flow uses current date by default
+    {}
+  # Retry configuration
+  retryConfig:
+    attempts: 3
+    exponentialDelay: 60  # Start with 60 seconds
+    maxDelay: 900         # Cap at 15 minutes
+  # Don't start new run if previous still running
+  noFlowOverlap: true
+  # Error handling
+  onFailure: f/common/notify_slack
+  onFailureExtraArgs:
+    channel: "#data-alerts"
+    severity: "critical"
+  onRecovery: f/common/notify_slack
+  onRecoveryExtraArgs:
+    channel: "#data-alerts"
+    message: "ETL pipeline recovered"
+
+---
+# Hourly health check
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillSchedule
+metadata:
+  name: health-check
+  namespace: production
+spec:
+  path: f/schedules/health_check
+  schedule: "0 * * * *"  # Every hour
+  timezone: "America/New_York"
+  scriptPath: f/monitoring/health_check
+  isFlow: false
+  enabled: true
+  args:
+    endpoints:
+      - "https://api.example.com/health"
+      - "https://app.example.com/health"
+    timeout_seconds: 30
+
+---
+# Weekly report generation (paused)
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillSchedule
+metadata:
+  name: weekly-report
+  namespace: production
+spec:
+  path: f/schedules/weekly_report
+  schedule: "0 9 * * 1"  # 9 AM UTC every Monday
+  timezone: "UTC"
+  scriptPath: f/reports/weekly_summary
+  isFlow: true
+  enabled: true
+  paused: true  # Temporarily paused
+  args:
+    recipients:
+      - "team@example.com"
+    include_charts: true

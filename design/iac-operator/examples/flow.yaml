@@ -1,0 +1,64 @@
+# Example: WindmillFlow
+# Defines a multi-step workflow
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillFlow
+metadata:
+  name: etl-pipeline
+  namespace: production
+spec:
+  path: f/data_team/etl_pipeline
+  summary: Daily ETL pipeline for sales data
+  description: |
+    Extracts data from source DB, transforms it, and loads to warehouse.
+    Runs daily via schedule.
+  value:
+    modules:
+      - id: extract
+        value:
+          type: script
+          path: f/data_team/extract_sales
+          input_transforms:
+            date:
+              type: javascript
+              expr: "flow_input.date || new Date().toISOString().split('T')[0]"
+
+      - id: transform
+        value:
+          type: script
+          path: f/data_team/transform_sales
+          input_transforms:
+            raw_data:
+              type: javascript
+              expr: "results.extract"
+
+      - id: load
+        value:
+          type: script
+          path: f/data_team/load_to_warehouse
+          input_transforms:
+            transformed_data:
+              type: javascript
+              expr: "results.transform"
+
+    failure_module:
+      id: notify_failure
+      value:
+        type: script
+        path: f/common/notify_slack
+        input_transforms:
+          channel:
+            type: static
+            value: "#data-alerts"
+          message:
+            type: javascript
+            expr: "`ETL pipeline failed: ${error.message}`"
+
+  schema:
+    type: object
+    properties:
+      date:
+        type: string
+        format: date
+        description: Date to process (defaults to today)
+  timeout: 3600  # 1 hour timeout
+  wsErrorHandlerMuted: true  # We have our own failure handler
