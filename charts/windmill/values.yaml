@@ -165,6 +165,14 @@ windmill:
 
       topologySpreadConstraints: []
 
+      # -- DNS policy for the pods. Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None"
+      # -- Set to "None" when using custom dnsConfig (e.g., for VPN sidecars or custom DNS resolution)
+      dnsPolicy: ""
+
+      # -- Custom DNS configuration for the pods. Only used when dnsPolicy is set to "None"
+      # -- Useful for pods with VPN sidecars that need to resolve external DNS names
+      dnsConfig: {}
+
     - name: "native"
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
       controller: "Deployment"

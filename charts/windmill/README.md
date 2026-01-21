@@ -191,6 +191,8 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].containerSecurityContext | object | `{}` | Security context to apply to the pod |
 | windmill.workerGroups[0].controller | string | `"Deployment"` | Controller to use. Valid options are "Deployment" and "StatefulSet" |
 | windmill.workerGroups[0].disableUnsharePid | bool | `false` | Set to true for nodes where user namespaces are disabled (e.g., Bottlerocket AMI with max_user_namespaces=0). |
+| windmill.workerGroups[0].dnsConfig | object | `{}` | Custom DNS configuration for the pods. Useful for pods with VPN sidecars that need to resolve external DNS names |
+| windmill.workerGroups[0].dnsPolicy | string | `""` | DNS policy for the pods. Set to "None" when using custom dnsConfig (e.g., for VPN sidecars or custom DNS resolution) |
 | windmill.workerGroups[0].exposeHostDocker | bool | `false` | mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon |
 | windmill.workerGroups[0].extraContainers | list | `[]` | Extra sidecar containers |
 | windmill.workerGroups[0].extraEnv | list | `[]` | value: "/tmp" |

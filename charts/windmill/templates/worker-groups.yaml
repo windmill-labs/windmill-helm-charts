@@ -226,7 +226,14 @@ spec:
     {{- with $v.tolerations }}
       tolerations:
 {{ toYaml . | indent 8 }}
-{{- end }}
+    {{- end }}
+    {{- if $v.dnsPolicy }}
+      dnsPolicy: {{ $v.dnsPolicy }}
+    {{- end }}
+    {{- with $v.dnsConfig }}
+      dnsConfig:
+{{ toYaml . | indent 8 }}
+    {{- end }}
 {{- if eq $controllerType "StatefulSet" }}
   {{- if $v.volumeClaimTemplates }}
   volumeClaimTemplates:
