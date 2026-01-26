@@ -1,0 +1,910 @@
+# Windmill IaC Operator - Custom Resource Definitions
+# These CRDs allow users to define Windmill resources declaratively in Kubernetes
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: windmillscripts.windmill.dev
+spec:
+  group: windmill.dev
+  names:
+    kind: WindmillScript
+    listKind: WindmillScriptList
+    plural: windmillscripts
+    singular: windmillscript
+    shortNames:
+      - wscript
+      - ws
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              type: object
+              required:
+                - path
+                - language
+                - content
+              properties:
+                workspace:
+                  type: string
+                  description: "Windmill workspace (defaults to 'default' or mapped from K8s namespace)"
+                path:
+                  type: string
+                  description: "Script path in Windmill (e.g., 'f/myteam/myscript')"
+                  pattern: "^[a-z0-9_/]+$"
+                summary:
+                  type: string
+                  description: "Short description of the script"
+                description:
+                  type: string
+                  description: "Detailed description (markdown supported)"
+                language:
+                  type: string
+                  enum:
+                    - python3
+                    - deno
+                    - go
+                    - bash
+                    - powershell
+                    - postgresql
+                    - mysql
+                    - bigquery
+                    - snowflake
+                    - mssql
+                    - graphql
+                    - nativets
+                    - bun
+                    - php
+                    - rust
+                    - ansible
+                content:
+                  type: string
+                  description: "Script source code"
+                schema:
+                  type: object
+                  description: "JSON Schema for script arguments"
+                  x-kubernetes-preserve-unknown-fields: true
+                lock:
+                  type: string
+                  description: "Dependency lock file content"
+                kind:
+                  type: string
+                  enum:
+                    - script
+                    - failure
+                    - trigger
+                    - command
+                    - approval
+                  default: script
+                tag:
+                  type: string
+                  description: "Worker tag for routing"
+                concurrencyLimit:
+                  type: integer
+                  description: "Max concurrent executions (0 = unlimited)"
+                concurrencyTimeWindowS:
+                  type: integer
+                  description: "Time window for concurrency limit in seconds"
+                cacheSeconds:
+                  type: integer
+                  description: "Cache results for N seconds (0 = no cache)"
+                dedicatedWorker:
+                  type: boolean
+                  description: "Run on dedicated worker"
+                wsErrorHandlerMuted:
+                  type: boolean
+                  description: "Mute workspace error handler for this script"
+                priority:
+                  type: integer
+                  minimum: 1
+                  maximum: 100
+                  description: "Execution priority (1-100, higher = more priority)"
+                timeout:
+                  type: integer
+                  description: "Execution timeout in seconds"
+                deleteAfterUse:
+                  type: boolean
+                  description: "Delete script after first successful execution"
+                restartedFrom:
+                  type: string
+                  description: "Path of script this was restarted from"
+                envs:
+                  type: array
+                  items:
+                    type: string
+                  description: "Additional environment variable names to pass"
+            status:
+              type: object
+              properties:
+                syncedAt:
+                  type: string
+                  format: date-time
+                hash:
+                  type: string
+                  description: "Hash of the script content in Windmill DB"
+                state:
+                  type: string
+                  enum:
+                    - Synced
+                    - OutOfSync
+                    - Error
+                    - Conflict
+                message:
+                  type: string
+                lastModifiedInDb:
+                  type: string
+                  format: date-time
+                  description: "Last modification time in Windmill DB"
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Path
+          type: string
+          jsonPath: .spec.path
+        - name: Language
+          type: string
+          jsonPath: .spec.language
+        - name: State
+          type: string
+          jsonPath: .status.state
+        - name: Synced
+          type: date
+          jsonPath: .status.syncedAt
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: windmillflows.windmill.dev
+spec:
+  group: windmill.dev
+  names:
+    kind: WindmillFlow
+    listKind: WindmillFlowList
+    plural: windmillflows
+    singular: windmillflow
+    shortNames:
+      - wflow
+      - wf
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              type: object
+              required:
+                - path
+                - value
+              properties:
+                workspace:
+                  type: string
+                path:
+                  type: string
+                  pattern: "^[a-z0-9_/]+$"
+                summary:
+                  type: string
+                description:
+                  type: string
+                value:
+                  type: object
+                  description: "Flow definition (modules, failure_module, etc.)"
+                  x-kubernetes-preserve-unknown-fields: true
+                schema:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+                tag:
+                  type: string
+                wsErrorHandlerMuted:
+                  type: boolean
+                concurrencyLimit:
+                  type: integer
+                concurrencyTimeWindowS:
+                  type: integer
+                cacheSeconds:
+                  type: integer
+                priority:
+                  type: integer
+                  minimum: 1
+                  maximum: 100
+                timeout:
+                  type: integer
+                dedicatedWorker:
+                  type: boolean
+                visibleToRunnerOnly:
+                  type: boolean
+            status:
+              type: object
+              properties:
+                syncedAt:
+                  type: string
+                  format: date-time
+                hash:
+                  type: string
+                state:
+                  type: string
+                  enum: [Synced, OutOfSync, Error, Conflict]
+                message:
+                  type: string
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Path
+          type: string
+          jsonPath: .spec.path
+        - name: State
+          type: string
+          jsonPath: .status.state
+        - name: Synced
+          type: date
+          jsonPath: .status.syncedAt
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: windmillvariables.windmill.dev
+spec:
+  group: windmill.dev
+  names:
+    kind: WindmillVariable
+    listKind: WindmillVariableList
+    plural: windmillvariables
+    singular: windmillvariable
+    shortNames:
+      - wvar
+      - wv
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              type: object
+              required:
+                - path
+              properties:
+                workspace:
+                  type: string
+                path:
+                  type: string
+                  pattern: "^[a-z0-9_/]+$"
+                description:
+                  type: string
+                value:
+                  type: string
+                  description: "Variable value (use valueFrom for secrets)"
+                valueFrom:
+                  type: object
+                  description: "Reference to a K8s Secret for the value"
+                  properties:
+                    secretKeyRef:
+                      type: object
+                      required:
+                        - name
+                        - key
+                      properties:
+                        name:
+                          type: string
+                        key:
+                          type: string
+                isSecret:
+                  type: boolean
+                  default: false
+                  description: "Whether this is a secret variable (encrypted in DB)"
+                isOauth:
+                  type: boolean
+                  default: false
+                accountId:
+                  type: integer
+                  description: "Associated OAuth account ID"
+            status:
+              type: object
+              properties:
+                syncedAt:
+                  type: string
+                  format: date-time
+                state:
+                  type: string
+                  enum: [Synced, OutOfSync, Error, Conflict]
+                message:
+                  type: string
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Path
+          type: string
+          jsonPath: .spec.path
+        - name: Secret
+          type: boolean
+          jsonPath: .spec.isSecret
+        - name: State
+          type: string
+          jsonPath: .status.state
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: windmillresources.windmill.dev
+spec:
+  group: windmill.dev
+  names:
+    kind: WindmillResource
+    listKind: WindmillResourceList
+    plural: windmillresources
+    singular: windmillresource
+    shortNames:
+      - wres
+      - wr
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              type: object
+              required:
+                - path
+                - resourceType
+              properties:
+                workspace:
+                  type: string
+                path:
+                  type: string
+                  pattern: "^[a-z0-9_/]+$"
+                description:
+                  type: string
+                resourceType:
+                  type: string
+                  description: "Resource type (e.g., 'postgresql', 's3', 'slack')"
+                value:
+                  type: object
+                  description: "Resource configuration object"
+                  x-kubernetes-preserve-unknown-fields: true
+                valueFrom:
+                  type: object
+                  description: "Reference to K8s Secret containing JSON resource value"
+                  properties:
+                    secretKeyRef:
+                      type: object
+                      required:
+                        - name
+                        - key
+                      properties:
+                        name:
+                          type: string
+                        key:
+                          type: string
+                isOauth:
+                  type: boolean
+                  default: false
+            status:
+              type: object
+              properties:
+                syncedAt:
+                  type: string
+                  format: date-time
+                state:
+                  type: string
+                  enum: [Synced, OutOfSync, Error, Conflict]
+                message:
+                  type: string
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Path
+          type: string
+          jsonPath: .spec.path
+        - name: Type
+          type: string
+          jsonPath: .spec.resourceType
+        - name: State
+          type: string
+          jsonPath: .status.state
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: windmillschedules.windmill.dev
+spec:
+  group: windmill.dev
+  names:
+    kind: WindmillSchedule
+    listKind: WindmillScheduleList
+    plural: windmillschedules
+    singular: windmillschedule
+    shortNames:
+      - wsched
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              type: object
+              required:
+                - path
+                - schedule
+                - scriptPath
+              properties:
+                workspace:
+                  type: string
+                path:
+                  type: string
+                  pattern: "^[a-z0-9_/]+$"
+                schedule:
+                  type: string
+                  description: "Cron expression (e.g., '0 * * * *')"
+                timezone:
+                  type: string
+                  default: "UTC"
+                scriptPath:
+                  type: string
+                  description: "Path to script or flow to execute"
+                isFlow:
+                  type: boolean
+                  default: false
+                args:
+                  type: object
+                  description: "Arguments to pass to the script/flow"
+                  x-kubernetes-preserve-unknown-fields: true
+                enabled:
+                  type: boolean
+                  default: true
+                onFailure:
+                  type: string
+                  description: "Path to error handler script"
+                onFailureExtraArgs:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+                onRecovery:
+                  type: string
+                  description: "Path to recovery handler script"
+                onRecoveryExtraArgs:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+                onSuccess:
+                  type: string
+                  description: "Path to success handler script"
+                onSuccessExtraArgs:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+                wsErrorHandlerMuted:
+                  type: boolean
+                retryConfig:
+                  type: object
+                  properties:
+                    attempts:
+                      type: integer
+                    exponentialDelay:
+                      type: integer
+                    maxDelay:
+                      type: integer
+                noFlowOverlap:
+                  type: boolean
+                  description: "Skip if previous run still in progress"
+                tag:
+                  type: string
+                paused:
+                  type: boolean
+                  default: false
+            status:
+              type: object
+              properties:
+                syncedAt:
+                  type: string
+                  format: date-time
+                state:
+                  type: string
+                  enum: [Synced, OutOfSync, Error, Conflict]
+                message:
+                  type: string
+                nextRun:
+                  type: string
+                  format: date-time
+                lastRun:
+                  type: string
+                  format: date-time
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Path
+          type: string
+          jsonPath: .spec.path
+        - name: Schedule
+          type: string
+          jsonPath: .spec.schedule
+        - name: Enabled
+          type: boolean
+          jsonPath: .spec.enabled
+        - name: State
+          type: string
+          jsonPath: .status.state
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: windmillresourcetypes.windmill.dev
+spec:
+  group: windmill.dev
+  names:
+    kind: WindmillResourceType
+    listKind: WindmillResourceTypeList
+    plural: windmillresourcetypes
+    singular: windmillresourcetype
+    shortNames:
+      - wrt
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              type: object
+              required:
+                - name
+                - schema
+              properties:
+                workspace:
+                  type: string
+                name:
+                  type: string
+                  description: "Resource type name (e.g., 'my_custom_db')"
+                description:
+                  type: string
+                schema:
+                  type: object
+                  description: "JSON Schema defining the resource type structure"
+                  x-kubernetes-preserve-unknown-fields: true
+            status:
+              type: object
+              properties:
+                syncedAt:
+                  type: string
+                  format: date-time
+                state:
+                  type: string
+                  enum: [Synced, OutOfSync, Error, Conflict]
+                message:
+                  type: string
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: windmillapps.windmill.dev
+spec:
+  group: windmill.dev
+  names:
+    kind: WindmillApp
+    listKind: WindmillAppList
+    plural: windmillapps
+    singular: windmillapp
+    shortNames:
+      - wapp
+      - wa
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              type: object
+              required:
+                - path
+                - value
+              properties:
+                workspace:
+                  type: string
+                path:
+                  type: string
+                  pattern: "^[a-z0-9_/]+$"
+                summary:
+                  type: string
+                value:
+                  type: object
+                  description: "App definition (components, layout, etc.)"
+                  x-kubernetes-preserve-unknown-fields: true
+                policy:
+                  type: object
+                  description: "Execution policy for app runnables"
+                  x-kubernetes-preserve-unknown-fields: true
+                customCss:
+                  type: string
+            status:
+              type: object
+              properties:
+                syncedAt:
+                  type: string
+                  format: date-time
+                state:
+                  type: string
+                  enum: [Synced, OutOfSync, Error, Conflict]
+                message:
+                  type: string
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Path
+          type: string
+          jsonPath: .spec.path
+        - name: State
+          type: string
+          jsonPath: .status.state
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: windmillfolders.windmill.dev
+spec:
+  group: windmill.dev
+  names:
+    kind: WindmillFolder
+    listKind: WindmillFolderList
+    plural: windmillfolders
+    singular: windmillfolder
+    shortNames:
+      - wfolder
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              type: object
+              required:
+                - name
+              properties:
+                workspace:
+                  type: string
+                name:
+                  type: string
+                  description: "Folder name"
+                displayName:
+                  type: string
+                owners:
+                  type: array
+                  items:
+                    type: string
+                  description: "Users/groups with owner permissions"
+                extraPerms:
+                  type: object
+                  additionalProperties:
+                    type: boolean
+                  description: "Additional permissions (user/group -> can_write)"
+            status:
+              type: object
+              properties:
+                syncedAt:
+                  type: string
+                  format: date-time
+                state:
+                  type: string
+                  enum: [Synced, OutOfSync, Error, Conflict]
+                message:
+                  type: string
+      subresources:
+        status: {}
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: windmillgroups.windmill.dev
+spec:
+  group: windmill.dev
+  names:
+    kind: WindmillGroup
+    listKind: WindmillGroupList
+    plural: windmillgroups
+    singular: windmillgroup
+    shortNames:
+      - wgroup
+      - wg
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              type: object
+              required:
+                - name
+              properties:
+                workspace:
+                  type: string
+                name:
+                  type: string
+                summary:
+                  type: string
+                members:
+                  type: array
+                  items:
+                    type: string
+                  description: "List of usernames in this group"
+            status:
+              type: object
+              properties:
+                syncedAt:
+                  type: string
+                  format: date-time
+                state:
+                  type: string
+                  enum: [Synced, OutOfSync, Error, Conflict]
+                message:
+                  type: string
+      subresources:
+        status: {}
+
+---
+# Workspace-level configuration CRD (cluster-scoped or namespace-scoped)
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: windmillworkspaces.windmill.dev
+spec:
+  group: windmill.dev
+  names:
+    kind: WindmillWorkspace
+    listKind: WindmillWorkspaceList
+    plural: windmillworkspaces
+    singular: windmillworkspace
+    shortNames:
+      - wworkspace
+      - wws
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              type: object
+              required:
+                - id
+                - name
+              properties:
+                id:
+                  type: string
+                  description: "Workspace ID (short identifier)"
+                  pattern: "^[a-z0-9_-]+$"
+                name:
+                  type: string
+                  description: "Display name"
+                owner:
+                  type: string
+                  description: "Owner username"
+                domain:
+                  type: string
+                  description: "Auto-invite domain for SSO"
+                # Settings that map to workspace_settings table
+                settings:
+                  type: object
+                  properties:
+                    webhookEditor:
+                      type: string
+                    deployUiSettings:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    aiProvider:
+                      type: string
+                    codeCompletionEnabled:
+                      type: boolean
+                    defaultApp:
+                      type: string
+                    defaultScripts:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    gitSync:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    deployTo:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    errorHandler:
+                      type: string
+                    errorHandlerExtraArgs:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    errorHandlerMutedOnCancel:
+                      type: boolean
+                    openaiResourcePath:
+                      type: string
+                    largeFileStorage:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    autoInviteDomain:
+                      type: string
+                    autoInviteOperator:
+                      type: boolean
+            status:
+              type: object
+              properties:
+                syncedAt:
+                  type: string
+                  format: date-time
+                state:
+                  type: string
+                  enum: [Synced, OutOfSync, Error, Conflict]
+                message:
+                  type: string
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: ID
+          type: string
+          jsonPath: .spec.id
+        - name: Name
+          type: string
+          jsonPath: .spec.name
+        - name: State
+          type: string
+          jsonPath: .status.state

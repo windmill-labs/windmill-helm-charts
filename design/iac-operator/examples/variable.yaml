@@ -1,0 +1,42 @@
+# Example: WindmillVariable
+# Defines variables that scripts can reference
+---
+# Plain text variable (non-secret)
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillVariable
+metadata:
+  name: app-environment
+  namespace: production
+spec:
+  path: f/config/app_environment
+  description: Current application environment
+  value: "production"
+  isSecret: false
+
+---
+# Secret variable with value from K8s Secret
+# The actual secret value is stored in a K8s Secret, not in the CR
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillVariable
+metadata:
+  name: api-token
+  namespace: production
+spec:
+  path: f/secrets/external_api_token
+  description: API token for external service
+  isSecret: true
+  valueFrom:
+    secretKeyRef:
+      name: external-api-credentials  # K8s Secret name
+      key: token                      # Key within the Secret
+
+---
+# The referenced K8s Secret (managed separately, possibly by external-secrets or sealed-secrets)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: external-api-credentials
+  namespace: production
+type: Opaque
+stringData:
+  token: "sk-live-xxxxxxxxxxxxx"
