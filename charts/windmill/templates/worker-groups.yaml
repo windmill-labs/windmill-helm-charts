@@ -130,7 +130,7 @@ spec:
         {{- end }}
         {{ if $.Values.enterprise.enabled }}
         - name : "METRICS_ADDR"
-          value: "true"
+          value: "{{ $.Values.enterprise.metricsAddr }}"
         {{ end }}
         {{ if $.Values.windmill.databaseSecret }}
         - name: "DATABASE_URL"

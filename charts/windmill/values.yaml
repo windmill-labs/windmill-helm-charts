@@ -514,6 +514,8 @@ enterprise:
   nsjail: false
   # -- Create RBAC Roles and RoleBindings needed for native k8s autoscaling integration.
   createKubernetesAutoscalingRolesAndBindings: false
+  # -- Bind address for metrics server. Sets METRICS_ADDR environment variable.
+  metricsAddr: "true"
 
 serviceAccount:
   # Specifies whether a ServiceAccount should be created
