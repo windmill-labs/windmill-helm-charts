@@ -1,0 +1,59 @@
+# Example: WindmillScript
+# Defines a Python script that will be synced to the Windmill database
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillScript
+metadata:
+  name: fetch-weather
+  namespace: production  # Maps to 'production' workspace by default
+spec:
+  path: f/data_team/fetch_weather
+  language: python3
+  summary: Fetch weather data from OpenWeatherMap API
+  description: |
+    Fetches current weather data for a given city.
+    Requires the `openweathermap` resource to be configured.
+  content: |
+    import requests
+
+    def main(city: str, resource: dict = None):
+        """
+        Fetch weather data for a city.
+
+        Args:
+            city: City name (e.g., "London")
+            resource: OpenWeatherMap API resource (auto-injected)
+        """
+        api_key = resource["api_key"]
+        url = f"https://api.openweathermap.org/data/2.5/weather"
+
+        response = requests.get(url, params={
+            "q": city,
+            "appid": api_key,
+            "units": "metric"
+        })
+        response.raise_for_status()
+
+        data = response.json()
+        return {
+            "city": data["name"],
+            "temperature": data["main"]["temp"],
+            "description": data["weather"][0]["description"],
+            "humidity": data["main"]["humidity"]
+        }
+  schema:
+    $schema: "https://json-schema.org/draft/2020-12/schema"
+    type: object
+    properties:
+      city:
+        type: string
+        description: City name
+        default: "London"
+      resource:
+        type: object
+        description: OpenWeatherMap API credentials
+        format: resource-openweathermap
+    required:
+      - city
+  tag: default
+  timeout: 30
+  cacheSeconds: 300  # Cache results for 5 minutes

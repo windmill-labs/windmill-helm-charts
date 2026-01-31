@@ -1,0 +1,70 @@
+# Example: WindmillResource
+# Defines typed resources (database connections, API credentials, etc.)
+---
+# PostgreSQL database connection
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillResource
+metadata:
+  name: warehouse-db
+  namespace: production
+spec:
+  path: f/resources/warehouse_db
+  description: Data warehouse PostgreSQL connection
+  resourceType: postgresql
+  # Value from K8s Secret (recommended for credentials)
+  valueFrom:
+    secretKeyRef:
+      name: warehouse-db-credentials
+      key: connection  # JSON string with connection details
+
+---
+# The K8s Secret containing the resource value as JSON
+apiVersion: v1
+kind: Secret
+metadata:
+  name: warehouse-db-credentials
+  namespace: production
+type: Opaque
+stringData:
+  connection: |
+    {
+      "host": "warehouse.db.example.com",
+      "port": 5432,
+      "user": "etl_user",
+      "password": "secure-password-here",
+      "dbname": "warehouse",
+      "sslmode": "require"
+    }
+
+---
+# S3 bucket configuration (inline value, no secrets)
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillResource
+metadata:
+  name: data-lake
+  namespace: production
+spec:
+  path: f/resources/data_lake
+  description: S3 bucket for raw data storage
+  resourceType: s3
+  value:
+    bucket: company-data-lake
+    region: us-east-1
+    # Note: For AWS credentials, use IAM roles or valueFrom with secretKeyRef
+    # This example assumes IAM role-based auth
+
+---
+# Slack webhook for notifications
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillResource
+metadata:
+  name: slack-webhook
+  namespace: production
+spec:
+  path: f/resources/slack_alerts
+  description: Slack webhook for alert notifications
+  resourceType: slack
+  valueFrom:
+    secretKeyRef:
+      name: slack-credentials
+      key: webhook
