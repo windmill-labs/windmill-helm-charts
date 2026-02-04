@@ -510,7 +510,9 @@ enterprise:
   scimTokenSecretName: ""
   # -- name of the key in secret storing the SCIM token. The default key of the SCIM token is 'scimToken'
   scimTokenSecretKey: scimToken
-  # -- use nsjail for sandboxing
+  # -- use nsjail for sandboxing (EE only). Requires user namespaces to be enabled.
+  # -- Some systems like Bottlerocket AMI have max_user_namespaces=0 which prevents nsjail from working.
+  # -- Consider using Amazon Linux 2/2023 AMI or configure Bottlerocket kernel parameters via launch template.
   nsjail: false
   # -- Create RBAC Roles and RoleBindings needed for native k8s autoscaling integration.
   createKubernetesAutoscalingRolesAndBindings: false
