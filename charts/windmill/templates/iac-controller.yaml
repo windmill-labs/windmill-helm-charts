@@ -1,0 +1,164 @@
+{{- if .Values.windmill.iacController.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: windmill-iac-controller
+  labels:
+    app: windmill-iac-controller
+    app.kubernetes.io/name: windmill-iac-controller
+    chart: {{ template "windmill.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.windmill.iacController.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: windmill-iac-controller
+  template:
+    metadata:
+      labels:
+        app: windmill-iac-controller
+        app.kubernetes.io/name: windmill-iac-controller
+        release: {{ .Release.Name }}
+{{- with .Values.windmill.iacController.labels }}
+{{ toYaml . | indent 8 }}
+{{- end }}
+{{- with .Values.windmill.iacController.annotations }}
+      annotations:
+{{ toYaml . | indent 8 }}
+{{- end }}
+    spec:
+      terminationGracePeriodSeconds: 30
+      serviceAccountName: windmill-iac-controller
+      {{ if .Values.windmill.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.windmill.imagePullSecrets }}
+      {{ end }}
+      containers:
+      - name: windmill-iac-controller
+        securityContext:
+      {{- with .Values.windmill.iacController.containerSecurityContext }}
+      {{- toYaml . | nindent 10 }}
+      {{- end }}
+        {{ if .Values.enterprise.enabled }}
+        image: {{ default "ghcr.io/windmill-labs/windmill-ee" .Values.windmill.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
+        {{ else }}
+        image: {{ default "ghcr.io/windmill-labs/windmill" .Values.windmill.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
+        {{ end }}
+        imagePullPolicy: Always
+        {{ if .Values.windmill.iacController.volumeMounts }}
+        volumeMounts:
+        {{- with .Values.windmill.iacController.volumeMounts }}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
+        {{ end }}
+        ports:
+        - containerPort: 8001
+          name: metrics
+        env:
+        {{- with .Values.windmill.iacController.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        - name: "MODE"
+          value: "iac-controller"
+        - name: "JSON_FMT"
+          value: "true"
+        - name: "RUST_LOG"
+          value: "{{ .Values.windmill.rustLog }}"
+        {{ if .Values.windmill.databaseSecret }}
+        - name: "DATABASE_URL"
+          valueFrom:
+            secretKeyRef:
+              name: "windmill-database"
+              key: "url"
+        {{ else if .Values.windmill.databaseUrlSecretName }}
+        - name: "DATABASE_URL"
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.windmill.databaseUrlSecretName }}"
+              key: "{{ .Values.windmill.databaseUrlSecretKey }}"
+        {{ else }}
+        - name: "DATABASE_URL"
+          value: "{{ .Values.windmill.databaseUrl }}"
+        {{ end }}
+        - name: "BASE_URL"
+          value: "{{ .Values.windmill.baseProtocol }}://{{ .Values.windmill.baseDomain }}"
+        {{ if .Values.windmill.iacController.conflictPolicy }}
+        - name: "IAC_CONFLICT_POLICY"
+          value: "{{ .Values.windmill.iacController.conflictPolicy }}"
+        {{ end }}
+        {{ if .Values.windmill.iacController.namespaceMapping }}
+        - name: "IAC_NAMESPACE_MAPPING"
+          value: "{{ .Values.windmill.iacController.namespaceMapping }}"
+        {{ end }}
+        {{ if .Values.windmill.iacController.deletionPolicy }}
+        - name: "IAC_DELETION_POLICY"
+          value: "{{ .Values.windmill.iacController.deletionPolicy }}"
+        {{ end }}
+        {{ if .Values.windmill.iacController.watchNamespaces }}
+        - name: "IAC_WATCH_NAMESPACES"
+          value: "{{ join "," .Values.windmill.iacController.watchNamespaces }}"
+        {{ end }}
+        {{ if .Values.windmill.iacController.resyncIntervalSeconds }}
+        - name: "IAC_RESYNC_INTERVAL"
+          value: "{{ .Values.windmill.iacController.resyncIntervalSeconds }}"
+        {{ end }}
+        {{ if .Values.enterprise.enabled }}
+        - name: "METRICS_ADDR"
+          value: "true"
+        {{ if .Values.enterprise.licenseKeySecretName }}
+        - name: "LICENSE_KEY"
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.enterprise.licenseKeySecretName }}
+              key: {{ .Values.enterprise.licenseKeySecretKey }}
+        {{ else }}
+        - name: "LICENSE_KEY"
+          value: "{{ .Values.enterprise.licenseKey }}"
+        {{ end }}
+        {{ end }}
+        resources:
+{{ toYaml .Values.windmill.iacController.resources | indent 12 }}
+{{- with .Values.windmill.iacController.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.iacController.volumes }}
+      volumes:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.iacController.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.iacController.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.iacController.podSecurityContext }}
+      securityContext:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: windmill-iac-controller-metrics
+  labels:
+    operated-prometheus: "true"
+spec:
+  clusterIP: None
+  ports:
+  - port: 8001
+    name: metrics
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: windmill-iac-controller
+  sessionAffinity: None
+  type: ClusterIP
+{{- end }}
