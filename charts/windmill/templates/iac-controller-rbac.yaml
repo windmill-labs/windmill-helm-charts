@@ -1,0 +1,80 @@
+{{- if .Values.windmill.iacController.enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: windmill-iac-controller
+  labels:
+    app: windmill-iac-controller
+    chart: {{ template "windmill.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Release.Name }}-iac-controller
+  labels:
+    app: windmill-iac-controller
+    chart: {{ template "windmill.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+rules:
+  # Watch and manage Windmill CRDs
+  - apiGroups: ["windmill.dev"]
+    resources:
+      - windmillscripts
+      - windmillflows
+      - windmillapps
+      - windmillvariables
+      - windmillresources
+      - windmillresourcetypes
+      - windmillschedules
+      - windmillfolders
+      - windmillgroups
+      - windmillworkspaces
+    verbs: ["get", "list", "watch", "update", "patch"]
+  # Update status subresource on all Windmill CRDs
+  - apiGroups: ["windmill.dev"]
+    resources:
+      - windmillscripts/status
+      - windmillflows/status
+      - windmillapps/status
+      - windmillvariables/status
+      - windmillresources/status
+      - windmillresourcetypes/status
+      - windmillschedules/status
+      - windmillfolders/status
+      - windmillgroups/status
+      - windmillworkspaces/status
+    verbs: ["update", "patch"]
+  # Read K8s Secrets for valueFrom.secretKeyRef resolution
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch"]
+  # Leader election via Lease objects (only one controller instance should reconcile at a time)
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "create", "update"]
+  # Emit events for observability
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Release.Name }}-iac-controller
+  labels:
+    app: windmill-iac-controller
+    chart: {{ template "windmill.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Release.Name }}-iac-controller
+subjects:
+  - kind: ServiceAccount
+    name: windmill-iac-controller
+    namespace: {{ .Release.Namespace }}
+{{- end }}
