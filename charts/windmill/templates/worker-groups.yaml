@@ -188,7 +188,7 @@ spec:
           value: "{{ $.Values.enterprise.s3CacheBucket }}"
         {{ end }}
         {{ if and (not $.Values.enterprise.nsjail) (ternary $v.privileged true (and (hasKey $v "privileged") (kindIs "bool" $v.privileged))) (not (or (default false $.Values.windmill.disableUnsharePid) (default false $v.disableUnsharePid))) }}
-        - name: "ENABLE_UNSHARE_PID"
+        - name: "FAVOR_UNSHARE_PID"
           value: "true"
         {{ end }}
         {{ if $.Values.enterprise.nsjail }}
