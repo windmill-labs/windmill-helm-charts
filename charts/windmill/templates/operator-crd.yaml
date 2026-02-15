@@ -390,6 +390,8 @@ spec:
                     type: object
                   object_store_cache_config:
                     nullable: true
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
                   openai_azure_base_path:
                     nullable: true
                     type: string
@@ -490,8 +492,12 @@ spec:
                     type: string
                   secret_backend:
                     nullable: true
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
                   slack:
                     nullable: true
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
                   smtp_settings:
                     description: SMTP server configuration.
                     nullable: true
@@ -522,6 +528,8 @@ spec:
                     type: object
                   teams:
                     nullable: true
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
                   timeout_wait_result:
                     format: int64
                     nullable: true
