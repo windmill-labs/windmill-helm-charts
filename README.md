@@ -16,7 +16,8 @@
   <a href="#core-values">Core Values</a> •
   <a href="#full-values">Full Values</a> •
   <a href="#local-s3">Local S3</a> •
-  <a href="#caveats">Caveats</a> •  
+  <a href="#kubernetes-operator">Operator</a> •
+  <a href="#caveats">Caveats</a> •
   <a href="#kubernetes-hosting-tips">Kubernetes Tips</a>
 </p>
 
@@ -358,6 +359,18 @@ enterprise:
 | windmill.windmillExtra.tolerations                              | list   | `[]`                                                                                       | Tolerations to apply to the pods                                                                                                                                                                                 |
 | windmill.windmillExtra.resources                                | object | `{"limits":{"memory":"1Gi"}}`                                                              | Resource limits and requests for the pods                                                                                                                                                                        |
 | windmill.windmillExtra.extraEnv                                 | list   | `[]`                                                                                       | Extra environment variables to apply to the pods                                                                                                                                                                 |
+| windmill.operator.enabled                                       | bool   | `false`                                                                                    | Enable the Windmill Kubernetes operator. See [Operator section](#kubernetes-operator). Works with both CE and EE.                                                                                                |
+| windmill.operator.replicas                                      | int    | `1`                                                                                        | Number of operator replicas (typically 1)                                                                                                                                                                        |
+| windmill.operator.installCRD                                    | bool   | `true`                                                                                     | Install the WindmillInstance CRD. Set to `false` if managed separately (e.g. ArgoCD)                                                                                                                             |
+| windmill.operator.instanceSpec                                   | object | `null`                                                                                     | When set, creates a WindmillInstance CR the operator reconciles. Omit to manage the CR externally. See [available fields](#available-global_settings-fields) |
+| windmill.operator.annotations                                    | object | `{}`                                                                                       | Annotations to apply to the operator pods                                                                                                                                                                        |
+| windmill.operator.labels                                         | object | `{}`                                                                                       | Labels to apply to the operator pods                                                                                                                                                                             |
+| windmill.operator.nodeSelector                                   | object | `{}`                                                                                       | Node selector for the operator pods                                                                                                                                                                              |
+| windmill.operator.tolerations                                    | list   | `[]`                                                                                       | Tolerations for the operator pods                                                                                                                                                                                |
+| windmill.operator.affinity                                       | object | `{}`                                                                                       | Affinity rules for the operator pods                                                                                                                                                                             |
+| windmill.operator.resources                                      | object | `{"limits":{"memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}}`                 | Resource limits and requests for the operator pods                                                                                                                                                               |
+| windmill.operator.extraEnv                                       | list   | `[]`                                                                                       | Extra environment variables for the operator pods                                                                                                                                                                |
+| windmill.operator.extraContainers                                | list   | `[]`                                                                                       | Extra sidecar containers for the operator pods                                                                                                                                                                   |
 | windmill.npmConfigRegistry                                      | string | `""`                                                                                       | pass the npm for private registries                                                                                                                                                                              |
 | windmill.pipExtraIndexUrl                                       | string | `""`                                                                                       | pass the extra index url to pip for private registries                                                                                                                                                           |
 | windmill.pipIndexUrl                                            | string | `""`                                                                                       | pass the index url to pip for private registries                                                                                                                                                                 |
@@ -491,6 +504,198 @@ enterprise:
   enabledS3DistributedCache: true
   s3CacheBucket: mybucketname
 ```
+
+## Kubernetes Operator
+
+The Windmill Kubernetes operator lets you manage your instance configuration declaratively via a `WindmillInstance` custom resource. Instead of configuring settings through the UI, you define them in YAML and the operator syncs them to the database — making your Windmill config GitOps-friendly, auditable, and reproducible across environments.
+
+The operator works with both **Community Edition** and **Enterprise Edition**.
+
+**Use it when you want to:**
+- Version-control your instance settings (global settings, worker configs, OAuth, SMTP, etc.)
+- Reproduce identical configurations across dev/staging/prod
+- Automate instance setup as part of your IaC pipeline
+- Detect and correct configuration drift (the operator re-syncs every 5 minutes)
+
+### Quick start
+
+**Step 1 — Install the chart with the operator enabled:**
+
+```yaml
+windmill:
+  operator:
+    enabled: true
+```
+
+This deploys the operator Deployment, installs the `WindmillInstance` CRD, and creates the necessary RBAC (ClusterRole for CRD access, Role for reading Secrets in the release namespace).
+
+**Step 2 — Create a `WindmillInstance` CR** (either via Helm values or manually):
+
+```yaml
+windmill:
+  operator:
+    enabled: true
+    instanceSpec:
+      global_settings:
+        base_url: "https://windmill.example.com"
+        retention_period_secs: 2592000
+      worker_configs:
+        default:
+          worker_tags:
+            - "deno"
+            - "python3"
+            - "bash"
+```
+
+**Step 3 — Verify the operator synced:**
+
+```sh
+$ kubectl get windmillinstances -n windmill
+NAME       SYNCED   LAST SYNCED            AGE
+windmill   true     2025-01-15T10:30:00Z   5m
+```
+
+> **⚠️ First install caveat:** Helm cannot create the CRD and a CR that uses it in the same `helm install`. On a fresh install, either:
+> 1. Install first without `instanceSpec`, then `helm upgrade` with it added, or
+> 2. Apply the CR manually after the initial install (see below), or
+> 3. Manage the CRD separately with `installCRD: false` and apply it before the Helm install.
+>
+> Subsequent `helm upgrade` commands work fine with both enabled since the CRD already exists.
+
+### Managing the CRD separately
+
+If you prefer to manage the CRD lifecycle outside of Helm (e.g. via a separate CI step or ArgoCD), disable CRD installation:
+
+```yaml
+windmill:
+  operator:
+    enabled: true
+    installCRD: false
+```
+
+You can generate the CRD YAML from the windmill binary:
+
+```sh
+windmill operator crd > windmillinstance-crd.yaml
+kubectl apply -f windmillinstance-crd.yaml
+```
+
+### Applying a WindmillInstance CR manually
+
+Instead of providing `instanceSpec` in your values, you can manage the CR yourself after deploying the chart:
+
+```yaml
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillInstance
+metadata:
+  name: my-instance
+  namespace: windmill
+spec:
+  global_settings:
+    base_url: "https://windmill.example.com"
+    license_key: "my-license-key"
+  worker_configs:
+    default:
+      worker_tags:
+        - "deno"
+        - "python3"
+```
+
+### Available `global_settings` fields
+
+The most commonly used fields (all optional):
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `base_url` | string | Instance base URL |
+| `license_key` | string | Enterprise license key |
+| `retention_period_secs` | int | Job retention period in seconds |
+| `request_size_limit_mb` | int | Max request body size |
+| `job_default_timeout` | int | Default timeout for jobs (seconds) |
+| `dev_instance` | bool | Mark as development instance |
+| `keep_job_dir` | bool | Keep job directories after execution |
+| `oauths` | object | OAuth provider configs (keyed by provider name) |
+| `smtp_settings` | object | SMTP server config (`smtp_host`, `smtp_port`, `smtp_username`, `smtp_password`, `smtp_from`, etc.) |
+| `otel` | object | OpenTelemetry config (`otel_exporter_otlp_endpoint`, `tracing_enabled`, `metrics_enabled`, `logs_enabled`) |
+| `pip_index_url` | string | Custom pip index URL |
+| `pip_extra_index_url` | string | Extra pip index URL |
+| `npm_config_registry` | string | Custom npm registry |
+| `custom_tags` | list | Custom worker tags |
+| `indexer_settings` | object | Full-text search indexer config |
+| `critical_error_channels` | list | Alert channels (email, Slack, Teams) |
+| `expose_metrics` | bool | Enable Prometheus metrics |
+
+Any unrecognized fields are passed through as-is via `x-kubernetes-preserve-unknown-fields`.
+
+### Available `worker_configs` fields
+
+Keys are worker group names (e.g. `default`, `native`, `gpu`). Each group supports:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `worker_tags` | list | Tags this worker group handles |
+| `dedicated_worker` | string | Dedicated worker script path |
+| `dedicated_workers` | list | Multiple dedicated worker paths |
+| `init_bash` | string | Bash script to run on worker init |
+| `cache_clear` | int | Cache clear interval |
+| `env_vars_static` | object | Static environment variables (key-value) |
+| `env_vars_allowlist` | list | Allowed environment variable names |
+| `pip_local_dependencies` | list | Local pip dependencies |
+| `additional_python_paths` | list | Extra Python paths |
+| `priority_tags` | object | Tag priority mapping |
+| `autoscaling` | object | Autoscaling config (`enabled`, `min_workers`, `max_workers`, `integration`, etc.) |
+
+### Secret references
+
+For sensitive values, store them in a Kubernetes Secret and reference them using `secretKeyRef`:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: windmill-secrets
+  namespace: windmill
+type: Opaque
+stringData:
+  license: "my-license-key"
+  github-oauth-secret: "ghp_xxxxxxxxxxxx"
+---
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillInstance
+metadata:
+  name: my-instance
+  namespace: windmill
+spec:
+  global_settings:
+    license_key:
+      secretKeyRef:
+        name: windmill-secrets
+        key: license
+    oauths:
+      github:
+        id: "my-github-client-id"
+        secret:
+          secretKeyRef:
+            name: windmill-secrets
+            key: github-oauth-secret
+```
+
+The operator resolves `secretKeyRef` values at reconciliation time. Supported fields include: `license_key`, `hub_api_secret`, `scim_token`, SMTP password, and OAuth secrets.
+
+### Monitoring operator status
+
+```sh
+# Check sync status (shortname: wmi)
+kubectl get wmi -n windmill
+
+# Detailed status
+kubectl get wmi my-instance -n windmill -o jsonpath='{.status}' | jq
+
+# Operator logs
+kubectl logs -n windmill deployment/windmill-operator
+```
+
+A healthy operator shows `SYNCED=true` and updates `LAST SYNCED` on each reconciliation cycle.
 
 ## Caveats
 
