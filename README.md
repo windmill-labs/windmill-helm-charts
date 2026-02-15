@@ -362,8 +362,7 @@ enterprise:
 | windmill.operator.enabled                                       | bool   | `false`                                                                                    | Enable the Windmill Kubernetes operator. See [Operator section](#kubernetes-operator). Works with both CE and EE.                                                                                                |
 | windmill.operator.replicas                                      | int    | `1`                                                                                        | Number of operator replicas (typically 1)                                                                                                                                                                        |
 | windmill.operator.installCRD                                    | bool   | `true`                                                                                     | Install the WindmillInstance CRD. Set to `false` if managed separately (e.g. ArgoCD)                                                                                                                             |
-| windmill.operator.createInstance                                 | bool   | `false`                                                                                    | Create a WindmillInstance CR from instanceSpec. On first `helm install`, use `false` then `helm upgrade` with `true`                                                                                             |
-| windmill.operator.instanceSpec                                   | object | `{"global_settings":{},"worker_configs":{}}`                                               | Spec for the WindmillInstance CR. See [available fields](#available-global_settings-fields)                                                                                                                       |
+| windmill.operator.instanceSpec                                   | object | `null`                                                                                     | When set, creates a WindmillInstance CR the operator reconciles. Omit to manage the CR externally. See [available fields](#available-global_settings-fields) |
 | windmill.operator.annotations                                    | object | `{}`                                                                                       | Annotations to apply to the operator pods                                                                                                                                                                        |
 | windmill.operator.labels                                         | object | `{}`                                                                                       | Labels to apply to the operator pods                                                                                                                                                                             |
 | windmill.operator.nodeSelector                                   | object | `{}`                                                                                       | Node selector for the operator pods                                                                                                                                                                              |
@@ -536,7 +535,6 @@ This deploys the operator Deployment, installs the `WindmillInstance` CRD, and c
 windmill:
   operator:
     enabled: true
-    createInstance: true
     instanceSpec:
       global_settings:
         base_url: "https://windmill.example.com"
@@ -558,7 +556,7 @@ windmill   true     2025-01-15T10:30:00Z   5m
 ```
 
 > **⚠️ First install caveat:** Helm cannot create the CRD and a CR that uses it in the same `helm install`. On a fresh install, either:
-> 1. Install first with `createInstance: false`, then `helm upgrade` with `createInstance: true`, or
+> 1. Install first without `instanceSpec`, then `helm upgrade` with it added, or
 > 2. Apply the CR manually after the initial install (see below), or
 > 3. Manage the CRD separately with `installCRD: false` and apply it before the Helm install.
 >
@@ -584,7 +582,7 @@ kubectl apply -f windmillinstance-crd.yaml
 
 ### Applying a WindmillInstance CR manually
 
-Instead of using `createInstance`, you can create the CR yourself after deploying the chart:
+Instead of providing `instanceSpec` in your values, you can manage the CR yourself after deploying the chart:
 
 ```yaml
 apiVersion: windmill.dev/v1alpha1

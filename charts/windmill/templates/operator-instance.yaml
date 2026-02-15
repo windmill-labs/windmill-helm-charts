@@ -1,4 +1,4 @@
-{{- if and .Values.windmill.operator.enabled .Values.windmill.operator.createInstance -}}
+{{- if and .Values.windmill.operator.enabled .Values.windmill.operator.instanceSpec -}}
 apiVersion: windmill.dev/v1alpha1
 kind: WindmillInstance
 metadata:

@@ -429,12 +429,12 @@ windmill:
     replicas: 1
     # -- install the WindmillInstance CRD
     installCRD: true
-    # -- create a WindmillInstance CR from instanceSpec
-    createInstance: false
-    # -- spec for the WindmillInstance CR (only when createInstance=true)
-    instanceSpec:
-      global_settings: {}
-      worker_configs: {}
+    # -- spec for the WindmillInstance CR. When set, the chart creates a WindmillInstance
+    # -- custom resource that the operator reconciles. Leave empty/omit to manage the CR externally.
+    # instanceSpec:
+    #   global_settings:
+    #     base_url: "https://windmill.example.com"
+    #   worker_configs: {}
     # -- Annotations to apply to the pods
     annotations: {}
     # -- Labels to apply to the pods
