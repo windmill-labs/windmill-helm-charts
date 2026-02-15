@@ -1,0 +1,99 @@
+{{- if .Values.windmill.operator.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: windmill-operator
+  labels:
+    app: windmill-operator
+    app.kubernetes.io/name: windmill-operator
+    chart: {{ template "windmill.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.windmill.operator.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: windmill-operator
+  template:
+    metadata:
+      labels:
+        app: windmill-operator
+        app.kubernetes.io/name: windmill-operator
+        container: windmill-operator
+{{- with .Values.windmill.operator.labels }}
+{{ toYaml . | indent 8 }}
+{{- end }}
+{{- with .Values.windmill.operator.annotations }}
+      annotations:
+{{ toYaml . | indent 8 }}
+  {{- end }}
+    spec:
+      serviceAccountName: {{ template "windmill.serviceAccountName" . }}
+      {{ if .Values.windmill.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.windmill.imagePullSecrets }}
+      {{ end }}
+      containers:
+      {{- with .Values.windmill.operator.extraContainers }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      - name: windmill-operator
+        securityContext:
+      {{- with .Values.windmill.operator.containerSecurityContext }}
+      {{- toYaml . | nindent 10 }}
+      {{- end }}
+        {{ if .Values.enterprise.enabled }}
+        image: {{ default "ghcr.io/windmill-labs/windmill-ee" .Values.windmill.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
+        {{ else }}
+        image: {{ default "ghcr.io/windmill-labs/windmill" .Values.windmill.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
+        {{ end }}
+        imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
+        command: ["windmill", "operator"]
+        env:
+        {{- with .Values.windmill.operator.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{ if .Values.windmill.databaseSecret }}
+        - name: "DATABASE_URL"
+          valueFrom:
+            secretKeyRef:
+              name: "windmill-database"
+              key: "url"
+        {{ else if .Values.windmill.databaseUrlSecretName }}
+        - name: "DATABASE_URL"
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.windmill.databaseUrlSecretName }}"
+              key: "{{ .Values.windmill.databaseUrlSecretKey }}"
+        {{ else }}
+        - name: "DATABASE_URL"
+          value: "{{ .Values.windmill.databaseUrl }}"
+        {{ end }}
+        - name: "RUST_LOG"
+          value: "{{ .Values.windmill.rustLog }}"
+        - name: "JSON_FMT"
+          value: "true"
+        resources:
+{{ toYaml .Values.windmill.operator.resources | indent 12 }}
+    {{- with .Values.windmill.operator.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.operator.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.operator.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.windmill.operator.podSecurityContext }}
+      securityContext:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+{{- end -}}

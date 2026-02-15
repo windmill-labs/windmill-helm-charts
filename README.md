@@ -16,7 +16,8 @@
   <a href="#core-values">Core Values</a> •
   <a href="#full-values">Full Values</a> •
   <a href="#local-s3">Local S3</a> •
-  <a href="#caveats">Caveats</a> •  
+  <a href="#kubernetes-operator">Operator</a> •
+  <a href="#caveats">Caveats</a> •
   <a href="#kubernetes-hosting-tips">Kubernetes Tips</a>
 </p>
 
@@ -358,6 +359,19 @@ enterprise:
 | windmill.windmillExtra.tolerations                              | list   | `[]`                                                                                       | Tolerations to apply to the pods                                                                                                                                                                                 |
 | windmill.windmillExtra.resources                                | object | `{"limits":{"memory":"1Gi"}}`                                                              | Resource limits and requests for the pods                                                                                                                                                                        |
 | windmill.windmillExtra.extraEnv                                 | list   | `[]`                                                                                       | Extra environment variables to apply to the pods                                                                                                                                                                 |
+| windmill.operator.enabled                                       | bool   | `false`                                                                                    | enable the Windmill Kubernetes operator for declarative instance configuration                                                                                                                                   |
+| windmill.operator.replicas                                      | int    | `1`                                                                                        | number of operator replicas                                                                                                                                                                                      |
+| windmill.operator.installCRD                                    | bool   | `true`                                                                                     | install the WindmillInstance CRD                                                                                                                                                                                 |
+| windmill.operator.createInstance                                 | bool   | `false`                                                                                    | create a WindmillInstance CR from instanceSpec                                                                                                                                                                   |
+| windmill.operator.instanceSpec                                   | object | `{"global_settings":{},"worker_configs":{}}`                                               | spec for the WindmillInstance CR (only used when createInstance=true)                                                                                                                                            |
+| windmill.operator.annotations                                    | object | `{}`                                                                                       | Annotations to apply to the pods                                                                                                                                                                                 |
+| windmill.operator.labels                                         | object | `{}`                                                                                       | Labels to apply to the pods                                                                                                                                                                                      |
+| windmill.operator.nodeSelector                                   | object | `{}`                                                                                       | Node selector to use for scheduling the pods                                                                                                                                                                     |
+| windmill.operator.tolerations                                    | list   | `[]`                                                                                       | Tolerations to apply to the pods                                                                                                                                                                                 |
+| windmill.operator.affinity                                       | object | `{}`                                                                                       | Affinity rules to apply to the pods                                                                                                                                                                              |
+| windmill.operator.resources                                      | object | `{"limits":{"memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}}`                 | Resource limits and requests for the pods                                                                                                                                                                        |
+| windmill.operator.extraEnv                                       | list   | `[]`                                                                                       | Extra environment variables to apply to the pods                                                                                                                                                                 |
+| windmill.operator.extraContainers                                | list   | `[]`                                                                                       | Extra sidecar containers                                                                                                                                                                                         |
 | windmill.npmConfigRegistry                                      | string | `""`                                                                                       | pass the npm for private registries                                                                                                                                                                              |
 | windmill.pipExtraIndexUrl                                       | string | `""`                                                                                       | pass the extra index url to pip for private registries                                                                                                                                                           |
 | windmill.pipIndexUrl                                            | string | `""`                                                                                       | pass the index url to pip for private registries                                                                                                                                                                 |
@@ -491,6 +505,85 @@ enterprise:
   enabledS3DistributedCache: true
   s3CacheBucket: mybucketname
 ```
+
+## Kubernetes Operator
+
+The Windmill Kubernetes operator enables declarative, GitOps-friendly configuration of your Windmill instance. It watches `WindmillInstance` custom resources and syncs global settings and worker group configs to the database, with automatic drift detection every 5 minutes.
+
+### Enabling the operator
+
+```yaml
+windmill:
+  operator:
+    enabled: true
+```
+
+This deploys the operator Deployment, installs the `WindmillInstance` CRD, and creates the necessary RBAC (ClusterRole for CRD access, Role for reading Secrets in the release namespace).
+
+### Managing the CRD separately
+
+If you prefer to manage the CRD lifecycle outside of Helm (e.g. via a separate CI step), disable CRD installation:
+
+```yaml
+windmill:
+  operator:
+    enabled: true
+    installCRD: false
+```
+
+### Creating a WindmillInstance via Helm values
+
+You can have the chart create a `WindmillInstance` CR directly from your values file:
+
+```yaml
+windmill:
+  operator:
+    enabled: true
+    createInstance: true
+    instanceSpec:
+      global_settings:
+        base_url: "https://windmill.example.com"
+        retention_period_secs: 2592000
+        oauths:
+          github:
+            id: "my-github-client-id"
+            secret: "my-github-client-secret"
+      worker_configs:
+        default:
+          worker_tags:
+            - "deno"
+            - "python3"
+            - "bash"
+        native:
+          worker_tags:
+            - "nativets"
+            - "postgresql"
+```
+
+### Applying a WindmillInstance CR manually
+
+Alternatively, create the CR yourself after deploying the chart:
+
+```yaml
+apiVersion: windmill.dev/v1alpha1
+kind: WindmillInstance
+metadata:
+  name: my-instance
+  namespace: windmill
+spec:
+  global_settings:
+    base_url: "https://windmill.example.com"
+    license_key: "my-license-key"
+  worker_configs:
+    default:
+      worker_tags:
+        - "deno"
+        - "python3"
+```
+
+### Secret references
+
+The operator supports resolving Kubernetes Secret references in the instance spec. For sensitive values like OAuth secrets or license keys, store them in a Kubernetes Secret and reference them using `secretKeyRef` in the CR spec. See the Windmill documentation for the full CRD schema.
 
 ## Caveats
 

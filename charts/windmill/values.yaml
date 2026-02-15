@@ -421,6 +421,46 @@ windmill:
     # -- Extra environment variables to apply to the pods
     extraEnv: []
 
+  # operator configuration (Kubernetes operator for declarative instance config)
+  operator:
+    # -- enable the Windmill Kubernetes operator
+    enabled: false
+    # -- number of operator replicas (typically 1)
+    replicas: 1
+    # -- install the WindmillInstance CRD
+    installCRD: true
+    # -- create a WindmillInstance CR from instanceSpec
+    createInstance: false
+    # -- spec for the WindmillInstance CR (only when createInstance=true)
+    instanceSpec:
+      global_settings: {}
+      worker_configs: {}
+    # -- Annotations to apply to the pods
+    annotations: {}
+    # -- Labels to apply to the pods
+    labels: {}
+    # -- Node selector to use for scheduling the pods
+    nodeSelector: {}
+    # -- Tolerations to apply to the pods
+    tolerations: []
+    # -- Affinity rules to apply to the pods
+    affinity: {}
+    # -- Security context to apply to the pods
+    podSecurityContext: {}
+    # -- Security context to apply to the container
+    containerSecurityContext: {}
+    # -- Resource limits and requests for the pods
+    resources:
+      limits:
+        memory: "512Mi"
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+    # -- Extra environment variables to apply to the pods
+    extraEnv: []
+    # -- Extra sidecar containers
+    extraContainers: []
+
   # windmill-extra configuration (unified LSP, Multiplayer, and Debugger container)
   windmillExtra:
     # -- custom image (defaults to ghcr.io/windmill-labs/windmill-extra)
