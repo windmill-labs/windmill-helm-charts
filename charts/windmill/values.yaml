@@ -478,10 +478,8 @@ windmill:
     enabled: false
     # -- number of operator replicas (typically 1)
     replicas: 1
-    # -- install the WindmillInstance CRD
-    installCRD: true
-    # -- spec for the WindmillInstance CR. When set, the chart creates a WindmillInstance
-    # -- custom resource that the operator reconciles. Leave empty/omit to manage the CR externally.
+    # -- instance spec for the operator. When set, the chart creates a ConfigMap
+    # -- that the operator watches and syncs to the database. Leave empty/omit to manage it externally.
     # instanceSpec:
     #   global_settings:
     #     base_url: "https://windmill.example.com"

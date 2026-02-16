@@ -1,14 +1,15 @@
 {{- if and .Values.windmill.operator.enabled .Values.windmill.operator.instanceSpec -}}
-apiVersion: windmill.dev/v1alpha1
-kind: WindmillInstance
+apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ .Release.Name }}-instance
   namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/name: windmill-operator
     chart: {{ template "windmill.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-spec:
-{{ toYaml .Values.windmill.operator.instanceSpec | indent 2 }}
+data:
+  spec: |
+{{ toYaml .Values.windmill.operator.instanceSpec | indent 4 }}
 {{- end -}}

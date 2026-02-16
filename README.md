@@ -361,8 +361,7 @@ enterprise:
 | windmill.windmillExtra.extraEnv                                 | list   | `[]`                                                                                       | Extra environment variables to apply to the pods                                                                                                                                                                 |
 | windmill.operator.enabled                                       | bool   | `false`                                                                                    | Enable the Windmill Kubernetes operator. See [Operator section](#kubernetes-operator). Works with both CE and EE.                                                                                                |
 | windmill.operator.replicas                                      | int    | `1`                                                                                        | Number of operator replicas (typically 1)                                                                                                                                                                        |
-| windmill.operator.installCRD                                    | bool   | `true`                                                                                     | Install the WindmillInstance CRD. Set to `false` if managed separately (e.g. ArgoCD)                                                                                                                             |
-| windmill.operator.instanceSpec                                   | object | `null`                                                                                     | When set, creates a WindmillInstance CR the operator reconciles. Omit to manage the CR externally. See [available fields](#available-global_settings-fields) |
+| windmill.operator.instanceSpec                                   | object | `null`                                                                                     | When set, creates a ConfigMap the operator watches and syncs to the database. Omit to manage it externally. See [available fields](#available-global_settings-fields) |
 | windmill.operator.annotations                                    | object | `{}`                                                                                       | Annotations to apply to the operator pods                                                                                                                                                                        |
 | windmill.operator.labels                                         | object | `{}`                                                                                       | Labels to apply to the operator pods                                                                                                                                                                             |
 | windmill.operator.nodeSelector                                   | object | `{}`                                                                                       | Node selector for the operator pods                                                                                                                                                                              |
@@ -507,7 +506,7 @@ enterprise:
 
 ## Kubernetes Operator
 
-The Windmill Kubernetes operator lets you manage your instance configuration declaratively via a `WindmillInstance` custom resource. Instead of configuring settings through the UI, you define them in YAML and the operator syncs them to the database — making your Windmill config GitOps-friendly, auditable, and reproducible across environments.
+The Windmill Kubernetes operator lets you manage your instance configuration declaratively via a ConfigMap. Instead of configuring settings through the UI, you define them in YAML and the operator syncs them to the database — making your Windmill config GitOps-friendly, auditable, and reproducible across environments.
 
 The operator works with both **Community Edition** and **Enterprise Edition**.
 
@@ -519,17 +518,7 @@ The operator works with both **Community Edition** and **Enterprise Edition**.
 
 ### Quick start
 
-**Step 1 — Install the chart with the operator enabled:**
-
-```yaml
-windmill:
-  operator:
-    enabled: true
-```
-
-This deploys the operator Deployment, installs the `WindmillInstance` CRD, and creates the necessary RBAC (ClusterRole for CRD access, Role for reading Secrets in the release namespace).
-
-**Step 2 — Create a `WindmillInstance` CR** (either via Helm values or manually):
+Enable the operator and provide your instance spec in a single `helm install`:
 
 ```yaml
 windmill:
@@ -547,58 +536,35 @@ windmill:
             - "bash"
 ```
 
-**Step 3 — Verify the operator synced:**
+This deploys the operator Deployment, creates a ConfigMap with your instance spec, and sets up the necessary RBAC (Role for reading ConfigMaps, Secrets, and creating Events in the release namespace).
+
+**Verify the operator synced:**
 
 ```sh
-$ kubectl get windmillinstances -n windmill
-NAME       SYNCED   LAST SYNCED            AGE
-windmill   true     2025-01-15T10:30:00Z   5m
+# Operator logs
+kubectl logs -n windmill deployment/windmill-operator
 ```
 
-> **⚠️ First install caveat:** Helm cannot create the CRD and a CR that uses it in the same `helm install`. On a fresh install, either:
-> 1. Install first without `instanceSpec`, then `helm upgrade` with it added, or
-> 2. Apply the CR manually after the initial install (see below), or
-> 3. Manage the CRD separately with `installCRD: false` and apply it before the Helm install.
->
-> Subsequent `helm upgrade` commands work fine with both enabled since the CRD already exists.
+### Applying the instance config manually
 
-### Managing the CRD separately
-
-If you prefer to manage the CRD lifecycle outside of Helm (e.g. via a separate CI step or ArgoCD), disable CRD installation:
+Instead of providing `instanceSpec` in your values, you can manage the ConfigMap yourself:
 
 ```yaml
-windmill:
-  operator:
-    enabled: true
-    installCRD: false
-```
-
-You can generate the CRD YAML from the windmill binary:
-
-```sh
-windmill operator crd > windmillinstance-crd.yaml
-kubectl apply -f windmillinstance-crd.yaml
-```
-
-### Applying a WindmillInstance CR manually
-
-Instead of providing `instanceSpec` in your values, you can manage the CR yourself after deploying the chart:
-
-```yaml
-apiVersion: windmill.dev/v1alpha1
-kind: WindmillInstance
+apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: my-instance
+  name: windmill-instance
   namespace: windmill
-spec:
-  global_settings:
-    base_url: "https://windmill.example.com"
-    license_key: "my-license-key"
-  worker_configs:
-    default:
-      worker_tags:
-        - "deno"
-        - "python3"
+data:
+  spec: |
+    global_settings:
+      base_url: "https://windmill.example.com"
+      license_key: "my-license-key"
+    worker_configs:
+      default:
+        worker_tags:
+          - "deno"
+          - "python3"
 ```
 
 ### Available `global_settings` fields
@@ -625,8 +591,6 @@ The most commonly used fields (all optional):
 | `critical_error_channels` | list | Alert channels (email, Slack, Teams) |
 | `expose_metrics` | bool | Enable Prometheus metrics |
 
-Any unrecognized fields are passed through as-is via `x-kubernetes-preserve-unknown-fields`.
-
 ### Available `worker_configs` fields
 
 Keys are worker group names (e.g. `default`, `native`, `gpu`). Each group supports:
@@ -647,7 +611,7 @@ Keys are worker group names (e.g. `default`, `native`, `gpu`). Each group suppor
 
 ### Secret references
 
-For sensitive values, store them in a Kubernetes Secret and reference them using `secretKeyRef`:
+For sensitive values, store them in a Kubernetes Secret and reference them in the instance spec using `secretKeyRef`:
 
 ```yaml
 apiVersion: v1
@@ -659,25 +623,27 @@ type: Opaque
 stringData:
   license: "my-license-key"
   github-oauth-secret: "ghp_xxxxxxxxxxxx"
----
-apiVersion: windmill.dev/v1alpha1
-kind: WindmillInstance
-metadata:
-  name: my-instance
-  namespace: windmill
-spec:
-  global_settings:
-    license_key:
-      secretKeyRef:
-        name: windmill-secrets
-        key: license
-    oauths:
-      github:
-        id: "my-github-client-id"
-        secret:
+```
+
+Then in your values:
+
+```yaml
+windmill:
+  operator:
+    enabled: true
+    instanceSpec:
+      global_settings:
+        license_key:
           secretKeyRef:
             name: windmill-secrets
-            key: github-oauth-secret
+            key: license
+        oauths:
+          github:
+            id: "my-github-client-id"
+            secret:
+              secretKeyRef:
+                name: windmill-secrets
+                key: github-oauth-secret
 ```
 
 The operator resolves `secretKeyRef` values at reconciliation time. Supported fields include: `license_key`, `hub_api_secret`, `scim_token`, SMTP password, and OAuth secrets.
@@ -685,17 +651,9 @@ The operator resolves `secretKeyRef` values at reconciliation time. Supported fi
 ### Monitoring operator status
 
 ```sh
-# Check sync status (shortname: wmi)
-kubectl get wmi -n windmill
-
-# Detailed status
-kubectl get wmi my-instance -n windmill -o jsonpath='{.status}' | jq
-
 # Operator logs
 kubectl logs -n windmill deployment/windmill-operator
 ```
-
-A healthy operator shows `SYNCED=true` and updates `LAST SYNCED` on each reconciliation cycle.
 
 ## Caveats
 

@@ -26,47 +26,9 @@ roleRef:
 {{- if .Values.windmill.operator.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: {{ .Release.Name }}-windmill-operator
-  labels:
-    app.kubernetes.io/name: windmill-operator
-    chart: {{ template "windmill.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-rules:
-  - apiGroups: ["windmill.dev"]
-    resources: ["windmillinstances"]
-    verbs: ["get", "list", "watch", "patch"]
-  - apiGroups: ["windmill.dev"]
-    resources: ["windmillinstances/status"]
-    verbs: ["patch", "update"]
-  - apiGroups: [""]
-    resources: ["events"]
-    verbs: ["create", "patch"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: {{ .Release.Name }}-windmill-operator
-  labels:
-    app.kubernetes.io/name: windmill-operator
-    chart: {{ template "windmill.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-subjects:
-  - kind: ServiceAccount
-    name: {{ template "windmill.serviceAccountName" . }}
-    namespace: {{ .Release.Namespace }}
-roleRef:
-  kind: ClusterRole
-  name: {{ .Release.Name }}-windmill-operator
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: windmill-operator-secrets
+  name: windmill-operator
   namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/name: windmill-operator
@@ -75,13 +37,19 @@ metadata:
     heritage: {{ .Release.Service }}
 rules:
   - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: windmill-operator-secrets
+  name: windmill-operator
   namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/name: windmill-operator
@@ -94,6 +62,6 @@ subjects:
     namespace: {{ .Release.Namespace }}
 roleRef:
   kind: Role
-  name: windmill-operator-secrets
+  name: windmill-operator
   apiGroup: rbac.authorization.k8s.io
 {{- end }}
