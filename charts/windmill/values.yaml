@@ -391,6 +391,42 @@ windmill:
       # -- key in the Secret for the private key PEM file (must be PKCS#8 format)
       keySecretKey: "tls.key"
 
+      # -- Automated certificate issuance/renewal via acme.sh with DNS-01 challenge.
+      # Stores the cert in the same K8s Secret referenced by certSecretName above.
+      acme:
+        # -- enable the acme.sh CronJob for automatic cert issuance/renewal
+        enabled: false
+        # -- domain to issue the certificate for (e.g., mx.example.com)
+        domain: ""
+        # -- cron schedule for the renewal check (default: daily at 03:00 UTC)
+        schedule: "0 3 * * *"
+        # -- acme.sh container image
+        image: "neilpang/acme.sh"
+        # -- acme.sh container image tag
+        imageTag: "latest"
+        # -- ACME server URL (default: Let's Encrypt production)
+        server: "https://acme-v02.api.letsencrypt.org/directory"
+        # -- acme.sh DNS plugin name (e.g., dns_cf, dns_aws, dns_gd)
+        dnsProvider: "dns_cf"
+        # -- name of an existing Secret containing DNS provider credentials (e.g., CF_Token, CF_Zone_ID)
+        dnsSecretName: ""
+        # -- RSA key length for the certificate
+        keyLength: 2048
+        # -- only renew when fewer than this many days remain before expiry
+        renewBeforeDays: 30
+        # -- resource limits and requests for the CronJob pod
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+        # -- node selector for the CronJob pod
+        nodeSelector: {}
+        # -- tolerations for the CronJob pod
+        tolerations: []
+
     # -- Topology spread constraints
     topologySpreadConstraints: []
 
