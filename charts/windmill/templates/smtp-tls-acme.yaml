@@ -1,0 +1,211 @@
+{{- if and .Values.windmill.app.smtpTls.enabled .Values.windmill.app.smtpTls.acme.enabled }}
+{{- if not .Values.windmill.app.smtpTls.certSecretName }}
+{{- fail "smtpTls.acme requires smtpTls.certSecretName to be set" }}
+{{- end }}
+{{- if not .Values.windmill.app.smtpTls.acme.domain }}
+{{- fail "smtpTls.acme.domain must be set when acme is enabled" }}
+{{- end }}
+{{- if not .Values.windmill.app.smtpTls.acme.dnsSecretName }}
+{{- fail "smtpTls.acme.dnsSecretName must be set when acme is enabled" }}
+{{- end }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: windmill-smtp-tls-acme
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: windmill-smtp-tls-acme
+    chart: {{ template "windmill.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "create", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: windmill-smtp-tls-acme
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: windmill-smtp-tls-acme
+    chart: {{ template "windmill.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "windmill.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: windmill-smtp-tls-acme
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: windmill-smtp-tls-acme
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: windmill-smtp-tls-acme
+    chart: {{ template "windmill.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  schedule: {{ .Values.windmill.app.smtpTls.acme.schedule | quote }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 600
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: windmill-smtp-tls-acme
+        spec:
+          serviceAccountName: {{ template "windmill.serviceAccountName" . }}
+          automountServiceAccountToken: true
+          restartPolicy: Never
+          {{- with .Values.windmill.app.smtpTls.acme.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.windmill.app.smtpTls.acme.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: acme
+              image: "{{ .Values.windmill.app.smtpTls.acme.image }}:{{ .Values.windmill.app.smtpTls.acme.imageTag }}"
+              envFrom:
+                - secretRef:
+                    name: {{ .Values.windmill.app.smtpTls.acme.dnsSecretName }}
+              env:
+                - name: ACME_DOMAIN
+                  value: {{ .Values.windmill.app.smtpTls.acme.domain | quote }}
+                - name: ACME_SERVER
+                  value: {{ .Values.windmill.app.smtpTls.acme.server | quote }}
+                - name: ACME_DNS_PROVIDER
+                  value: {{ .Values.windmill.app.smtpTls.acme.dnsProvider | quote }}
+                - name: ACME_KEY_LENGTH
+                  value: {{ .Values.windmill.app.smtpTls.acme.keyLength | quote }}
+                - name: RENEW_BEFORE_DAYS
+                  value: {{ .Values.windmill.app.smtpTls.acme.renewBeforeDays | quote }}
+                - name: SECRET_NAME
+                  value: {{ .Values.windmill.app.smtpTls.certSecretName | quote }}
+                - name: SECRET_CERT_KEY
+                  value: {{ .Values.windmill.app.smtpTls.certSecretKey | quote }}
+                - name: SECRET_KEY_KEY
+                  value: {{ .Values.windmill.app.smtpTls.keySecretKey | quote }}
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+              command:
+                - /bin/sh
+                - -ec
+                - |
+                  # ── Phase 1: Check existing cert expiry ──
+                  SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+                  CA_CERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+                  API="https://kubernetes.default.svc"
+
+                  EXISTING=$(curl -sSf \
+                    --cacert "$CA_CERT" \
+                    -H "Authorization: Bearer $SA_TOKEN" \
+                    "$API/api/v1/namespaces/$NAMESPACE/secrets/$SECRET_NAME" 2>/dev/null) || true
+
+                  if [ -n "$EXISTING" ]; then
+                    CERT_B64=$(echo "$EXISTING" | sed -n 's/.*"'"$SECRET_CERT_KEY"'"\s*:\s*"\([^"]*\)".*/\1/p')
+                    if [ -n "$CERT_B64" ]; then
+                      echo "$CERT_B64" | base64 -d > /tmp/existing.crt 2>/dev/null || true
+                      RENEW_SECONDS=$((RENEW_BEFORE_DAYS * 86400))
+                      if openssl x509 -in /tmp/existing.crt -checkend "$RENEW_SECONDS" -noout 2>/dev/null; then
+                        EXPIRY=$(openssl x509 -in /tmp/existing.crt -enddate -noout 2>/dev/null)
+                        echo "Certificate still valid (${EXPIRY}), skipping renewal."
+                        exit 0
+                      fi
+                      echo "Certificate expires within ${RENEW_BEFORE_DAYS} days, renewing..."
+                    fi
+                  else
+                    echo "No existing certificate secret found, issuing new cert..."
+                  fi
+
+                  # ── Phase 2: Issue certificate ──
+                  ACME_HOME="/acme.sh"
+
+                  acme.sh --register-account --server "$ACME_SERVER" --home "$ACME_HOME" || true
+
+                  acme.sh --issue \
+                    --server "$ACME_SERVER" \
+                    --dns "$ACME_DNS_PROVIDER" \
+                    -d "$ACME_DOMAIN" \
+                    --keylength "$ACME_KEY_LENGTH" \
+                    --force \
+                    --home "$ACME_HOME"
+
+                  # acme.sh uses _ecc suffix for ECC keys, no suffix for RSA
+                  CERT_DIR="$ACME_HOME/${ACME_DOMAIN}_ecc"
+                  if [ ! -d "$CERT_DIR" ]; then
+                    CERT_DIR="$ACME_HOME/${ACME_DOMAIN}"
+                  fi
+                  CERT_FILE="$CERT_DIR/${ACME_DOMAIN}.cer"
+                  KEY_FILE="$CERT_DIR/${ACME_DOMAIN}.key"
+                  FULLCHAIN_FILE="$CERT_DIR/fullchain.cer"
+
+                  # ── Phase 3: Convert key to PKCS#8 ──
+                  openssl pkcs8 -topk8 -nocrypt -in "$KEY_FILE" -out /tmp/key_pkcs8.pem
+
+                  # ── Phase 4: Base64-encode cert and key ──
+                  CERT_B64=$(base64 -w0 < "$FULLCHAIN_FILE")
+                  KEY_B64=$(base64 -w0 < /tmp/key_pkcs8.pem)
+
+                  # ── Phase 5: Create or update the K8s Secret ──
+                  SECRET_JSON=$(cat <<EOJSON
+                  {
+                    "apiVersion": "v1",
+                    "kind": "Secret",
+                    "metadata": {
+                      "name": "$SECRET_NAME",
+                      "namespace": "$NAMESPACE"
+                    },
+                    "type": "Opaque",
+                    "data": {
+                      "$SECRET_CERT_KEY": "$CERT_B64",
+                      "$SECRET_KEY_KEY": "$KEY_B64"
+                    }
+                  }
+                  EOJSON
+                  )
+
+                  # Try update first (PUT), fall back to create (POST)
+                  HTTP_CODE=$(curl -s -o /tmp/k8s_response -w '%{http_code}' \
+                    --cacert "$CA_CERT" \
+                    -H "Authorization: Bearer $SA_TOKEN" \
+                    -H "Content-Type: application/json" \
+                    -X PUT \
+                    -d "$SECRET_JSON" \
+                    "$API/api/v1/namespaces/$NAMESPACE/secrets/$SECRET_NAME")
+
+                  if [ "$HTTP_CODE" = "404" ]; then
+                    echo "Secret does not exist yet, creating..."
+                    HTTP_CODE=$(curl -s -o /tmp/k8s_response -w '%{http_code}' \
+                      --cacert "$CA_CERT" \
+                      -H "Authorization: Bearer $SA_TOKEN" \
+                      -H "Content-Type: application/json" \
+                      -X POST \
+                      -d "$SECRET_JSON" \
+                      "$API/api/v1/namespaces/$NAMESPACE/secrets")
+                  fi
+
+                  if echo "$HTTP_CODE" | grep -qE '^2'; then
+                    echo "Successfully wrote certificate to secret/$SECRET_NAME"
+                  else
+                    echo "Failed to write secret (HTTP $HTTP_CODE):"
+                    cat /tmp/k8s_response
+                    exit 1
+                  fi
+              resources:
+                {{- toYaml .Values.windmill.app.smtpTls.acme.resources | nindent 16 }}
+{{- end }}
