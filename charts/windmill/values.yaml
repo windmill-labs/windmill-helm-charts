@@ -376,6 +376,21 @@ windmill:
       # -- annotations to apply to the service
       annotations: {}
 
+    # -- SMTP TLS certificate configuration for the inbound email server (port 2525).
+    # Mount a TLS certificate from a Kubernetes Secret so acme.sh / cert-manager
+    # issued certs are used instead of the auto-generated self-signed certificate.
+    # The private key must be in PKCS#8 PEM format (openssl pkcs8 -topk8 -nocrypt -in key.pem -out key_pkcs8.pem).
+    # Certificates are hot-reloaded from disk every 12 hours (no restart needed on renewal).
+    smtpTls:
+      # -- enable mounting a TLS certificate for the SMTP server
+      enabled: false
+      # -- name of the Kubernetes Secret containing the certificate and key
+      certSecretName: ""
+      # -- key in the Secret for the certificate PEM file
+      certSecretKey: "tls.crt"
+      # -- key in the Secret for the private key PEM file (must be PKCS#8 format)
+      keySecretKey: "tls.key"
+
     # -- Topology spread constraints
     topologySpreadConstraints: []
 

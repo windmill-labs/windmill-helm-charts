@@ -74,11 +74,16 @@ spec:
         image: {{ default "ghcr.io/windmill-labs/windmill" .Values.windmill.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
         {{ end }}
         imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
-        {{ if .Values.windmill.app.volumeMounts }}
+        {{ if or .Values.windmill.app.volumeMounts .Values.windmill.app.smtpTls.enabled }}
         volumeMounts:
         {{- with .Values.windmill.app.volumeMounts }}
         {{ toYaml . | nindent 8 }}
         {{- end }}
+        {{ if .Values.windmill.app.smtpTls.enabled }}
+        - name: smtp-tls-cert
+          mountPath: /etc/windmill/smtp-tls
+          readOnly: true
+        {{ end }}
         {{ end }}
         ports:
         - containerPort: 8000
@@ -175,16 +180,29 @@ spec:
         - name: "COOKIE_DOMAIN"
           value: "{{ .Values.windmill.cookieDomain }}"
         {{ end }}
+        {{ if .Values.windmill.app.smtpTls.enabled }}
+        - name: "SMTP_TLS_CERT_PEM_PATH"
+          value: "/etc/windmill/smtp-tls/{{ .Values.windmill.app.smtpTls.certSecretKey }}"
+        - name: "SMTP_TLS_KEY_PKCS8_PEM_PATH"
+          value: "/etc/windmill/smtp-tls/{{ .Values.windmill.app.smtpTls.keySecretKey }}"
+        {{ end }}
         resources:
 {{ toYaml .Values.windmill.app.resources | indent 12 }}
 {{- with .Values.windmill.app.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
     {{- end }}
-    {{- with .Values.windmill.app.volumes }}
+    {{ if or .Values.windmill.app.volumes .Values.windmill.app.smtpTls.enabled }}
       volumes:
+      {{- with .Values.windmill.app.volumes }}
 {{ toYaml . | indent 8 }}
-    {{- end }}
+      {{- end }}
+      {{ if .Values.windmill.app.smtpTls.enabled }}
+        - name: smtp-tls-cert
+          secret:
+            secretName: {{ .Values.windmill.app.smtpTls.certSecretName }}
+      {{ end }}
+    {{ end }}
     {{- with .Values.windmill.app.affinity }}
       affinity:
 {{ toYaml . | indent 8 }}
