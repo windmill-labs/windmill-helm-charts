@@ -1,0 +1,12 @@
+
+╭─── Claude Code v2.1.42 ──────────────────────────────────────────────────────╮
+│                            │ Tips for getting started                        │
+│     Welcome back Ruben!    │ Run /init to create a CLAUDE.md file with inst… │
+│                            │ ─────────────────────────────────────────────── │
+│           ▐▛███▜▌          │ Recent activity                                 │
+│          ▝▜█████▛▘         │ No recent activity                              │
+│            ▘▘ ▝▝           │                                                 │
+│                            │                                                 │
+│   Opus 4.6 · Claude Max    │                                                 │
+│   ~/windmill-helm-charts   │                                                 │
+╰──────────────────────────────────────────────────────────────────────────────╯
