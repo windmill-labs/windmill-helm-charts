@@ -562,6 +562,18 @@ The operator works with both **Community Edition** and **Enterprise Edition**.
 - Automate instance setup as part of your IaC pipeline
 - Detect and correct configuration drift (the operator re-syncs every 5 minutes)
 
+> **Important:** Once the operator is enabled, it is the source of truth. Any settings changed directly in the UI will be reverted by the operator on the next reconciliation cycle (every 5 minutes). To make changes, update the `instanceSpec` in your Helm values or ConfigMap and re-deploy.
+
+### Migrating from UI-managed configuration
+
+If you already have an existing Windmill instance configured through the UI, you can export the entire current configuration as YAML from the API:
+
+```
+GET /api/settings/instance_config/yaml
+```
+
+The response can be copy-pasted directly as the `instanceSpec` value in your Helm values file. This is the easiest way to migrate from a UI-managed instance to a declarative, GitOps-friendly setup without having to manually re-type every setting.
+
 ### Quick start
 
 Enable the operator and provide your instance spec in a single `helm install`:
