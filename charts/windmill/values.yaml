@@ -220,8 +220,8 @@ windmill:
 
       # -- Extra environment variables to apply to the pods
       extraEnv:
-        - name: "NUM_WORKERS"
-          value: "8"
+        - name: "NATIVE_MODE"
+          value: "true"
         - name: "SLEEP_QUEUE"
           value: "200"
       # -- Extra sidecar containers

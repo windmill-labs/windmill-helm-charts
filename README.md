@@ -15,6 +15,7 @@
   <a href="#install">Install</a> •
   <a href="#core-values">Core Values</a> •
   <a href="#full-values">Full Values</a> •
+  <a href="#native-mode">Native Mode</a> •
   <a href="#local-s3">Local S3</a> •
   <a href="#kubernetes-operator">Operator</a> •
   <a href="#caveats">Caveats</a> •
@@ -192,6 +193,12 @@ windmill:
       # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
       exposeHostDocker: false
 
+    # Native worker group — runs with NATIVE_MODE=true.
+    # Native mode workers only execute lightweight "native" jobs in-process:
+    # nativets, postgresql, mysql, graphql, snowflake, mssql, bigquery, oracledb.
+    # Non-native jobs (python, bash, go, etc.) are rejected.
+    # NUM_WORKERS is automatically forced to 8 for higher concurrency.
+    # Does not require privileged mode or sandboxing.
     - name: "native"
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
       controller: "Deployment"
@@ -212,7 +219,7 @@ windmill:
       # -- Host aliases to apply to the pods (overrides global hostAliases if set)
       hostAliases: []
 
-      # -- Whether to run the container as privileged (false by default). 
+      # -- Whether to run the container as privileged (false by default).
       # -- Not needed for native workers as they use a different memory management and isolation mechanism.
       privileged: false
 
@@ -235,8 +242,8 @@ windmill:
 
       # -- Extra environment variables to apply to the pods
       extraEnv:
-        - name: "NUM_WORKERS"
-          value: "8"
+        - name: "NATIVE_MODE"
+          value: "true"
         - name: "SLEEP_QUEUE"
           value: "200"
       # -- Extra sidecar containers
@@ -416,6 +423,45 @@ enterprise:
 | windmill.workerGroups[2].mode                                   | string | `"worker"`                                                                                 | Mode for workers, "worker" or "agent", agent requires Enterprise                                                                                                                                                 |
 | windmill.workerGroups[2].command                                | list   | `[]`                                                                                       | Command to run, overrides image default command                                                                                                                                                                  |
 
+## Native Mode
+
+Native mode is a specialized worker execution mode that optimizes workers for lightweight "native" jobs — jobs that run in-process rather than requiring full sandboxed execution environments. This results in significantly higher throughput and lower resource usage for supported job types.
+
+### Supported native languages
+
+`nativets`, `postgresql`, `mysql`, `graphql`, `snowflake`, `mssql`, `bigquery`, `oracledb`
+
+### How it works
+
+- **`NUM_WORKERS` is automatically forced to 8** for higher concurrency (each native job has minimal overhead)
+- **Non-native jobs are rejected** — jobs in languages like Python, Bash, Go, etc. will fail if routed to a native worker
+- **No sandboxing required** — native workers don't need privileged mode, unshare PID, or nsjail
+- **Lower resource footprint** — native workers need less CPU and memory than regular workers
+
+### Enabling native mode
+
+Native mode is activated when any of the following is true:
+
+1. The environment variable `NATIVE_MODE=true` is set (recommended, explicit)
+2. The worker group is named `native` (auto-detected)
+3. The `native_mode: true` setting is configured in the worker group config via the database/operator
+
+The default helm chart values include a `native` worker group with `NATIVE_MODE=true` set. To scale native workers, adjust `replicas`:
+
+```yaml
+windmill:
+  workerGroups:
+    - name: "native"
+      replicas: 4
+      extraEnv:
+        - name: "NATIVE_MODE"
+          value: "true"
+        - name: "SLEEP_QUEUE"
+          value: "200"
+```
+
+> **Tip:** Since native jobs are very lightweight, you can run many more concurrent native workers than regular workers on the same hardware. A single native worker pod with `NUM_WORKERS=8` can handle 8 concurrent native jobs.
+
 ## Local S3
 
 The chart includes a Minio S3 distribution to demonstrate the usage of S3 as a
@@ -534,6 +580,8 @@ windmill:
             - "deno"
             - "python3"
             - "bash"
+        native:
+          native_mode: true
 ```
 
 This deploys the operator Deployment, creates a ConfigMap with your instance spec, and sets up the necessary RBAC (Role for reading ConfigMaps, Secrets, and creating Events in the release namespace).
@@ -565,6 +613,8 @@ data:
         worker_tags:
           - "deno"
           - "python3"
+      native:
+        native_mode: true
 ```
 
 ### Available `global_settings` fields
@@ -606,6 +656,7 @@ Keys are worker group names (e.g. `default`, `native`, `gpu`). Each group suppor
 | `env_vars_allowlist` | list | Allowed environment variable names |
 | `pip_local_dependencies` | list | Local pip dependencies |
 | `additional_python_paths` | list | Extra Python paths |
+| `native_mode` | bool | Enable native mode: only accept native jobs, force NUM_WORKERS=8 |
 | `priority_tags` | object | Tag priority mapping |
 | `autoscaling` | object | Autoscaling config (`enabled`, `min_workers`, `max_workers`, `integration`, etc.) |
 
