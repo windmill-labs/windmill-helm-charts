@@ -558,6 +558,10 @@ windmill:
     # -- require signed debug requests (JWT tokens for debug sessions)
     requireSignedDebugRequests: true
 
+    # -- override WINDMILL_BASE_URL for the extra container (defaults to baseProtocol://windmill-app:8000).
+    # -- Set to your external URL (e.g. "https://windmill.example.com") if the debugger fails with token verification errors.
+    windmillBaseUrl: ""
+
     # -- Extra environment variables to apply to the pods
     extraEnv: []
 
