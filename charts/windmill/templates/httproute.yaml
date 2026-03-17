@@ -35,23 +35,6 @@ spec:
     - name: windmill-extra
       port: 3002
   {{ end }}
-  {{- else }}
-  - matches:
-    - path:
-        type: PathPrefix
-        value: "/ws/"
-    backendRefs:
-    - name: windmill-lsp
-      port: 3001
-  {{ if .Values.enterprise.enabled }}
-  - matches:
-    - path:
-        type: PathPrefix
-        value: "/ws_mp/"
-    backendRefs:
-    - name: windmill-multiplayer
-      port: 3002
-  {{ end }}
   {{- end }}
   {{ if .Values.enterprise.enabled }}
   {{ if .Values.windmill.indexer.enabled }}
@@ -108,23 +91,6 @@ spec:
         value: "/ws_mp/"
     backendRefs:
     - name: windmill-extra
-      port: 3002
-  {{ end }}
-  {{- else }}
-  - matches:
-    - path:
-        type: PathPrefix
-        value: "/ws/"
-    backendRefs:
-    - name: windmill-lsp
-      port: 3001
-  {{ if .Values.enterprise.enabled }}
-  - matches:
-    - path:
-        type: PathPrefix
-        value: "/ws_mp/"
-    backendRefs:
-    - name: windmill-multiplayer
       port: 3002
   {{ end }}
   {{- end }}
