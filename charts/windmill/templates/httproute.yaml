@@ -156,7 +156,7 @@ spec:
         value: "/"
     backendRefs:
     - name: windmill-hub
-      port: 8000
+      port: 3003
 {{- end }}
 {{ if .Values.windmill.publicAppDomain }}
 ---
