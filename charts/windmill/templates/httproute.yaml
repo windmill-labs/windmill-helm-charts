@@ -4,7 +4,7 @@ kind: HTTPRoute
 metadata:
   name: windmill
 spec:
-{{- with .Values.httproute.parentRefs }}
+{{- with .Values.httproute.appParentRefs | default .Values.httproute.parentRefs }}
   parentRefs:
 {{ toYaml . | indent 4 }}
 {{- end }}
@@ -62,7 +62,7 @@ kind: HTTPRoute
 metadata:
   name: windmill-secondaryBaseDomain
 spec:
-{{- with .Values.httproute.parentRefs }}
+{{- with .Values.httproute.secondaryBaseDomainParentRefs | default .Values.httproute.parentRefs }}
   parentRefs:
 {{ toYaml . | indent 4 }}
 {{- end }}
@@ -121,7 +121,7 @@ kind: HTTPRoute
 metadata:
   name: windmill-secondaryApiDomain
 spec:
-{{- with .Values.httproute.parentRefs }}
+{{- with .Values.httproute.secondaryApiDomainParentRefs | default .Values.httproute.parentRefs }}
   parentRefs:
 {{ toYaml . | indent 4 }}
 {{- end }}
@@ -143,7 +143,7 @@ kind: HTTPRoute
 metadata:
   name: windmill-hub
 spec:
-{{- with .Values.httproute.parentRefs }}
+{{- with .Values.httproute.hubParentRefs | default .Values.httproute.parentRefs }}
   parentRefs:
 {{ toYaml . | indent 4 }}
 {{- end }}
@@ -165,7 +165,7 @@ kind: HTTPRoute
 metadata:
   name: windmill-publicAppDomain
 spec:
-{{- with .Values.httproute.parentRefs }}
+{{- with .Values.httproute.publicAppDomainParentRefs | default .Values.httproute.parentRefs }}
   parentRefs:
 {{ toYaml . | indent 4 }}
 {{- end }}
