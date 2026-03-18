@@ -581,7 +581,18 @@ ingress:
 httproute:
   # -- enable/disable creation of a httproute resource (experimental)
   enabled: false
+  # -- default parentRefs for all httproutes
   parentRefs: []
+  # -- override parentRefs for the windmill app httproute (falls back to parentRefs)
+  appParentRefs: []
+  # -- override parentRefs for the windmill hub httproute (falls back to parentRefs)
+  hubParentRefs: []
+  # -- override parentRefs for the secondaryBaseDomain httproute (falls back to parentRefs)
+  secondaryBaseDomainParentRefs: []
+  # -- override parentRefs for the secondaryApiDomain httproute (falls back to parentRefs)
+  secondaryApiDomainParentRefs: []
+  # -- override parentRefs for the publicAppDomain httproute (falls back to parentRefs)
+  publicAppDomainParentRefs: []
 
 enterprise:
   # -- enable Windmill Enterprise, requires license key.
