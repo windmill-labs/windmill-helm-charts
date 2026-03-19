@@ -555,6 +555,9 @@ windmill:
     # -- enable Debugger for debugging scripts
     enableDebugger: true
 
+    # -- enable Gateway reverse proxy (routes /ws/*, /ws_mp/*, /ws_debug/* via a single port)
+    enableGateway: true
+
     # -- require signed debug requests (JWT tokens for debug sessions)
     requireSignedDebugRequests: true
 

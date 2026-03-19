@@ -46,6 +46,8 @@ spec:
         image: {{ default "ghcr.io/windmill-labs/windmill-extra" .Values.windmill.windmillExtra.image }}:{{ default .Chart.AppVersion .Values.windmill.windmillExtra.tag }}
         imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
         ports:
+        - containerPort: 3000
+          name: gateway
         - containerPort: 3001
           name: lsp
         - containerPort: 3002
@@ -61,6 +63,8 @@ spec:
           value: {{ .Values.enterprise.enabled | quote }}
         - name: ENABLE_DEBUGGER
           value: {{ .Values.windmill.windmillExtra.enableDebugger | quote }}
+        - name: ENABLE_GATEWAY
+          value: {{ .Values.windmill.windmillExtra.enableGateway | quote }}
         - name: ENABLE_NSJAIL
           value: {{ .Values.enterprise.nsjail | quote }}
         - name: REQUIRE_SIGNED_DEBUG_REQUESTS
@@ -103,6 +107,10 @@ metadata:
 {{- end }}
 spec:
   ports:
+    - port: 3000
+      protocol: TCP
+      targetPort: 3000
+      name: gateway
     - port: 3001
       protocol: TCP
       targetPort: 3001

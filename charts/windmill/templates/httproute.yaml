@@ -16,25 +16,17 @@ spec:
     - path:
         type: PathPrefix
         value: "/ws/"
-    backendRefs:
-    - name: windmill-extra
-      port: 3001
-  - matches:
     - path:
         type: PathPrefix
         value: "/ws_debug/"
-    backendRefs:
-    - name: windmill-extra
-      port: 3003
-  {{ if .Values.enterprise.enabled }}
-  - matches:
+    {{- if .Values.enterprise.enabled }}
     - path:
         type: PathPrefix
         value: "/ws_mp/"
+    {{- end }}
     backendRefs:
     - name: windmill-extra
-      port: 3002
-  {{ end }}
+      port: 3000
   {{- end }}
   {{ if .Values.enterprise.enabled }}
   {{ if .Values.windmill.indexer.enabled }}
@@ -74,25 +66,17 @@ spec:
     - path:
         type: PathPrefix
         value: "/ws/"
-    backendRefs:
-    - name: windmill-extra
-      port: 3001
-  - matches:
     - path:
         type: PathPrefix
         value: "/ws_debug/"
-    backendRefs:
-    - name: windmill-extra
-      port: 3003
-  {{ if .Values.enterprise.enabled }}
-  - matches:
+    {{- if .Values.enterprise.enabled }}
     - path:
         type: PathPrefix
         value: "/ws_mp/"
+    {{- end }}
     backendRefs:
     - name: windmill-extra
-      port: 3002
-  {{ end }}
+      port: 3000
   {{- end }}
   {{ if .Values.enterprise.enabled }}
   {{ if .Values.windmill.indexer.enabled }}
