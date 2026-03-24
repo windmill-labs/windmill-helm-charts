@@ -173,6 +173,11 @@ windmill:
       # -- Useful for pods with VPN sidecars that need to resolve external DNS names
       dnsConfig: {}
 
+      # -- Optional override of the ServiceAccount name for this worker group.
+      # -- Useful for EKS IRSA where each worker group needs its own SA annotated with a distinct IAM role ARN.
+      # -- Falls back to the global service account when not set.
+      serviceAccountName: ""
+
     - name: "native"
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
       controller: "Deployment"
@@ -240,6 +245,10 @@ windmill:
 
       topologySpreadConstraints: []
 
+      # -- Optional override of the ServiceAccount name for this worker group.
+      # -- Falls back to the global service account when not set.
+      serviceAccountName: ""
+
     - name: "gpu"
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
       controller: "Deployment"
@@ -305,6 +314,10 @@ windmill:
       volumeClaimTemplates: []
 
       topologySpreadConstraints: []
+
+      # -- Optional override of the ServiceAccount name for this worker group.
+      # -- Falls back to the global service account when not set.
+      serviceAccountName: ""
 
   # app configuration
   app:
