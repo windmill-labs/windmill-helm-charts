@@ -2,6 +2,38 @@ apiVersion: v1
 entries:
   windmill:
   - apiVersion: v2
+    appVersion: 1.671.0
+    created: "2026-03-31T22:04:06.162265421Z"
+    dependencies:
+    - condition: minio.enabled
+      name: minio
+      repository: https://charts.min.io/
+      version: 5.4.0
+    description: Windmill - Turn scripts into endpoints, workflows and UIs in minutes
+    digest: d21641af71438bcd7bd2e486f24fd775a8d5847d505e997ec720f7094d04e686
+    home: https://www.windmill.dev/
+    icon: https://www.windmill.dev/img/windmill.svg
+    keywords:
+    - windmill
+    - scripts
+    - flows
+    - workflows
+    - engine
+    - internal
+    - apps
+    - open-source
+    maintainers:
+    - email: ruben@windmill.dev
+      name: windmill
+      url: https://www.windmill.dev/
+    name: windmill
+    sources:
+    - https://github.com/windmill-labs/windmill-helm-charts.git
+    type: application
+    urls:
+    - https://github.com/windmill-labs/windmill-helm-charts/releases/download/windmill-4.0.118/windmill-4.0.118.tgz
+    version: 4.0.118
+  - apiVersion: v2
     appVersion: 1.670.0
     created: "2026-03-31T16:32:47.376014523Z"
     dependencies:
@@ -29648,4 +29680,4 @@ entries:
     urls:
     - https://github.com/windmill-labs/windmill-helm-charts/releases/download/windmill-0.1.0/windmill-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-31T16:32:47.378394635Z"
+generated: "2026-03-31T22:04:06.164088588Z"
