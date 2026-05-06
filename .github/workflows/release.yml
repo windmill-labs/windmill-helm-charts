@@ -15,6 +15,7 @@ jobs:
     # see: https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token
     permissions:
       contents: write
+      packages: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -30,7 +31,7 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v3
         with:
-          version: v3.10.0
+          version: v3.14.4
 
       - name: Add Dependencies
         run: |
@@ -39,5 +40,27 @@ jobs:
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
+        with:
+          skip_existing: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Publish chart to GHCR (OCI)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          echo "$GITHUB_TOKEN" | helm registry login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+
+          # chart-releaser packages charts under .cr-release-packages/
+          shopt -s nullglob
+          packages=(.cr-release-packages/*.tgz)
+          if [ ${#packages[@]} -eq 0 ]; then
+            echo "No packaged charts found in .cr-release-packages/, nothing to push."
+            exit 0
+          fi
+
+          for pkg in "${packages[@]}"; do
+            echo "Pushing $pkg to oci://ghcr.io/windmill-labs/charts"
+            helm push "$pkg" oci://ghcr.io/windmill-labs/charts
+          done
