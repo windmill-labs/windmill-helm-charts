@@ -36,3 +36,6 @@ Session.vim
 
 .history
 .direnv
+
+# Local Claude Code settings (user-specific)
+.claude/settings.local.json
