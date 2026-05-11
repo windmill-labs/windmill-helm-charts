@@ -77,7 +77,11 @@ spec:
         - name: PUBLIC_PRIVATE_HUB
           value: "true"
         - name: PUBLIC_APP_URL
-          value: "{{ .Values.windmill.baseProtocol }}://{{ .Values.windmill.baseDomain }}"
+          value: "{{ .Values.hub.appUrl | default (printf "%s://%s" .Values.windmill.baseProtocol .Values.windmill.baseDomain) }}"
+        {{- if .Values.hub.appAccessibleUrl }}
+        - name: PUBLIC_APP_ACCESSIBLE_URL
+          value: "{{ .Values.hub.appAccessibleUrl }}"
+        {{- end }}
         {{ if .Values.hub.apiSecretSecretName }}
         - name: "API_SECRET"
           valueFrom:

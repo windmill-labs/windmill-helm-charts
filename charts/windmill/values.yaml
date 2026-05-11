@@ -675,6 +675,10 @@ hub:
   baseDomain: hub.windmill
   # -- protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container
   baseProtocol: http
+  # -- URL the hub uses for server-side requests to the Windmill app (PUBLIC_APP_URL). Defaults to `{windmill.baseProtocol}://{windmill.baseDomain}`. Set to an internal cluster URL (e.g. `http://windmill-app:8000`) to avoid TLS validation issues when the external ingress uses a self-signed certificate.
+  appUrl: ""
+  # -- URL the hub renders in the browser for links pointing back to the Windmill app (PUBLIC_APP_ACCESSIBLE_URL). When unset, the hub falls back to `appUrl`. Set this to your external URL when `appUrl` is an internal cluster URL.
+  appAccessibleUrl: ""
   # -- name of the secret storing the API secret, take precedence over apiSecret
   apiSecretSecretName: ""
   # -- name of the key in secret storing the API secret. The default key of the api secret is 'apiSecret'
