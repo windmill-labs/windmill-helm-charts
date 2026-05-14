@@ -686,6 +686,10 @@ hub:
   # -- API secret for the hub. Optional, only set if you want to restrict access to the hub.
   apiSecret: ""
 
+  serviceAccount:
+    # -- Name of an existing ServiceAccount to use for the hub pods. If empty, falls back to the chart's main ServiceAccount (see `serviceAccount` at the top level). Set this to bind a dedicated SA for IRSA (EKS) / Workload Identity (GKE).
+    name: ""
+
   # -- Annotations to apply to the pods
   annotations: {}
   # -- Annotations to apply to the pods
