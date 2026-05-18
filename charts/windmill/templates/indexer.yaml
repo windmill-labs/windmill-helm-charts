@@ -10,7 +10,9 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
+  {{- if not (dig "autoscaling" "enabled" false (.Values.windmill.indexer | default dict)) }}
   replicas: 1
+  {{- end }}
   revisionHistoryLimit: 3
   strategy:
     type: RollingUpdate

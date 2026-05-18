@@ -10,7 +10,9 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
+  {{- if not (dig "autoscaling" "enabled" false (.Values.windmill.operator | default dict)) }}
   replicas: {{ .Values.windmill.operator.replicas }}
+  {{- end }}
   strategy:
     type: RollingUpdate
     rollingUpdate:

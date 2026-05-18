@@ -12,7 +12,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: windmill-{{ $comp }}
-  minReplicas: {{ $values.replicas }}
+  minReplicas: {{ $values.replicas | default (index $.Values.windmill (printf "%sReplicas" $comp)) | default 1 }}
   maxReplicas: {{ $values.autoscaling.maxReplicas }}
   targetCPUUtilizationPercentage: {{ $values.autoscaling.targetCPUUtilizationPercentage }}
 {{- end }}
