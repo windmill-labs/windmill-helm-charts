@@ -13,6 +13,10 @@ metadata:
     release: {{ $.Release.Name }}
     heritage: {{ $.Release.Service }}
     workerGroup: {{ $v.name }}
+{{- with $v.deploymentAnnotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
 spec:
   replicas: {{ $v.replicas }}
   {{- if eq $controllerType "Deployment" }}
