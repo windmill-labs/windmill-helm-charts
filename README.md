@@ -271,6 +271,8 @@ windmill:
     enableDebugger: true
     # -- require signed debug requests (JWT tokens for debug sessions)
     requireSignedDebugRequests: true
+    # -- require signed multiplayer requests (JWT tokens for collaborative editing sessions). Keep enabled in production.
+    requireSignedMultiplayerRequests: true
 
   # Use those to override the tag or image used for the app and worker containers. Windmill uses the same image for both.
   # By default, if enterprise is enable, the image is set to ghcr.io/windmill-labs/windmill-ee, otherwise the image is set to ghcr.io/windmill-labs/windmill
@@ -359,6 +361,7 @@ enterprise:
 | windmill.windmillExtra.enableLsp                                | bool   | `true`                                                                                     | enable LSP (Language Server Protocol) for code completion                                                                                                                                                        |
 | windmill.windmillExtra.enableDebugger                           | bool   | `true`                                                                                     | enable Debugger for debugging scripts                                                                                                                                                                            |
 | windmill.windmillExtra.requireSignedDebugRequests               | bool   | `true`                                                                                     | require signed debug requests (JWT tokens for debug sessions)                                                                                                                                                    |
+| windmill.windmillExtra.requireSignedMultiplayerRequests         | bool   | `true`                                                                                     | require signed multiplayer requests (JWT tokens for collaborative editing sessions). Keep enabled in production.                                                                                                 |
 | windmill.windmillExtra.affinity                                 | object | `{}`                                                                                       | Affinity rules to apply to the pods                                                                                                                                                                              |
 | windmill.windmillExtra.annotations                              | object | `{}`                                                                                       | Annotations to apply to the pods                                                                                                                                                                                 |
 | windmill.windmillExtra.labels                                   | object | `{}`                                                                                       | Labels to apply to the pods                                                                                                                                                                                      |

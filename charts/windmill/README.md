@@ -181,6 +181,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.windmillExtra.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.windmillExtra.podSecurityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
 | windmill.windmillExtra.requireSignedDebugRequests | bool | `true` | require signed debug requests (JWT tokens for debug sessions) |
+| windmill.windmillExtra.requireSignedMultiplayerRequests | bool | `true` | require signed multiplayer requests (JWT tokens for collaborative editing sessions). Keep enabled in production. |
 | windmill.windmillExtra.resources | object | `{"limits":{"memory":"1Gi"}}` | Resource limits and requests for the pods |
 | windmill.windmillExtra.securityContext | object | `{}` | legacy, use podSecurityContext instead |
 | windmill.windmillExtra.service.annotations | object | `{}` | Annotations to apply to the service |

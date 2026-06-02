@@ -583,6 +583,9 @@ windmill:
     # -- require signed debug requests (JWT tokens for debug sessions)
     requireSignedDebugRequests: true
 
+    # -- require signed multiplayer requests (JWT tokens for collaborative editing sessions). Keep enabled in production.
+    requireSignedMultiplayerRequests: true
+
     # -- override WINDMILL_BASE_URL for the extra container (defaults to http://windmill-app:8000).
     # -- Set to your external URL (e.g. "https://windmill.example.com") if the debugger fails with token verification errors.
     windmillBaseUrl: ""
