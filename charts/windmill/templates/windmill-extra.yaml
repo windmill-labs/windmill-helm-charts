@@ -71,6 +71,8 @@ spec:
           value: {{ .Values.enterprise.nsjail | quote }}
         - name: REQUIRE_SIGNED_DEBUG_REQUESTS
           value: {{ .Values.windmill.windmillExtra.requireSignedDebugRequests | quote }}
+        - name: REQUIRE_SIGNED_MULTIPLAYER_REQUESTS
+          value: {{ .Values.windmill.windmillExtra.requireSignedMultiplayerRequests | quote }}
         - name: WINDMILL_BASE_URL
           value: "{{ .Values.windmill.windmillExtra.windmillBaseUrl | default "http://windmill-app:8000" }}"
         {{- with .Values.windmill.windmillExtra.extraEnv }}
