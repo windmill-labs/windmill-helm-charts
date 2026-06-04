@@ -89,6 +89,16 @@ windmill:
   disableUnsharePid: false
 
   # worker groups
+  # NOTE: workerGroups may be provided either as a list (the form documented below)
+  # or as a dict/map keyed by the worker group name, e.g.:
+  #   workerGroups:
+  #     default:
+  #       replicas: 3
+  #     native:
+  #       replicas: 1
+  # The dict form is convenient for kustomize overlays, since it lets you patch a
+  # single group by key instead of redefining the whole list. When using the dict
+  # form, the key is used as the worker group name (an explicit `name` still wins).
   workerGroups:
     # workers configuration
     # The default worker group

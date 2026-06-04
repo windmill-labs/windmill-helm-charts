@@ -1,4 +1,20 @@
-{{- range $v := .Values.windmill.workerGroups }}
+{{- /*
+workerGroups can be configured either as a list (the primary, documented form)
+or as a dict/map keyed by the worker group name (handy for kustomize overlays,
+where merging into a keyed map avoids having to redefine the whole list).
+Normalize both into a list of objects that each carry a `name` field.
+*/ -}}
+{{- $workerGroups := .Values.windmill.workerGroups }}
+{{- if kindIs "map" $workerGroups }}
+{{- $asList := list }}
+{{- range $name, $group := $workerGroups }}
+{{- $group = default dict $group }}
+{{- $_ := set $group "name" (default $name $group.name) }}
+{{- $asList = append $asList $group }}
+{{- end }}
+{{- $workerGroups = $asList }}
+{{- end }}
+{{- range $v := $workerGroups }}
 {{ if and $v.replicas (ge (int $v.replicas) 0)}}
 ---
 {{- $controllerType := include "validateControllerKind" $v.controller }}
