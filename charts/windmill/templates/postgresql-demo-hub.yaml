@@ -3,6 +3,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-hub-postgresql
 spec:
   serviceName: windmill-hub-postgresql
@@ -50,6 +51,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-postgresql-demo-hub
 spec:
   replicas: 1
@@ -80,6 +82,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-hub-postgresql
 spec:
   selector:

@@ -21,6 +21,7 @@ Normalize both into a list of objects that each carry a `name` field.
 apiVersion: apps/v1
 kind: {{ $controllerType }}
 metadata:
+  namespace: {{ $.Release.Namespace }}
   name: windmill-workers-{{ $v.name }}
   labels:
     app: windmill-workers
