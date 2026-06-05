@@ -138,7 +138,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.databaseUrlSecretKey | string | `"url"` | name of the key in existing secret storing the database URI. The default key of the url is 'url' |
 | windmill.databaseUrlSecretName | string | `""` | name of the existing secret storing the database URI, take precedence over databaseUrl. |
 | windmill.disableUnsharePid | bool | `false` | Some systems like Bottlerocket AMI have max_user_namespaces=0 which prevents unshare from working. |
-| windmill.exposeHostDocker | bool | `false` | mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon |
+| windmill.exposeHostDocker | bool | `false` | SECURITY RISK: mounts the host node's Docker socket into the worker, giving any user who can run a script root-equivalent control of the node's Docker daemon (and typically the cluster). Trusted, single-tenant use only — never enable for untrusted or multi-tenant workloads. Prefer a dedicated docker worker group with the rootless podman runtime (CONTAINER_RUNTIME=podman on a *-full image, run as a non-root user) instead. |
 | windmill.extraReplicas | int | `1` | replicas for the lsp smart assistant (not required but useful for the web IDE) |
 | windmill.hostAliases | list | `[]` | host aliases for all pods (can be overridden by individual worker groups) |
 | windmill.image | string | `""` | windmill image tag, will use the Acorresponding ee or ce image from ghcr if not defined. Do not include tag in the image name. |
@@ -195,7 +195,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].disableUnsharePid | bool | `false` | Set to true for nodes where user namespaces are disabled (e.g., Bottlerocket AMI with max_user_namespaces=0). |
 | windmill.workerGroups[0].dnsConfig | object | `{}` | Custom DNS configuration for the pods. Useful for pods with VPN sidecars that need to resolve external DNS names |
 | windmill.workerGroups[0].dnsPolicy | string | `""` | DNS policy for the pods. Set to "None" when using custom dnsConfig (e.g., for VPN sidecars or custom DNS resolution) |
-| windmill.workerGroups[0].exposeHostDocker | bool | `false` | mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon |
+| windmill.workerGroups[0].exposeHostDocker | bool | `false` | SECURITY RISK: mounts the host node's Docker socket into this worker group, giving any script author root-equivalent control of the node's Docker daemon. Trusted, single-tenant use only. Prefer the rootless podman runtime (CONTAINER_RUNTIME=podman on a *-full image, non-root) instead. |
 | windmill.workerGroups[0].extraContainers | list | `[]` | Extra sidecar containers |
 | windmill.workerGroups[0].extraEnv | list | `[]` | value: "/tmp" |
 | windmill.workerGroups[0].hostAliases | list | `[]` | Host aliases to apply to the pods (overrides global hostAliases if set) |
@@ -221,7 +221,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[1].containerSecurityContext | object | `{}` | Security context to apply to the pod |
 | windmill.workerGroups[1].controller | string | `"Deployment"` | Controller to use. Valid options are "Deployment" and "StatefulSet" |
 | windmill.workerGroups[1].disableUnsharePid | bool | `false` | Set to true for nodes where user namespaces are disabled (e.g., Bottlerocket AMI with max_user_namespaces=0). |
-| windmill.workerGroups[1].exposeHostDocker | bool | `false` | mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon |
+| windmill.workerGroups[1].exposeHostDocker | bool | `false` | SECURITY RISK: mounts the host node's Docker socket into this worker group, giving any script author root-equivalent control of the node's Docker daemon. Trusted, single-tenant use only. Prefer the rootless podman runtime (CONTAINER_RUNTIME=podman on a *-full image, non-root) instead. |
 | windmill.workerGroups[1].extraContainers | list | `[]` | Extra sidecar containers |
 | windmill.workerGroups[1].extraEnv | list | `[{"name":"NUM_WORKERS","value":"8"},{"name":"SLEEP_QUEUE","value":"200"}]` | Extra environment variables to apply to the pods |
 | windmill.workerGroups[1].hostAliases | list | `[]` | Host aliases to apply to the pods (overrides global hostAliases if set) |
@@ -246,7 +246,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[2].containerSecurityContext | object | `{}` | Security context to apply to the pod |
 | windmill.workerGroups[2].controller | string | `"Deployment"` | Controller to use. Valid options are "Deployment" and "StatefulSet" |
 | windmill.workerGroups[2].disableUnsharePid | bool | `false` | Set to true for nodes where user namespaces are disabled (e.g., Bottlerocket AMI with max_user_namespaces=0). |
-| windmill.workerGroups[2].exposeHostDocker | bool | `false` | mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon |
+| windmill.workerGroups[2].exposeHostDocker | bool | `false` | SECURITY RISK: mounts the host node's Docker socket into this worker group, giving any script author root-equivalent control of the node's Docker daemon. Trusted, single-tenant use only. Prefer the rootless podman runtime (CONTAINER_RUNTIME=podman on a *-full image, non-root) instead. |
 | windmill.workerGroups[2].extraContainers | list | `[]` | Extra sidecar containers |
 | windmill.workerGroups[2].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
 | windmill.workerGroups[2].hostAliases | list | `[]` | Host aliases to apply to the pods (overrides global hostAliases if set) |
