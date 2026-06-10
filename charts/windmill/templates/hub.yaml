@@ -2,6 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-hub
   labels:
     app: windmill-hub
@@ -10,7 +11,9 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}    
 spec:
+  {{- if not (dig "autoscaling" "enabled" false (.Values.hub | default dict)) }}
   replicas: {{ .Values.hub.replicas }}
+  {{- end }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -34,11 +37,19 @@ spec:
 {{- end }}
     spec:
 {{ include "windmill.podDns" (dict "root" .) | indent 6 }}
+      serviceAccountName: {{ default (include "windmill.serviceAccountName" .) .Values.hub.serviceAccount.name }}
       {{ if .Values.windmill.imagePullSecrets }}
       imagePullSecrets:
       - name: {{ .Values.windmill.imagePullSecrets }}
-      {{ end }}       
+      {{ end }}
+      {{- if .Values.hub.initContainers }}
+      initContainers:
+      {{- toYaml .Values.hub.initContainers | nindent 6 }}
+      {{- end }}
       containers:
+      {{- with .Values.hub.extraContainers }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
       - name: windmill-hub
         securityContext:
       {{- with .Values.hub.containerSecurityContext }}
@@ -71,7 +82,11 @@ spec:
         - name: PUBLIC_PRIVATE_HUB
           value: "true"
         - name: PUBLIC_APP_URL
-          value: "{{ .Values.windmill.baseProtocol }}://{{ .Values.windmill.baseDomain }}"
+          value: "{{ .Values.hub.appUrl | default (printf "%s://%s" .Values.windmill.baseProtocol .Values.windmill.baseDomain) }}"
+        {{- if .Values.hub.appAccessibleUrl }}
+        - name: PUBLIC_APP_ACCESSIBLE_URL
+          value: "{{ .Values.hub.appAccessibleUrl }}"
+        {{- end }}
         {{ if .Values.hub.apiSecretSecretName }}
         - name: "API_SECRET"
           valueFrom:
@@ -133,6 +148,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-hub
 spec:
   ports:

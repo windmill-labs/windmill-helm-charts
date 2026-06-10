@@ -2,6 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-indexer
   labels:
     app: windmill-indexer
@@ -10,7 +11,9 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
+  {{- if not (dig "autoscaling" "enabled" false (.Values.windmill.indexer | default dict)) }}
   replicas: 1
+  {{- end }}
   revisionHistoryLimit: 3
   strategy:
     type: RollingUpdate
@@ -40,6 +43,10 @@ spec:
       imagePullSecrets:
       - name: {{ .Values.windmill.imagePullSecrets }}
       {{ end }}
+      {{- if .Values.windmill.indexer.initContainers }}
+      initContainers:
+      {{- toYaml .Values.windmill.indexer.initContainers | nindent 6 }}
+      {{- end }}
       containers:
       {{- with .Values.windmill.indexer.extraContainers }}
       {{- toYaml . | nindent 6 }}
@@ -149,6 +156,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-indexer
 spec:
   ports:

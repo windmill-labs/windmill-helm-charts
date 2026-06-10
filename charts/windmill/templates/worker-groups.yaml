@@ -1,10 +1,27 @@
-{{- range $v := .Values.windmill.workerGroups }}
+{{- /*
+workerGroups can be configured either as a list (the primary, documented form)
+or as a dict/map keyed by the worker group name (handy for kustomize overlays,
+where merging into a keyed map avoids having to redefine the whole list).
+Normalize both into a list of objects that each carry a `name` field.
+*/ -}}
+{{- $workerGroups := .Values.windmill.workerGroups }}
+{{- if kindIs "map" $workerGroups }}
+{{- $asList := list }}
+{{- range $name, $group := $workerGroups }}
+{{- $group = default dict $group }}
+{{- $_ := set $group "name" (default $name $group.name) }}
+{{- $asList = append $asList $group }}
+{{- end }}
+{{- $workerGroups = $asList }}
+{{- end }}
+{{- range $v := $workerGroups }}
 {{ if and $v.replicas (ge (int $v.replicas) 0)}}
 ---
 {{- $controllerType := include "validateControllerKind" $v.controller }}
 apiVersion: apps/v1
 kind: {{ $controllerType }}
 metadata:
+  namespace: {{ $.Release.Namespace }}
   name: windmill-workers-{{ $v.name }}
   labels:
     app: windmill-workers
@@ -13,6 +30,10 @@ metadata:
     release: {{ $.Release.Name }}
     heritage: {{ $.Release.Service }}
     workerGroup: {{ $v.name }}
+{{- with $v.deploymentAnnotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
 spec:
   replicas: {{ $v.replicas }}
   {{- if eq $controllerType "Deployment" }}
@@ -47,7 +68,7 @@ spec:
 {{ toYaml . | indent 8 }}
 {{- end }}
     spec:
-      serviceAccountName: {{ template "windmill.serviceAccountName" $ }}
+      serviceAccountName: {{ default (include "windmill.serviceAccountName" $) $v.serviceAccountName }}
       {{- if $.Values.windmill.imagePullSecrets }}
       imagePullSecrets:
       - name: {{ $.Values.windmill.imagePullSecrets }}

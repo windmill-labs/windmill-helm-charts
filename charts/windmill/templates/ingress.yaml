@@ -2,6 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill
 {{- with .Values.ingress.annotations }}
   annotations:
@@ -32,48 +33,22 @@ spec:
               service:
                 name: windmill-extra
                 port:
-                  number: 3001
+                  number: 3000
           - path: /ws_debug/
             pathType: Prefix
             backend:
               service:
                 name: windmill-extra
                 port:
-                  number: 3003
+                  number: 3000
     {{ if .Values.enterprise.enabled }}
-    - host: {{ .Values.windmill.baseDomain | quote }}
-      http:
-        paths:
           - path: /ws_mp/
             pathType: Prefix
             backend:
               service:
                 name: windmill-extra
                 port:
-                  number: 3002
-    {{ end }}
-    {{- else }}
-    - host: {{ .Values.windmill.baseDomain | quote }}
-      http:
-        paths:
-          - path: /ws/
-            pathType: Prefix
-            backend:
-              service:
-                name: windmill-lsp
-                port:
-                  number: 3001
-    {{ if .Values.enterprise.enabled }}
-    - host: {{ .Values.windmill.baseDomain | quote }}
-      http:
-        paths:
-          - path: /ws_mp/
-            pathType: Prefix
-            backend:
-              service:
-                name: windmill-multiplayer
-                port:
-                  number: 3002
+                  number: 3000
     {{ end }}
     {{- end }}
     {{ if .Values.enterprise.enabled }}
@@ -148,48 +123,22 @@ spec:
               service:
                 name: windmill-extra
                 port:
-                  number: 3001
+                  number: 3000
           - path: /ws_debug/
             pathType: Prefix
             backend:
               service:
                 name: windmill-extra
                 port:
-                  number: 3003
+                  number: 3000
     {{ if .Values.enterprise.enabled }}
-    - host: {{ .Values.windmill.secondaryBaseDomain | quote }}
-      http:
-        paths:
           - path: /ws_mp/
             pathType: Prefix
             backend:
               service:
                 name: windmill-extra
                 port:
-                  number: 3002
-    {{ end }}
-    {{- else }}
-    - host: {{ .Values.windmill.secondaryBaseDomain | quote }}
-      http:
-        paths:
-          - path: /ws/
-            pathType: Prefix
-            backend:
-              service:
-                name: windmill-lsp
-                port:
-                  number: 3001
-    {{ if .Values.enterprise.enabled }}
-    - host: {{ .Values.windmill.secondaryBaseDomain | quote }}
-      http:
-        paths:
-          - path: /ws_mp/
-            pathType: Prefix
-            backend:
-              service:
-                name: windmill-multiplayer
-                port:
-                  number: 3002
+                  number: 3000
     {{ end }}
     {{- end }}
     {{ if .Values.enterprise.enabled }}

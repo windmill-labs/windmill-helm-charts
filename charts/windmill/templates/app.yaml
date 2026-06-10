@@ -2,6 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-app
   labels:
     app: windmill-app
@@ -10,7 +11,9 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
+  {{- if not (dig "autoscaling" "enabled" false (.Values.windmill.app | default dict)) }}
   replicas: {{ .Values.windmill.appReplicas }}
+  {{- end }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -224,6 +227,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-app
 {{- with .Values.windmill.app.service.annotations }}
   annotations:
@@ -242,6 +246,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-app-metrics
   labels:
     operated-prometheus: "true"
@@ -260,6 +265,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-app-smtp
 {{- with .Values.windmill.app.smtpService.annotations }}
   annotations:

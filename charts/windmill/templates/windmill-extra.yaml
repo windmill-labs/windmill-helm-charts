@@ -2,6 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-extra
   labels:
     app: windmill-extra
@@ -10,7 +11,9 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
+  {{- if not (dig "autoscaling" "enabled" false (.Values.windmill.extra | default dict)) }}
   replicas: {{ .Values.windmill.extraReplicas }}
+  {{- end }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -47,6 +50,8 @@ spec:
         image: {{ default "ghcr.io/windmill-labs/windmill-extra" .Values.windmill.windmillExtra.image }}:{{ default .Chart.AppVersion .Values.windmill.windmillExtra.tag }}
         imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
         ports:
+        - containerPort: 3000
+          name: gateway
         - containerPort: 3001
           name: lsp
         - containerPort: 3002
@@ -62,10 +67,14 @@ spec:
           value: {{ .Values.enterprise.enabled | quote }}
         - name: ENABLE_DEBUGGER
           value: {{ .Values.windmill.windmillExtra.enableDebugger | quote }}
+        - name: ENABLE_GATEWAY
+          value: {{ .Values.windmill.windmillExtra.enableGateway | quote }}
         - name: ENABLE_NSJAIL
           value: {{ .Values.enterprise.nsjail | quote }}
         - name: REQUIRE_SIGNED_DEBUG_REQUESTS
           value: {{ .Values.windmill.windmillExtra.requireSignedDebugRequests | quote }}
+        - name: REQUIRE_SIGNED_MULTIPLAYER_REQUESTS
+          value: {{ .Values.windmill.windmillExtra.requireSignedMultiplayerRequests | quote }}
         - name: WINDMILL_BASE_URL
           value: "{{ .Values.windmill.windmillExtra.windmillBaseUrl | default "http://windmill-app:8000" }}"
         {{- with .Values.windmill.windmillExtra.extraEnv }}
@@ -97,6 +106,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-extra
 {{- with .Values.windmill.windmillExtra.service.annotations }}
   annotations:
@@ -104,6 +114,10 @@ metadata:
 {{- end }}
 spec:
   ports:
+    - port: 3000
+      protocol: TCP
+      targetPort: 3000
+      name: gateway
     - port: 3001
       protocol: TCP
       targetPort: 3001

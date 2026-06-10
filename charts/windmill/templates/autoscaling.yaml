@@ -6,13 +6,14 @@
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
+  namespace: {{ $.Release.Namespace }}
   name: windmill-{{ $comp }}-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
     name: windmill-{{ $comp }}
-  minReplicas: {{ $values.replicas }}
+  minReplicas: {{ $values.replicas | default (index $.Values.windmill (printf "%sReplicas" $comp)) | default 1 }}
   maxReplicas: {{ $values.autoscaling.maxReplicas }}
   targetCPUUtilizationPercentage: {{ $values.autoscaling.targetCPUUtilizationPercentage }}
 {{- end }}

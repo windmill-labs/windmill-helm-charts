@@ -95,6 +95,16 @@ windmill:
   disableUnsharePid: false
 
   # worker groups
+  # NOTE: workerGroups may be provided either as a list (the form documented below)
+  # or as a dict/map keyed by the worker group name, e.g.:
+  #   workerGroups:
+  #     default:
+  #       replicas: 3
+  #     native:
+  #       replicas: 1
+  # The dict form is convenient for kustomize overlays, since it lets you patch a
+  # single group by key instead of redefining the whole list. When using the dict
+  # form, the key is used as the worker group name (an explicit `name` still wins).
   workerGroups:
     # workers configuration
     # The default worker group
@@ -105,6 +115,9 @@ windmill:
       replicas: 3
       # -- Annotations to apply to the pods
       annotations: {}
+
+      # -- Annotations to apply to the controller (Deployment/StatefulSet) itself
+      deploymentAnnotations: {}
 
       # -- If a job is being ran, the container will wait for it to finish before terminating until this grace period
       terminationGracePeriodSeconds: 604800
@@ -179,6 +192,11 @@ windmill:
       # -- Useful for pods with VPN sidecars that need to resolve external DNS names
       dnsConfig: {}
 
+      # -- Optional override of the ServiceAccount name for this worker group.
+      # -- Useful for EKS IRSA where each worker group needs its own SA annotated with a distinct IAM role ARN.
+      # -- Falls back to the global service account when not set.
+      serviceAccountName: ""
+
     - name: "native"
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
       controller: "Deployment"
@@ -186,6 +204,9 @@ windmill:
       replicas: 1
       # -- Annotations to apply to the pods
       annotations: {}
+
+      # -- Annotations to apply to the controller (Deployment/StatefulSet) itself
+      deploymentAnnotations: {}
 
       # -- Labels to apply to the pods
       labels: {}
@@ -245,6 +266,10 @@ windmill:
       volumeClaimTemplates: []
 
       topologySpreadConstraints: []
+
+      # -- Optional override of the ServiceAccount name for this worker group.
+      # -- Falls back to the global service account when not set.
+      serviceAccountName: ""
 
     - name: "gpu"
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
@@ -311,6 +336,10 @@ windmill:
       volumeClaimTemplates: []
 
       topologySpreadConstraints: []
+
+      # -- Optional override of the ServiceAccount name for this worker group.
+      # -- Falls back to the global service account when not set.
+      serviceAccountName: ""
 
   # app configuration
   app:
@@ -475,6 +504,9 @@ windmill:
     # -- Extra sidecar containers
     extraContainers: []
 
+    # -- Extra init containers
+    initContainers: []
+
     # -- Extra environment variables to apply to the pods
     extraEnv: []
 
@@ -561,8 +593,14 @@ windmill:
     # -- enable Debugger for debugging scripts
     enableDebugger: true
 
+    # -- enable Gateway reverse proxy (routes /ws/*, /ws_mp/*, /ws_debug/* via a single port)
+    enableGateway: true
+
     # -- require signed debug requests (JWT tokens for debug sessions)
     requireSignedDebugRequests: true
+
+    # -- require signed multiplayer requests (JWT tokens for collaborative editing sessions). Keep enabled in production.
+    requireSignedMultiplayerRequests: true
 
     # -- override WINDMILL_BASE_URL for the extra container (defaults to http://windmill-app:8000).
     # -- Set to your external URL (e.g. "https://windmill.example.com") if the debugger fails with token verification errors.
@@ -587,7 +625,18 @@ ingress:
 httproute:
   # -- enable/disable creation of a httproute resource (experimental)
   enabled: false
+  # -- default parentRefs for all httproutes
   parentRefs: []
+  # -- override parentRefs for the windmill app httproute (falls back to parentRefs)
+  appParentRefs: []
+  # -- override parentRefs for the windmill hub httproute (falls back to parentRefs)
+  hubParentRefs: []
+  # -- override parentRefs for the secondaryBaseDomain httproute (falls back to parentRefs)
+  secondaryBaseDomainParentRefs: []
+  # -- override parentRefs for the secondaryApiDomain httproute (falls back to parentRefs)
+  secondaryApiDomainParentRefs: []
+  # -- override parentRefs for the publicAppDomain httproute (falls back to parentRefs)
+  publicAppDomainParentRefs: []
 
 enterprise:
   # -- enable Windmill Enterprise, requires license key.
@@ -651,12 +700,20 @@ hub:
   baseDomain: hub.windmill
   # -- protocol as shown in browser, change to https etc based on your endpoint/ingress configuration, this variable and `baseDomain` are used as part of the BASE_URL environment variable in app and worker container
   baseProtocol: http
+  # -- URL the hub uses for server-side requests to the Windmill app (PUBLIC_APP_URL). Defaults to `{windmill.baseProtocol}://{windmill.baseDomain}`. Set to an internal cluster URL (e.g. `http://windmill-app:8000`) to avoid TLS validation issues when the external ingress uses a self-signed certificate.
+  appUrl: ""
+  # -- URL the hub renders in the browser for links pointing back to the Windmill app (PUBLIC_APP_ACCESSIBLE_URL). When unset, the hub falls back to `appUrl`. Set this to your external URL when `appUrl` is an internal cluster URL.
+  appAccessibleUrl: ""
   # -- name of the secret storing the API secret, take precedence over apiSecret
   apiSecretSecretName: ""
   # -- name of the key in secret storing the API secret. The default key of the api secret is 'apiSecret'
   apiSecretSecretKey: apiSecret
   # -- API secret for the hub. Optional, only set if you want to restrict access to the hub.
   apiSecret: ""
+
+  serviceAccount:
+    # -- Name of an existing ServiceAccount to use for the hub pods. If empty, falls back to the chart's main ServiceAccount (see `serviceAccount` at the top level). Set this to bind a dedicated SA for IRSA (EKS) / Workload Identity (GKE).
+    name: ""
 
   # -- Annotations to apply to the pods
   annotations: {}
@@ -684,6 +741,12 @@ hub:
       memory: "2Gi"
   # -- Extra environment variables to apply to the pods
   extraEnv: []
+
+  # -- Extra sidecar containers
+  extraContainers: []
+
+  # -- Extra init containers
+  initContainers: []
 
   # -- volumes
   volumes: []

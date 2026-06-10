@@ -2,9 +2,10 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill
 spec:
-{{- with .Values.httproute.parentRefs }}
+{{- with .Values.httproute.appParentRefs | default .Values.httproute.parentRefs }}
   parentRefs:
 {{ toYaml . | indent 4 }}
 {{- end }}
@@ -16,42 +17,17 @@ spec:
     - path:
         type: PathPrefix
         value: "/ws/"
-    backendRefs:
-    - name: windmill-extra
-      port: 3001
-  - matches:
     - path:
         type: PathPrefix
         value: "/ws_debug/"
-    backendRefs:
-    - name: windmill-extra
-      port: 3003
-  {{ if .Values.enterprise.enabled }}
-  - matches:
+    {{- if .Values.enterprise.enabled }}
     - path:
         type: PathPrefix
         value: "/ws_mp/"
+    {{- end }}
     backendRefs:
     - name: windmill-extra
-      port: 3002
-  {{ end }}
-  {{- else }}
-  - matches:
-    - path:
-        type: PathPrefix
-        value: "/ws/"
-    backendRefs:
-    - name: windmill-lsp
-      port: 3001
-  {{ if .Values.enterprise.enabled }}
-  - matches:
-    - path:
-        type: PathPrefix
-        value: "/ws_mp/"
-    backendRefs:
-    - name: windmill-multiplayer
-      port: 3002
-  {{ end }}
+      port: 3000
   {{- end }}
   {{ if .Values.enterprise.enabled }}
   {{ if .Values.windmill.indexer.enabled }}
@@ -77,9 +53,10 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: windmill-secondaryBaseDomain
+  namespace: {{ .Release.Namespace }}
+  name: windmill-secondary-base-domain
 spec:
-{{- with .Values.httproute.parentRefs }}
+{{- with .Values.httproute.secondaryBaseDomainParentRefs | default .Values.httproute.parentRefs }}
   parentRefs:
 {{ toYaml . | indent 4 }}
 {{- end }}
@@ -91,42 +68,17 @@ spec:
     - path:
         type: PathPrefix
         value: "/ws/"
-    backendRefs:
-    - name: windmill-extra
-      port: 3001
-  - matches:
     - path:
         type: PathPrefix
         value: "/ws_debug/"
-    backendRefs:
-    - name: windmill-extra
-      port: 3003
-  {{ if .Values.enterprise.enabled }}
-  - matches:
+    {{- if .Values.enterprise.enabled }}
     - path:
         type: PathPrefix
         value: "/ws_mp/"
+    {{- end }}
     backendRefs:
     - name: windmill-extra
-      port: 3002
-  {{ end }}
-  {{- else }}
-  - matches:
-    - path:
-        type: PathPrefix
-        value: "/ws/"
-    backendRefs:
-    - name: windmill-lsp
-      port: 3001
-  {{ if .Values.enterprise.enabled }}
-  - matches:
-    - path:
-        type: PathPrefix
-        value: "/ws_mp/"
-    backendRefs:
-    - name: windmill-multiplayer
-      port: 3002
-  {{ end }}
+      port: 3000
   {{- end }}
   {{ if .Values.enterprise.enabled }}
   {{ if .Values.windmill.indexer.enabled }}
@@ -153,9 +105,10 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: windmill-secondaryApiDomain
+  namespace: {{ .Release.Namespace }}
+  name: windmill-secondary-api-domain
 spec:
-{{- with .Values.httproute.parentRefs }}
+{{- with .Values.httproute.secondaryApiDomainParentRefs | default .Values.httproute.parentRefs }}
   parentRefs:
 {{ toYaml . | indent 4 }}
 {{- end }}
@@ -175,9 +128,10 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-hub
 spec:
-{{- with .Values.httproute.parentRefs }}
+{{- with .Values.httproute.hubParentRefs | default .Values.httproute.parentRefs }}
   parentRefs:
 {{ toYaml . | indent 4 }}
 {{- end }}
@@ -190,16 +144,17 @@ spec:
         value: "/"
     backendRefs:
     - name: windmill-hub
-      port: 8000
+      port: 3003
 {{- end }}
 {{ if .Values.windmill.publicAppDomain }}
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: windmill-publicAppDomain
+  namespace: {{ .Release.Namespace }}
+  name: windmill-public-app-domain
 spec:
-{{- with .Values.httproute.parentRefs }}
+{{- with .Values.httproute.publicAppDomainParentRefs | default .Values.httproute.parentRefs }}
   parentRefs:
 {{ toYaml . | indent 4 }}
 {{- end }}
