@@ -34,6 +34,7 @@ spec:
   {{- end }}
     spec:
       serviceAccountName: {{ template "windmill.serviceAccountName" . }}
+{{ include "windmill.podDns" (dict "root" .) | indent 6 }}
       {{ if .Values.windmill.imagePullSecrets }}
       imagePullSecrets:
       - name: {{ .Values.windmill.imagePullSecrets }}
