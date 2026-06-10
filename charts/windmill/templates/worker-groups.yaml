@@ -248,13 +248,7 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
-    {{- if $v.dnsPolicy }}
-      dnsPolicy: {{ $v.dnsPolicy }}
-    {{- end }}
-    {{- with $v.dnsConfig }}
-      dnsConfig:
-{{ toYaml . | indent 8 }}
-    {{- end }}
+{{ include "windmill.podDns" (dict "root" $ "dnsPolicy" $v.dnsPolicy "dnsConfig" $v.dnsConfig) | indent 6 }}
 {{- if eq $controllerType "StatefulSet" }}
   {{- if $v.volumeClaimTemplates }}
   volumeClaimTemplates:

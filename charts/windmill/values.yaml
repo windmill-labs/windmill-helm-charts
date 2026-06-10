@@ -19,6 +19,12 @@ postgresql:
     # -- size of the PVC
     size: 50Gi
 
+# -- DNS policy for Windmill pods. Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None"
+dnsPolicy: ""
+
+# -- Custom DNS configuration for Windmill pods. When dnsPolicy is "None", nameservers must include at least one resolver.
+dnsConfig: {}
+
 minio:
   # -- enabled included Minio operator for s3 resource demo purposes
   enabled: false

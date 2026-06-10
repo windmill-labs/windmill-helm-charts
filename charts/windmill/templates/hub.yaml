@@ -36,6 +36,7 @@ spec:
 {{ toYaml . | indent 8 }}
 {{- end }}
     spec:
+{{ include "windmill.podDns" (dict "root" .) | indent 6 }}
       serviceAccountName: {{ default (include "windmill.serviceAccountName" .) .Values.hub.serviceAccount.name }}
       {{ if .Values.windmill.imagePullSecrets }}
       imagePullSecrets:
