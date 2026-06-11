@@ -75,6 +75,34 @@ Validate controller kind, defaulting to "Deployment"
 {{- end -}}
 
 {{/*
+Optional pod DNS settings. Component values fall back to the global
+windmill.dnsPolicy / windmill.dnsConfig values. Emits nothing when neither is set.
+Usage:
+{{- with include "windmill.podDns" (dict "root" $ "component" "app" "dnsPolicy" $policy "dnsConfig" $config) }}
+{{ . | indent 6 }}
+{{- end }}
+*/}}
+{{- define "windmill.podDns" -}}
+{{- $root := .root -}}
+{{- $component := .component | default "pod" -}}
+{{- $dnsPolicy := default $root.Values.windmill.dnsPolicy .dnsPolicy -}}
+{{- $dnsConfig := default dict (default $root.Values.windmill.dnsConfig .dnsConfig) -}}
+{{- if and (eq $dnsPolicy "None") (not $dnsConfig.nameservers) -}}
+{{- fail (printf "windmill: %s: dnsPolicy \"None\" requires dnsConfig.nameservers" $component) -}}
+{{- end -}}
+{{- $dns := dict -}}
+{{- if $dnsPolicy -}}
+{{- $_ := set $dns "dnsPolicy" $dnsPolicy -}}
+{{- end -}}
+{{- if $dnsConfig -}}
+{{- $_ := set $dns "dnsConfig" $dnsConfig -}}
+{{- end -}}
+{{- if $dns -}}
+{{- toYaml $dns -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Renders a value that contains a template, with scope if present.
 Usage:
 {{ include "common.tplvalues.render" (dict "value" . "context" $) }}

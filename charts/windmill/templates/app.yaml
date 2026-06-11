@@ -38,6 +38,9 @@ spec:
     spec:
       terminationGracePeriodSeconds: 40
       serviceAccountName: {{ template "windmill.serviceAccountName" . }}
+      {{- with include "windmill.podDns" (dict "root" $ "component" "app" "dnsPolicy" .Values.windmill.app.dnsPolicy "dnsConfig" .Values.windmill.app.dnsConfig) }}
+      {{- . | nindent 6 }}
+      {{- end }}
       {{ if .Values.windmill.imagePullSecrets }}
       imagePullSecrets:
       - name: {{ .Values.windmill.imagePullSecrets }}
