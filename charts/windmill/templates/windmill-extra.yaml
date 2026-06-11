@@ -36,6 +36,9 @@ spec:
 {{ toYaml . | indent 8 }}
 {{- end }}
     spec:
+      {{- with include "windmill.podDns" (dict "root" $ "component" "windmill-extra" "dnsPolicy" .Values.windmill.windmillExtra.dnsPolicy "dnsConfig" .Values.windmill.windmillExtra.dnsConfig) }}
+      {{- . | nindent 6 }}
+      {{- end }}
       {{ if .Values.windmill.imagePullSecrets }}
       imagePullSecrets:
       - name: {{ .Values.windmill.imagePullSecrets }}

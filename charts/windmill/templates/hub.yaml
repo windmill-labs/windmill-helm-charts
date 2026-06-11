@@ -37,6 +37,9 @@ spec:
 {{- end }}
     spec:
       serviceAccountName: {{ default (include "windmill.serviceAccountName" .) .Values.hub.serviceAccount.name }}
+      {{- with include "windmill.podDns" (dict "root" $ "component" "hub" "dnsPolicy" .Values.hub.dnsPolicy "dnsConfig" .Values.hub.dnsConfig) }}
+      {{- . | nindent 6 }}
+      {{- end }}
       {{ if .Values.windmill.imagePullSecrets }}
       imagePullSecrets:
       - name: {{ .Values.windmill.imagePullSecrets }}
