@@ -71,7 +71,7 @@ windmill:
   instanceEventsWebhook: ""
   # -- configure a custom openai base path for azure
   openaiAzureBasePath: ""
-  # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
+  # -- SECURITY RISK: mounts the host node's Docker socket into the worker, giving any user who can run a script root-equivalent control of the node's Docker daemon (and typically the cluster). Trusted, single-tenant use only — never enable for untrusted or multi-tenant workloads. Prefer a dedicated docker worker group with the rootless podman runtime (CONTAINER_RUNTIME=podman on a *-full image, run as a non-root user) instead.
   exposeHostDocker: false
   # -- rust log level, set to debug for more information etc, sets RUST_LOG environment variable in app and worker container
   rustLog: info
@@ -177,7 +177,7 @@ windmill:
       # -- command override
       command: []
 
-      # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
+      # -- SECURITY RISK: mounts the host node's Docker socket into this worker group, giving any script author root-equivalent control of the node's Docker daemon. Trusted, single-tenant use only. Prefer the rootless podman runtime (CONTAINER_RUNTIME=podman on a *-full image, non-root) instead.
       exposeHostDocker: false
 
       topologySpreadConstraints: []
@@ -257,7 +257,7 @@ windmill:
       volumes: []
       volumeMounts: []
 
-      # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
+      # -- SECURITY RISK: mounts the host node's Docker socket into this worker group, giving any script author root-equivalent control of the node's Docker daemon. Trusted, single-tenant use only. Prefer the rootless podman runtime (CONTAINER_RUNTIME=podman on a *-full image, non-root) instead.
       exposeHostDocker: false
 
       # -- Volume claim templates. Only applies when controller is "StatefulSet"
@@ -327,7 +327,7 @@ windmill:
       # -- command override
       command: []
 
-      # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
+      # -- SECURITY RISK: mounts the host node's Docker socket into this worker group, giving any script author root-equivalent control of the node's Docker daemon. Trusted, single-tenant use only. Prefer the rootless podman runtime (CONTAINER_RUNTIME=podman on a *-full image, non-root) instead.
       exposeHostDocker: false
 
       # -- Volume claim templates. Only applies when controller is "StatefulSet"
