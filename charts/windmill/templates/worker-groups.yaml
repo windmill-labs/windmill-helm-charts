@@ -1,10 +1,27 @@
-{{- range $v := .Values.windmill.workerGroups }}
+{{- /*
+workerGroups can be configured either as a list (the primary, documented form)
+or as a dict/map keyed by the worker group name (handy for kustomize overlays,
+where merging into a keyed map avoids having to redefine the whole list).
+Normalize both into a list of objects that each carry a `name` field.
+*/ -}}
+{{- $workerGroups := .Values.windmill.workerGroups }}
+{{- if kindIs "map" $workerGroups }}
+{{- $asList := list }}
+{{- range $name, $group := $workerGroups }}
+{{- $group = default dict $group }}
+{{- $_ := set $group "name" (default $name $group.name) }}
+{{- $asList = append $asList $group }}
+{{- end }}
+{{- $workerGroups = $asList }}
+{{- end }}
+{{- range $v := $workerGroups }}
 {{ if and $v.replicas (ge (int $v.replicas) 0)}}
 ---
 {{- $controllerType := include "validateControllerKind" $v.controller }}
 apiVersion: apps/v1
 kind: {{ $controllerType }}
 metadata:
+  namespace: {{ $.Release.Namespace }}
   name: windmill-workers-{{ $v.name }}
   labels:
     app: windmill-workers
@@ -231,12 +248,8 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
-    {{- if $v.dnsPolicy }}
-      dnsPolicy: {{ $v.dnsPolicy }}
-    {{- end }}
-    {{- with $v.dnsConfig }}
-      dnsConfig:
-{{ toYaml . | indent 8 }}
+    {{- with include "windmill.podDns" (dict "root" $ "component" (printf "workerGroup %s" $v.name) "dnsPolicy" $v.dnsPolicy "dnsConfig" $v.dnsConfig) }}
+      {{- . | nindent 6 }}
     {{- end }}
 {{- if eq $controllerType "StatefulSet" }}
   {{- if $v.volumeClaimTemplates }}

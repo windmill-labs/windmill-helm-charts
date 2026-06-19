@@ -6,6 +6,7 @@
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
+  namespace: {{ $.Release.Namespace }}
   name: windmill-{{ $comp }}-hpa
 spec:
   scaleTargetRef:

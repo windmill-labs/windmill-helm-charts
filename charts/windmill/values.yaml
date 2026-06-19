@@ -77,6 +77,10 @@ windmill:
   rustLog: info
   # -- host aliases for all pods (can be overridden by individual worker groups)
   hostAliases: []
+  # -- DNS policy for all Windmill pods (app, workers, indexer, operator, extra, hub). Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None". Can be overridden per component or per worker group
+  dnsPolicy: ""
+  # -- DNS configuration for all Windmill pods. When dnsPolicy is "None", nameservers must include at least one resolver. Per-component dnsConfig replaces this value entirely (no deep merge)
+  dnsConfig: {}
   # -- domain to use for the public app. Use it for extra security so that custom apps cannot force the user to do custom api call on the main app
   publicAppDomain: ""
   # -- domain to use for the secondary api. Can be useful to have a secondary api domain that bypass a CDN like Cloudflare or similar.
@@ -89,6 +93,16 @@ windmill:
   disableUnsharePid: false
 
   # worker groups
+  # NOTE: workerGroups may be provided either as a list (the form documented below)
+  # or as a dict/map keyed by the worker group name, e.g.:
+  #   workerGroups:
+  #     default:
+  #       replicas: 3
+  #     native:
+  #       replicas: 1
+  # The dict form is convenient for kustomize overlays, since it lets you patch a
+  # single group by key instead of redefining the whole list. When using the dict
+  # form, the key is used as the worker group name (an explicit `name` still wins).
   workerGroups:
     # workers configuration
     # The default worker group
@@ -169,11 +183,11 @@ windmill:
       topologySpreadConstraints: []
 
       # -- DNS policy for the pods. Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None"
-      # -- Set to "None" when using custom dnsConfig (e.g., for VPN sidecars or custom DNS resolution)
+      # -- Set to "None" when using custom dnsConfig (e.g., for VPN sidecars or custom DNS resolution). Falls back to windmill.dnsPolicy when unset
       dnsPolicy: ""
 
       # -- Custom DNS configuration for the pods. Only used when dnsPolicy is set to "None"
-      # -- Useful for pods with VPN sidecars that need to resolve external DNS names
+      # -- Useful for pods with VPN sidecars that need to resolve external DNS names. Falls back to windmill.dnsConfig when unset
       dnsConfig: {}
 
       # -- Optional override of the ServiceAccount name for this worker group.
@@ -354,6 +368,10 @@ windmill:
 
     # -- Affinity rules to apply to the pods
     affinity: {}
+    # -- DNS policy for the pods. Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None". Falls back to windmill.dnsPolicy when unset
+    dnsPolicy: ""
+    # -- Custom DNS configuration for the pods. Falls back to windmill.dnsConfig when unset
+    dnsConfig: {}
 
     # -- Resource limits and requests for the pods
     resources:
@@ -478,6 +496,10 @@ windmill:
 
     # -- Affinity rules to apply to the pods
     affinity: {}
+    # -- DNS policy for the pods. Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None". Falls back to windmill.dnsPolicy when unset
+    dnsPolicy: ""
+    # -- Custom DNS configuration for the pods. Falls back to windmill.dnsConfig when unset
+    dnsConfig: {}
 
     # -- Resource limits and requests for the pods
     resources:
@@ -516,6 +538,10 @@ windmill:
     tolerations: []
     # -- Affinity rules to apply to the pods
     affinity: {}
+    # -- DNS policy for the pods. Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None". Falls back to windmill.dnsPolicy when unset
+    dnsPolicy: ""
+    # -- Custom DNS configuration for the pods. Falls back to windmill.dnsConfig when unset
+    dnsConfig: {}
     # -- Security context to apply to the pods
     podSecurityContext: {}
     # -- Security context to apply to the container
@@ -565,6 +591,10 @@ windmill:
 
     # -- Affinity rules to apply to the pods
     affinity: {}
+    # -- DNS policy for the pods. Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None". Falls back to windmill.dnsPolicy when unset
+    dnsPolicy: ""
+    # -- Custom DNS configuration for the pods. Falls back to windmill.dnsConfig when unset
+    dnsConfig: {}
 
     # -- Resource limits and requests for the pods
     resources:
@@ -719,6 +749,10 @@ hub:
 
   # -- Affinity rules to apply to the pods
   affinity: {}
+  # -- DNS policy for the pods. Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None". Falls back to windmill.dnsPolicy when unset
+  dnsPolicy: ""
+  # -- Custom DNS configuration for the pods. Falls back to windmill.dnsConfig when unset
+  dnsConfig: {}
   # -- Resource limits and requests for the pods
   resources:
     limits:

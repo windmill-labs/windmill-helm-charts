@@ -2,6 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-operator
   labels:
     app: windmill-operator
@@ -36,6 +37,9 @@ spec:
   {{- end }}
     spec:
       serviceAccountName: {{ template "windmill.serviceAccountName" . }}
+      {{- with include "windmill.podDns" (dict "root" $ "component" "operator" "dnsPolicy" .Values.windmill.operator.dnsPolicy "dnsConfig" .Values.windmill.operator.dnsConfig) }}
+      {{- . | nindent 6 }}
+      {{- end }}
       {{ if .Values.windmill.imagePullSecrets }}
       imagePullSecrets:
       - name: {{ .Values.windmill.imagePullSecrets }}

@@ -2,6 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-indexer
   labels:
     app: windmill-indexer
@@ -37,6 +38,9 @@ spec:
   {{- end }}
     spec:
       serviceAccountName: {{ template "windmill.serviceAccountName" . }}
+      {{- with include "windmill.podDns" (dict "root" $ "component" "indexer" "dnsPolicy" .Values.windmill.indexer.dnsPolicy "dnsConfig" .Values.windmill.indexer.dnsConfig) }}
+      {{- . | nindent 6 }}
+      {{- end }}
       {{ if .Values.windmill.imagePullSecrets }}
       imagePullSecrets:
       - name: {{ .Values.windmill.imagePullSecrets }}
@@ -154,6 +158,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-indexer
 spec:
   ports:

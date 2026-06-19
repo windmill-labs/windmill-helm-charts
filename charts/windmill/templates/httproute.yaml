@@ -2,6 +2,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill
 spec:
 {{- with .Values.httproute.appParentRefs | default .Values.httproute.parentRefs }}
@@ -52,6 +53,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-secondary-base-domain
 spec:
 {{- with .Values.httproute.secondaryBaseDomainParentRefs | default .Values.httproute.parentRefs }}
@@ -103,6 +105,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-secondary-api-domain
 spec:
 {{- with .Values.httproute.secondaryApiDomainParentRefs | default .Values.httproute.parentRefs }}
@@ -125,6 +128,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-hub
 spec:
 {{- with .Values.httproute.hubParentRefs | default .Values.httproute.parentRefs }}
@@ -147,6 +151,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-public-app-domain
 spec:
 {{- with .Values.httproute.publicAppDomainParentRefs | default .Values.httproute.parentRefs }}

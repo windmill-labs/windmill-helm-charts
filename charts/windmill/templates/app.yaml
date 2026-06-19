@@ -2,6 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-app
   labels:
     app: windmill-app
@@ -37,6 +38,9 @@ spec:
     spec:
       terminationGracePeriodSeconds: 40
       serviceAccountName: {{ template "windmill.serviceAccountName" . }}
+      {{- with include "windmill.podDns" (dict "root" $ "component" "app" "dnsPolicy" .Values.windmill.app.dnsPolicy "dnsConfig" .Values.windmill.app.dnsConfig) }}
+      {{- . | nindent 6 }}
+      {{- end }}
       {{ if .Values.windmill.imagePullSecrets }}
       imagePullSecrets:
       - name: {{ .Values.windmill.imagePullSecrets }}
@@ -225,6 +229,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-app
 {{- with .Values.windmill.app.service.annotations }}
   annotations:
@@ -243,6 +248,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-app-metrics
   labels:
     operated-prometheus: "true"
@@ -261,6 +267,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-app-smtp
 {{- with .Values.windmill.app.smtpService.annotations }}
   annotations:

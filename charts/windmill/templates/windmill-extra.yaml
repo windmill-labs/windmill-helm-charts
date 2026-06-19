@@ -2,6 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-extra
   labels:
     app: windmill-extra
@@ -35,6 +36,9 @@ spec:
 {{ toYaml . | indent 8 }}
 {{- end }}
     spec:
+      {{- with include "windmill.podDns" (dict "root" $ "component" "windmill-extra" "dnsPolicy" .Values.windmill.windmillExtra.dnsPolicy "dnsConfig" .Values.windmill.windmillExtra.dnsConfig) }}
+      {{- . | nindent 6 }}
+      {{- end }}
       {{ if .Values.windmill.imagePullSecrets }}
       imagePullSecrets:
       - name: {{ .Values.windmill.imagePullSecrets }}
@@ -104,6 +108,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: windmill-extra
 {{- with .Values.windmill.windmillExtra.service.annotations }}
   annotations:
