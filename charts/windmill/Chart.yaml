@@ -1,8 +1,8 @@
 apiVersion: v2
 name: windmill
 type: application
-version: 4.0.185
-appVersion: 1.733.1
+version: 4.0.186
+appVersion: 1.734.0
 dependencies:
   - condition: minio.enabled
     name: minio
