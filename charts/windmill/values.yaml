@@ -111,6 +111,12 @@ windmill:
       controller: "Deployment"
 
       replicas: 3
+      # -- Set to true when this worker group's replica count is managed by Windmill's
+      # -- native Kubernetes autoscaler. The chart then omits spec.replicas so helm
+      # -- upgrades no longer reset the count the autoscaler set (and avoids the
+      # -- server-side apply field-ownership conflict under Helm 4). When true, the
+      # -- `replicas` value above is ignored and the deployment is rendered regardless.
+      autoscalingManaged: false
       # -- Annotations to apply to the pods
       annotations: {}
 
@@ -200,6 +206,12 @@ windmill:
       controller: "Deployment"
 
       replicas: 1
+      # -- Set to true when this worker group's replica count is managed by Windmill's
+      # -- native Kubernetes autoscaler. The chart then omits spec.replicas so helm
+      # -- upgrades no longer reset the count the autoscaler set (and avoids the
+      # -- server-side apply field-ownership conflict under Helm 4). When true, the
+      # -- `replicas` value above is ignored and the deployment is rendered regardless.
+      autoscalingManaged: false
       # -- Annotations to apply to the pods
       annotations: {}
 
