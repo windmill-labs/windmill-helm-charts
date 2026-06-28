@@ -15,7 +15,7 @@ Normalize both into a list of objects that each carry a `name` field.
 {{- $workerGroups = $asList }}
 {{- end }}
 {{- range $v := $workerGroups }}
-{{ if and $v.replicas (ge (int $v.replicas) 0)}}
+{{ if or $v.autoscalingManaged (and $v.replicas (ge (int $v.replicas) 0)) }}
 ---
 {{- $controllerType := include "validateControllerKind" $v.controller }}
 apiVersion: apps/v1
@@ -35,7 +35,9 @@ metadata:
 {{ toYaml . | indent 4 }}
 {{- end }}
 spec:
+  {{- if not $v.autoscalingManaged }}
   replicas: {{ $v.replicas }}
+  {{- end }}
   {{- if eq $controllerType "Deployment" }}
   strategy:
     type: RollingUpdate
@@ -248,12 +250,8 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
-    {{- if $v.dnsPolicy }}
-      dnsPolicy: {{ $v.dnsPolicy }}
-    {{- end }}
-    {{- with $v.dnsConfig }}
-      dnsConfig:
-{{ toYaml . | indent 8 }}
+    {{- with include "windmill.podDns" (dict "root" $ "component" (printf "workerGroup %s" $v.name) "dnsPolicy" $v.dnsPolicy "dnsConfig" $v.dnsConfig) }}
+      {{- . | nindent 6 }}
     {{- end }}
 {{- if eq $controllerType "StatefulSet" }}
   {{- if $v.volumeClaimTemplates }}

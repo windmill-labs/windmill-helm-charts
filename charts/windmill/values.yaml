@@ -71,12 +71,16 @@ windmill:
   instanceEventsWebhook: ""
   # -- configure a custom openai base path for azure
   openaiAzureBasePath: ""
-  # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
+  # -- SECURITY RISK: mounts the host node's Docker socket into the worker, giving any user who can run a script root-equivalent control of the node's Docker daemon (and typically the cluster). Trusted, single-tenant use only — never enable for untrusted or multi-tenant workloads. Prefer a dedicated docker worker group with the rootless podman runtime (CONTAINER_RUNTIME=podman on a *-full image, run as a non-root user) instead.
   exposeHostDocker: false
   # -- rust log level, set to debug for more information etc, sets RUST_LOG environment variable in app and worker container
   rustLog: info
   # -- host aliases for all pods (can be overridden by individual worker groups)
   hostAliases: []
+  # -- DNS policy for all Windmill pods (app, workers, indexer, operator, extra, hub). Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None". Can be overridden per component or per worker group
+  dnsPolicy: ""
+  # -- DNS configuration for all Windmill pods. When dnsPolicy is "None", nameservers must include at least one resolver. Per-component dnsConfig replaces this value entirely (no deep merge)
+  dnsConfig: {}
   # -- domain to use for the public app. Use it for extra security so that custom apps cannot force the user to do custom api call on the main app
   publicAppDomain: ""
   # -- domain to use for the secondary api. Can be useful to have a secondary api domain that bypass a CDN like Cloudflare or similar.
@@ -107,6 +111,12 @@ windmill:
       controller: "Deployment"
 
       replicas: 3
+      # -- Set to true when this worker group's replica count is managed by Windmill's
+      # -- native Kubernetes autoscaler. The chart then omits spec.replicas so helm
+      # -- upgrades no longer reset the count the autoscaler set (and avoids the
+      # -- server-side apply field-ownership conflict under Helm 4). When true, the
+      # -- `replicas` value above is ignored and the deployment is rendered regardless.
+      autoscalingManaged: false
       # -- Annotations to apply to the pods
       annotations: {}
 
@@ -173,17 +183,17 @@ windmill:
       # -- command override
       command: []
 
-      # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
+      # -- SECURITY RISK: mounts the host node's Docker socket into this worker group, giving any script author root-equivalent control of the node's Docker daemon. Trusted, single-tenant use only. Prefer the rootless podman runtime (CONTAINER_RUNTIME=podman on a *-full image, non-root) instead.
       exposeHostDocker: false
 
       topologySpreadConstraints: []
 
       # -- DNS policy for the pods. Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None"
-      # -- Set to "None" when using custom dnsConfig (e.g., for VPN sidecars or custom DNS resolution)
+      # -- Set to "None" when using custom dnsConfig (e.g., for VPN sidecars or custom DNS resolution). Falls back to windmill.dnsPolicy when unset
       dnsPolicy: ""
 
       # -- Custom DNS configuration for the pods. Only used when dnsPolicy is set to "None"
-      # -- Useful for pods with VPN sidecars that need to resolve external DNS names
+      # -- Useful for pods with VPN sidecars that need to resolve external DNS names. Falls back to windmill.dnsConfig when unset
       dnsConfig: {}
 
       # -- Optional override of the ServiceAccount name for this worker group.
@@ -196,6 +206,12 @@ windmill:
       controller: "Deployment"
 
       replicas: 1
+      # -- Set to true when this worker group's replica count is managed by Windmill's
+      # -- native Kubernetes autoscaler. The chart then omits spec.replicas so helm
+      # -- upgrades no longer reset the count the autoscaler set (and avoids the
+      # -- server-side apply field-ownership conflict under Helm 4). When true, the
+      # -- `replicas` value above is ignored and the deployment is rendered regardless.
+      autoscalingManaged: false
       # -- Annotations to apply to the pods
       annotations: {}
 
@@ -253,7 +269,7 @@ windmill:
       volumes: []
       volumeMounts: []
 
-      # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
+      # -- SECURITY RISK: mounts the host node's Docker socket into this worker group, giving any script author root-equivalent control of the node's Docker daemon. Trusted, single-tenant use only. Prefer the rootless podman runtime (CONTAINER_RUNTIME=podman on a *-full image, non-root) instead.
       exposeHostDocker: false
 
       # -- Volume claim templates. Only applies when controller is "StatefulSet"
@@ -323,7 +339,7 @@ windmill:
       # -- command override
       command: []
 
-      # -- mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon
+      # -- SECURITY RISK: mounts the host node's Docker socket into this worker group, giving any script author root-equivalent control of the node's Docker daemon. Trusted, single-tenant use only. Prefer the rootless podman runtime (CONTAINER_RUNTIME=podman on a *-full image, non-root) instead.
       exposeHostDocker: false
 
       # -- Volume claim templates. Only applies when controller is "StatefulSet"
@@ -364,6 +380,10 @@ windmill:
 
     # -- Affinity rules to apply to the pods
     affinity: {}
+    # -- DNS policy for the pods. Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None". Falls back to windmill.dnsPolicy when unset
+    dnsPolicy: ""
+    # -- Custom DNS configuration for the pods. Falls back to windmill.dnsConfig when unset
+    dnsConfig: {}
 
     # -- Resource limits and requests for the pods
     resources:
@@ -488,6 +508,10 @@ windmill:
 
     # -- Affinity rules to apply to the pods
     affinity: {}
+    # -- DNS policy for the pods. Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None". Falls back to windmill.dnsPolicy when unset
+    dnsPolicy: ""
+    # -- Custom DNS configuration for the pods. Falls back to windmill.dnsConfig when unset
+    dnsConfig: {}
 
     # -- Resource limits and requests for the pods
     resources:
@@ -526,6 +550,10 @@ windmill:
     tolerations: []
     # -- Affinity rules to apply to the pods
     affinity: {}
+    # -- DNS policy for the pods. Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None". Falls back to windmill.dnsPolicy when unset
+    dnsPolicy: ""
+    # -- Custom DNS configuration for the pods. Falls back to windmill.dnsConfig when unset
+    dnsConfig: {}
     # -- Security context to apply to the pods
     podSecurityContext: {}
     # -- Security context to apply to the container
@@ -575,6 +603,10 @@ windmill:
 
     # -- Affinity rules to apply to the pods
     affinity: {}
+    # -- DNS policy for the pods. Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None". Falls back to windmill.dnsPolicy when unset
+    dnsPolicy: ""
+    # -- Custom DNS configuration for the pods. Falls back to windmill.dnsConfig when unset
+    dnsConfig: {}
 
     # -- Resource limits and requests for the pods
     resources:
@@ -732,6 +764,10 @@ hub:
 
   # -- Affinity rules to apply to the pods
   affinity: {}
+  # -- DNS policy for the pods. Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None". Falls back to windmill.dnsPolicy when unset
+  dnsPolicy: ""
+  # -- Custom DNS configuration for the pods. Falls back to windmill.dnsConfig when unset
+  dnsConfig: {}
   # -- Resource limits and requests for the pods
   resources:
     limits:
