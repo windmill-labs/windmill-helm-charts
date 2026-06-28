@@ -17,9 +17,11 @@ spec:
     - path:
         type: PathPrefix
         value: "/ws/"
+    {{- if .Values.windmill.windmillExtra.enableDebugger }}
     - path:
         type: PathPrefix
         value: "/ws_debug/"
+    {{- end }}
     {{- if .Values.enterprise.enabled }}
     - path:
         type: PathPrefix
@@ -68,9 +70,11 @@ spec:
     - path:
         type: PathPrefix
         value: "/ws/"
+    {{- if .Values.windmill.windmillExtra.enableDebugger }}
     - path:
         type: PathPrefix
         value: "/ws_debug/"
+    {{- end }}
     {{- if .Values.enterprise.enabled }}
     - path:
         type: PathPrefix

@@ -76,6 +76,10 @@ spec:
           value: {{ .Values.windmill.windmillExtra.requireSignedMultiplayerRequests | quote }}
         - name: WINDMILL_BASE_URL
           value: "{{ .Values.windmill.windmillExtra.windmillBaseUrl | default "http://windmill-app:8000" }}"
+        {{- if .Values.windmill.windmillExtra.debugAllowedOrigins }}
+        - name: DEBUG_ALLOWED_ORIGINS
+          value: {{ .Values.windmill.windmillExtra.debugAllowedOrigins | quote }}
+        {{- end }}
         {{- with .Values.windmill.windmillExtra.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

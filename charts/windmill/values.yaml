@@ -590,8 +590,11 @@ windmill:
     # -- enable Gateway reverse proxy (routes /ws/*, /ws_mp/*, /ws_debug/* via a single port)
     enableGateway: true
 
-    # -- require signed debug requests (JWT tokens for debug sessions)
+    # -- require signed debug requests (JWT tokens for debug sessions). Do NOT disable on internet-reachable deployments: it exposes an unauthenticated code-execution debugger.
     requireSignedDebugRequests: true
+
+    # -- comma-separated allowlist of browser Origins permitted to open debug WebSockets (cross-site WebSocket hijacking hardening). Empty = rely on signed-token verification only; set to your external URL(s), e.g. "https://windmill.example.com", to also reject cross-origin handshakes.
+    debugAllowedOrigins: ""
 
     # -- require signed multiplayer requests (JWT tokens for collaborative editing sessions). Keep enabled in production.
     requireSignedMultiplayerRequests: true
