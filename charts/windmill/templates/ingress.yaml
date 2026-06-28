@@ -34,6 +34,7 @@ spec:
                 name: windmill-extra
                 port:
                   number: 3000
+    {{- if .Values.windmill.windmillExtra.enableDebugger }}
           - path: /ws_debug/
             pathType: Prefix
             backend:
@@ -41,6 +42,7 @@ spec:
                 name: windmill-extra
                 port:
                   number: 3000
+    {{- end }}
     {{ if .Values.enterprise.enabled }}
           - path: /ws_mp/
             pathType: Prefix
@@ -124,6 +126,7 @@ spec:
                 name: windmill-extra
                 port:
                   number: 3000
+    {{- if .Values.windmill.windmillExtra.enableDebugger }}
           - path: /ws_debug/
             pathType: Prefix
             backend:
@@ -131,6 +134,7 @@ spec:
                 name: windmill-extra
                 port:
                   number: 3000
+    {{- end }}
     {{ if .Values.enterprise.enabled }}
           - path: /ws_mp/
             pathType: Prefix
