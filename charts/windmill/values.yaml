@@ -201,6 +201,15 @@ windmill:
       # -- Falls back to the global service account when not set.
       serviceAccountName: ""
 
+      # -- Optional override of the container image for this worker group.
+      # -- Useful for running a custom image (e.g. with pre-installed binaries) on some
+      # -- worker groups while keeping the standard image elsewhere.
+      # -- Falls back to windmill.image when not set.
+      image: ""
+      # -- Optional override of the container image tag for this worker group.
+      # -- Falls back to windmill.tag (then the chart appVersion) when not set.
+      tag: ""
+
     - name: "native"
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
       controller: "Deployment"
@@ -281,6 +290,15 @@ windmill:
       # -- Falls back to the global service account when not set.
       serviceAccountName: ""
 
+      # -- Optional override of the container image for this worker group.
+      # -- Useful for running a custom image (e.g. with pre-installed binaries) on some
+      # -- worker groups while keeping the standard image elsewhere.
+      # -- Falls back to windmill.image when not set.
+      image: ""
+      # -- Optional override of the container image tag for this worker group.
+      # -- Falls back to windmill.tag (then the chart appVersion) when not set.
+      tag: ""
+
     - name: "gpu"
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
       controller: "Deployment"
@@ -350,6 +368,15 @@ windmill:
       # -- Optional override of the ServiceAccount name for this worker group.
       # -- Falls back to the global service account when not set.
       serviceAccountName: ""
+
+      # -- Optional override of the container image for this worker group.
+      # -- Useful for running a custom image (e.g. with pre-installed binaries) on some
+      # -- worker groups while keeping the standard image elsewhere.
+      # -- Falls back to windmill.image when not set.
+      image: ""
+      # -- Optional override of the container image tag for this worker group.
+      # -- Falls back to windmill.tag (then the chart appVersion) when not set.
+      tag: ""
 
   # app configuration
   app:
