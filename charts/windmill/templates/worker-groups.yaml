@@ -111,9 +111,9 @@ spec:
         {{ end }}
         {{ end }}
         {{ if $.Values.enterprise.enabled }}
-        image: {{ default "ghcr.io/windmill-labs/windmill-ee" $.Values.windmill.image }}:{{ default $.Chart.AppVersion $.Values.windmill.tag }}
+        image: {{ default (default "ghcr.io/windmill-labs/windmill-ee" $.Values.windmill.image) $v.image }}:{{ default (default $.Chart.AppVersion $.Values.windmill.tag) $v.tag }}
         {{ else }}
-        image: {{ default "ghcr.io/windmill-labs/windmill" $.Values.windmill.image }}:{{ default $.Chart.AppVersion $.Values.windmill.tag }}
+        image: {{ default (default "ghcr.io/windmill-labs/windmill" $.Values.windmill.image) $v.image }}:{{ default (default $.Chart.AppVersion $.Values.windmill.tag) $v.tag }}
         {{ end }}
         imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
         {{ if $v.command }}
