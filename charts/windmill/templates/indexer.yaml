@@ -67,7 +67,6 @@ spec:
           successThreshold: 1
           failureThreshold: 1
           httpGet:
-            host:
             scheme: HTTP
             path: /
             httpHeaders:
