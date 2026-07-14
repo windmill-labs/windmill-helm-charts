@@ -66,9 +66,9 @@ spec:
       {{- toYaml . | nindent 6 }}
       {{- end }}
       - name: windmill-app
-        securityContext:
       {{- with .Values.windmill.app.containerSecurityContext }}
-      {{- toYaml . | nindent 10 }}
+        securityContext:
+        {{- toYaml . | nindent 10 }}
       {{- end }}
         lifecycle:
           preStop:

@@ -45,9 +45,9 @@ spec:
       {{ end }}
       containers:
       - name: windmill-extra
-        securityContext:
       {{- with .Values.windmill.windmillExtra.containerSecurityContext }}
-      {{- toYaml . | nindent 10 }}
+        securityContext:
+        {{- toYaml . | nindent 10 }}
       {{- end }}
         image: {{ default "ghcr.io/windmill-labs/windmill-extra" .Values.windmill.windmillExtra.image }}:{{ default .Chart.AppVersion .Values.windmill.windmillExtra.tag }}
         imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}

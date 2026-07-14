@@ -102,12 +102,14 @@ spec:
         securityContext:
           privileged: true
         {{ else }}
+        {{ if or $v.securityContext $v.containerSecurityContext }}
         securityContext:
         {{ with $v.securityContext }}
 {{ toYaml . | indent 10 }}
         {{ end }}
         {{ with $v.containerSecurityContext }}
 {{ toYaml . | indent 10 }}
+        {{ end }}
         {{ end }}
         {{ end }}
         {{ if $.Values.enterprise.enabled }}
@@ -154,7 +156,13 @@ spec:
         - name : "METRICS_ADDR"
           value: "{{ $.Values.enterprise.metricsAddr }}"
         {{ end }}
-        {{ if $.Values.windmill.databaseSecret }}
+        {{ if $v.databaseUrlSecretName }}
+        - name: "DATABASE_URL"
+          valueFrom:
+            secretKeyRef:
+              name: "{{ $v.databaseUrlSecretName }}"
+              key: "{{ default "url" $v.databaseUrlSecretKey }}"
+        {{ else if $.Values.windmill.databaseSecret }}
         - name: "DATABASE_URL"
           valueFrom:
             secretKeyRef:
@@ -171,7 +179,7 @@ spec:
           value: "{{ $.Values.windmill.databaseUrl }}"
         {{ end }}
         - name: "BASE_URL"
-          value: "{{ $.Values.windmill.baseProtocol }}://{{ $.Values.windmill.baseDomain }}"
+          value: "{{ if $v.baseUrl }}{{ $v.baseUrl }}{{ else }}{{ $.Values.windmill.baseProtocol }}://{{ $.Values.windmill.baseDomain }}{{ end }}"
         - name: "RUST_LOG"
           value: "{{ $.Values.windmill.rustLog }}"
         - name: "MODE"
