@@ -102,12 +102,14 @@ spec:
         securityContext:
           privileged: true
         {{ else }}
+        {{ if or $v.securityContext $v.containerSecurityContext }}
         securityContext:
         {{ with $v.securityContext }}
 {{ toYaml . | indent 10 }}
         {{ end }}
         {{ with $v.containerSecurityContext }}
 {{ toYaml . | indent 10 }}
+        {{ end }}
         {{ end }}
         {{ end }}
         {{ if $.Values.enterprise.enabled }}

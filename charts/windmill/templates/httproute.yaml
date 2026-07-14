@@ -28,8 +28,11 @@ spec:
         value: "/ws_mp/"
     {{- end }}
     backendRefs:
-    - name: windmill-extra
+    - group: ""
+      kind: Service
+      name: windmill-extra
       port: 3000
+      weight: 1
   {{- end }}
   {{ if .Values.enterprise.enabled }}
   {{ if .Values.windmill.indexer.enabled }}
@@ -38,8 +41,11 @@ spec:
         type: PathPrefix
         value: "/api/srch/"
     backendRefs:
-    - name: windmill-indexer
+    - group: ""
+      kind: Service
+      name: windmill-indexer
       port: 8000
+      weight: 1
   {{ end }}
   {{ end }}
   - matches:
@@ -47,8 +53,11 @@ spec:
         type: PathPrefix
         value: "/"
     backendRefs:
-    - name: windmill-app
+    - group: ""
+      kind: Service
+      name: windmill-app
       port: 8000
+      weight: 1
 
 {{ if .Values.windmill.secondaryBaseDomain }}
 ---
@@ -81,8 +90,11 @@ spec:
         value: "/ws_mp/"
     {{- end }}
     backendRefs:
-    - name: windmill-extra
+    - group: ""
+      kind: Service
+      name: windmill-extra
       port: 3000
+      weight: 1
   {{- end }}
   {{ if .Values.enterprise.enabled }}
   {{ if .Values.windmill.indexer.enabled }}
@@ -91,8 +103,11 @@ spec:
         type: PathPrefix
         value: "/api/srch/"
     backendRefs:
-    - name: windmill-indexer
+    - group: ""
+      kind: Service
+      name: windmill-indexer
       port: 8000
+      weight: 1
   {{ end }}
   {{ end }}
   - matches:
@@ -100,8 +115,11 @@ spec:
         type: PathPrefix
         value: "/"
     backendRefs:
-    - name: windmill-app
+    - group: ""
+      kind: Service
+      name: windmill-app
       port: 8000
+      weight: 1
 {{- end }}
 
 {{ if .Values.windmill.secondaryApiDomain }}
@@ -124,8 +142,11 @@ spec:
         type: PathPrefix
         value: "/api/"
     backendRefs:
-    - name: windmill-app
+    - group: ""
+      kind: Service
+      name: windmill-app
       port: 8000
+      weight: 1
 {{- end }}
 {{ if .Values.hub.enabled }}
 ---
@@ -147,8 +168,11 @@ spec:
         type: PathPrefix
         value: "/"
     backendRefs:
-    - name: windmill-hub
+    - group: ""
+      kind: Service
+      name: windmill-hub
       port: 3003
+      weight: 1
 {{- end }}
 {{ if .Values.windmill.publicAppDomain }}
 ---
@@ -170,7 +194,10 @@ spec:
         type: PathPrefix
         value: "/"
     backendRefs:
-    - name: windmill-app
+    - group: ""
+      kind: Service
+      name: windmill-app
       port: 8000
+      weight: 1
 {{- end }}
 {{- end }}

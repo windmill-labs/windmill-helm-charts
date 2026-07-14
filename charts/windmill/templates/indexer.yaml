@@ -54,9 +54,9 @@ spec:
       {{- toYaml . | nindent 6 }}
       {{- end }}
       - name: windmill-indexer
-        securityContext:
       {{- with .Values.windmill.indexer.containerSecurityContext }}
-      {{- toYaml . | nindent 10 }}
+        securityContext:
+        {{- toYaml . | nindent 10 }}
       {{- end }}
         image: {{ default "ghcr.io/windmill-labs/windmill-ee" .Values.windmill.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
         imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
