@@ -210,6 +210,18 @@ windmill:
       # -- Falls back to windmill.tag (then the chart appVersion) when not set.
       tag: ""
 
+      # -- Optional name of an existing secret holding the DATABASE_URL for this
+      # -- worker group. Points a single group at a different Windmill instance's
+      # -- database without running a separate Helm release. When set, it takes
+      # -- precedence over the release-global windmill.databaseSecret and
+      # -- windmill.databaseUrlSecretName.
+      databaseUrlSecretName: ""
+      # -- Key within databaseUrlSecretName holding the database URL. Defaults to "url" when not set.
+      databaseUrlSecretKey: ""
+      # -- Optional override of BASE_URL for this worker group. Falls back to
+      # -- {windmill.baseProtocol}://{windmill.baseDomain} when not set.
+      baseUrl: ""
+
     - name: "native"
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
       controller: "Deployment"
@@ -299,6 +311,18 @@ windmill:
       # -- Falls back to windmill.tag (then the chart appVersion) when not set.
       tag: ""
 
+      # -- Optional name of an existing secret holding the DATABASE_URL for this
+      # -- worker group. Points a single group at a different Windmill instance's
+      # -- database without running a separate Helm release. When set, it takes
+      # -- precedence over the release-global windmill.databaseSecret and
+      # -- windmill.databaseUrlSecretName.
+      databaseUrlSecretName: ""
+      # -- Key within databaseUrlSecretName holding the database URL. Defaults to "url" when not set.
+      databaseUrlSecretKey: ""
+      # -- Optional override of BASE_URL for this worker group. Falls back to
+      # -- {windmill.baseProtocol}://{windmill.baseDomain} when not set.
+      baseUrl: ""
+
     - name: "gpu"
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
       controller: "Deployment"
@@ -377,6 +401,18 @@ windmill:
       # -- Optional override of the container image tag for this worker group.
       # -- Falls back to windmill.tag (then the chart appVersion) when not set.
       tag: ""
+
+      # -- Optional name of an existing secret holding the DATABASE_URL for this
+      # -- worker group. Points a single group at a different Windmill instance's
+      # -- database without running a separate Helm release. When set, it takes
+      # -- precedence over the release-global windmill.databaseSecret and
+      # -- windmill.databaseUrlSecretName.
+      databaseUrlSecretName: ""
+      # -- Key within databaseUrlSecretName holding the database URL. Defaults to "url" when not set.
+      databaseUrlSecretKey: ""
+      # -- Optional override of BASE_URL for this worker group. Falls back to
+      # -- {windmill.baseProtocol}://{windmill.baseDomain} when not set.
+      baseUrl: ""
 
   # app configuration
   app:
