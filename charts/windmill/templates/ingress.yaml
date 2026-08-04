@@ -91,7 +91,7 @@ spec:
                 port:
                   number: 8000
     {{ end }}
-    {{ if .Values.windmill.secondaryApiDomain }}
+    {{ if and .Values.windmill.secondaryApiDomain (not .Values.ingress.secondaryApi.separateIngress) }}
     - host: {{ .Values.windmill.secondaryApiDomain | quote }}
       http:
         paths:
@@ -170,4 +170,57 @@ spec:
                 port:
                   number: 8000
     {{- end }}
+{{- end }}
+{{- if and .Values.ingress.enabled .Values.windmill.secondaryApiDomain .Values.ingress.secondaryApi.separateIngress }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: windmill-api
+{{- with .Values.ingress.secondaryApi.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  {{- with (.Values.ingress.secondaryApi.className | default .Values.ingress.className) }}
+  ingressClassName: {{ . | quote }}
+  {{- end }}
+{{- if .Values.ingress.secondaryApi.tls }}
+  tls:
+  {{- range .Values.ingress.secondaryApi.tls }}
+    - hosts:
+      {{- range .hosts }}
+        - {{ . | quote }}
+      {{- end }}
+      secretName: {{ .secretName }}
+  {{- end }}
+{{- else if .Values.ingress.tls }}
+  {{- $apiDomain := .Values.windmill.secondaryApiDomain }}
+  {{- $inherited := list }}
+  {{- range .Values.ingress.tls }}
+    {{- if has $apiDomain .hosts }}
+      {{- $inherited = append $inherited . }}
+    {{- end }}
+  {{- end }}
+  {{- if $inherited }}
+  tls:
+  {{- range $inherited }}
+    - hosts:
+        - {{ $apiDomain | quote }}
+      secretName: {{ .secretName }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+  rules:
+    - host: {{ .Values.windmill.secondaryApiDomain | quote }}
+      http:
+        paths:
+          - path: /api/
+            pathType: Prefix
+            backend:
+              service:
+                name: windmill-app
+                port:
+                  number: 8000
 {{- end }}

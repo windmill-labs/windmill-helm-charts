@@ -1,2 +1,15 @@
 enterprise:
   enabled: true
+
+# exercises the separate API ingress, including the carry-over of the matching ingress.tls entry
+windmill:
+  secondaryApiDomain: api.windmill.local
+ingress:
+  tls:
+    - hosts:
+        - windmill.local
+        - api.windmill.local
+      secretName: windmill-tls
+  secondaryApi:
+    separateIngress: true
+    className: nginx

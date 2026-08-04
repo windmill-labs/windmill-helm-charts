@@ -714,6 +714,16 @@ ingress:
   # -- TLS config for the ingress resource. Useful when using cert-manager and nginx-ingress
   tls: []
 
+  secondaryApi:
+    # -- render `windmill.secondaryApiDomain` as its own Ingress resource instead of an extra host on the main one. Required to route the API domain through a different ingress class, controller entrypoint or LoadBalancer IP, which is what allows firewalling API traffic separately from UI traffic. The Gateway API path already does this through `httproute.secondaryApiDomainParentRefs`.
+    separateIngress: false
+    # -- ingress class for the API ingress. Falls back to `ingress.className`.
+    className: ""
+    # -- annotations for the API ingress. Replaces `ingress.annotations`, it does not merge with them.
+    annotations: {}
+    # -- TLS config for the API ingress. When empty, entries of `ingress.tls` listing the API domain are carried over.
+    tls: []
+
 httproute:
   # -- enable/disable creation of a httproute resource (experimental)
   enabled: false
