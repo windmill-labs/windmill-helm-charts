@@ -46,12 +46,28 @@ jobs:
       pull-requests: read
       id-token: write
     steps:
+      # Mirrors the codex/pi guards: with no credential the action runs and fails, which
+      # reads as a broken build rather than an unconfigured optional reviewer.
+      - name: Check Claude configuration
+        id: claude_config
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          if [ -n "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "CLAUDE_CODE_OAUTH_TOKEN is not configured; skipping Claude review."
+          fi
+
       - name: Checkout repository
+        if: steps.claude_config.outputs.enabled == 'true'
         uses: actions/checkout@v5
         with:
           fetch-depth: 1
 
       - name: Resolve PR number
+        if: steps.claude_config.outputs.enabled == 'true'
         id: resolve
         env:
           INPUT_PR_NUMBER: ${{ inputs.pr_number }}
@@ -64,6 +80,7 @@ jobs:
           fi
 
       - name: Fetch prior PR discussion
+        if: steps.claude_config.outputs.enabled == 'true'
         id: prior
         env:
           GH_TOKEN: ${{ github.token }}
@@ -82,6 +99,7 @@ jobs:
           ' prior-comments.json > prior-comments.md
 
       - name: Read review prompt
+        if: steps.claude_config.outputs.enabled == 'true'
         id: review-prompt
         env:
           EXTRA_PROMPT: ${{ inputs.extra_prompt }}
@@ -105,6 +123,7 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Automatic PR Review
+        if: steps.claude_config.outputs.enabled == 'true'
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
