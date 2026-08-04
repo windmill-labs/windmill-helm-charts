@@ -95,6 +95,10 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
 | ingress.enabled | bool | `true` | enable/disable included ingress resource |
+| ingress.secondaryApi.annotations | object | `{}` | annotations for the API ingress. Replaces `ingress.annotations`, it does not merge with them. |
+| ingress.secondaryApi.className | string | `""` | ingress class for the API ingress. Falls back to `ingress.className`. |
+| ingress.secondaryApi.separateIngress | bool | `false` | render `windmill.secondaryApiDomain` as its own Ingress resource instead of an extra host on the main one. Required to route the API domain through a different ingress class, controller entrypoint or LoadBalancer IP, which is what allows firewalling API traffic separately from UI traffic. The Gateway API path already does this through `httproute.secondaryApiDomainParentRefs`. |
+| ingress.secondaryApi.tls | list | `[]` | TLS config for the API ingress. When empty, entries of `ingress.tls` listing the API domain are carried over. |
 | ingress.tls | list | `[]` | TLS config for the ingress resource. Useful when using cert-manager and nginx-ingress |
 | minio.auth.rootPassword | string | `"windmill"` |  |
 | minio.auth.rootUser | string | `"windmill"` |  |
