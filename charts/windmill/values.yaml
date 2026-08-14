@@ -547,6 +547,12 @@ windmill:
     # -- enable or disable indexer
     enabled: true
 
+    # -- How long a rollout may take before Kubernetes reports ProgressDeadlineExceeded.
+    # The incoming pod waits for the outgoing one to hand over the index write lock and
+    # then loads the index from object storage, so raise this further if your index is
+    # large enough that upgrades still time out.
+    progressDeadlineSeconds: 1800
+
     # -- Annotations to apply to the pods
     annotations: {}
 

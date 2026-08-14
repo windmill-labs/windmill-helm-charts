@@ -15,11 +15,19 @@ spec:
   replicas: 1
   {{- end }}
   revisionHistoryLimit: 3
+  # A surged pod is required, not incidental: the incoming pod is what signals the
+  # outgoing one to hand over the index write lock, and the outgoing one keeps serving
+  # searches read-only until the new pod is ready. Recreate breaks both halves and
+  # takes search down for the whole restart, including the index load from object storage.
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 0
+  # The handoff also has to wait out the outgoing pod's in-flight index refresh and
+  # merge flush, which can exceed the 600s default and get a healthy rollout reported
+  # as ProgressDeadlineExceeded.
+  progressDeadlineSeconds: {{ .Values.windmill.indexer.progressDeadlineSeconds | default 1800 }}
   selector:
     matchLabels:
       app: windmill-indexer
