@@ -99,10 +99,19 @@ spec:
         startupProbe:
         {{- toYaml . | nindent 10 }}
         {{- end }}
-        {{- with .Values.windmill.app.readinessProbe }}
         readinessProbe:
-        {{- toYaml . | nindent 10 }}
-        {{- end }}
+          timeoutSeconds: 1
+          successThreshold: 1
+          failureThreshold: 1
+          httpGet:
+            scheme: HTTP
+            path: /
+            httpHeaders:
+            - name: Host
+              value: localhost
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
         {{- with .Values.windmill.app.livenessProbe }}
         livenessProbe:
         {{- toYaml . | nindent 10 }}

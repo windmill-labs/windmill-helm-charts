@@ -126,10 +126,7 @@ spec:
         {{ end }}
         ports:
         - containerPort: 8001
-        {{- if $v.readinessProbe }}
-        readinessProbe:
-        {{- toYaml $v.readinessProbe | nindent 10 }}
-        {{- else if $.Values.enterprise.enabled }}
+        {{ if $.Values.enterprise.enabled }}
         readinessProbe:
           initialDelaySeconds: 1
           periodSeconds: 5
@@ -140,11 +137,7 @@ spec:
             scheme: HTTP
             path: /ready
             port: 8001
-        {{- end }}
-        {{- with $v.livenessProbe }}
-        livenessProbe:
-        {{- toYaml . | nindent 10 }}
-        {{- end }}
+        {{ end }}
         volumeMounts:
         {{ if or $.Values.windmill.exposeHostDocker $v.exposeHostDocker }}
         - name: docker-sock

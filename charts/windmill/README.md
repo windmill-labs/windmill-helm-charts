@@ -140,7 +140,6 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.app.podSecurityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
 | windmill.app.podSecurityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
 | windmill.app.podSecurityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
-| windmill.app.readinessProbe | object | `{"failureThreshold":1,"httpGet":{"httpHeaders":[{"name":"Host","value":"localhost"}],"path":"/","port":8000,"scheme":"HTTP"},"initialDelaySeconds":5,"periodSeconds":5,"successThreshold":1,"timeoutSeconds":1}` | Readiness probe for the app pods. Set to {} to remove it. Point it at /api/health/status to also take a pod out of the service when its database connection is unhealthy, at the cost of removing every pod at once during a database outage. |
 | windmill.app.resources | object | `{"limits":{"memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.app.securityContext | object | `{}` | legacy, use podSecurityContext instead |
 | windmill.app.service.annotations | object | `{}` | Annotations to apply to the service |
@@ -207,7 +206,6 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.indexer.podSecurityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
 | windmill.indexer.podSecurityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
 | windmill.indexer.progressDeadlineSeconds | int | `1800` | How long a rollout may take before Kubernetes reports ProgressDeadlineExceeded. The incoming pod waits for the outgoing one to hand over the index write lock and then loads the index from object storage, so raise this further if your index is large enough that upgrades still time out. |
-| windmill.indexer.readinessProbe | object | `{"failureThreshold":1,"httpGet":{"httpHeaders":[{"name":"Host","value":"localhost"}],"path":"/","port":8000,"scheme":"HTTP"},"initialDelaySeconds":5,"periodSeconds":5,"successThreshold":1,"timeoutSeconds":1}` | Readiness probe for the indexer pods. Set to {} to remove it. |
 | windmill.indexer.resources | object | `{"limits":{"ephemeral-storage":"50Gi","memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.indexer.securityContext | string | `nil` | legacy, use podSecurityContext instead |
 | windmill.indexer.startupProbe | object | `{"failureThreshold":180,"httpGet":{"path":"/api/version","port":8000,"scheme":"HTTP"},"periodSeconds":10,"timeoutSeconds":5}` | Startup probe for the indexer pods. Set to {} to remove it. The indexer loads its index from object storage before it starts serving HTTP, so the liveness probe must stay disabled until that finishes or a large index restarts the pod forever. Keep the budget (periodSeconds x failureThreshold) at least as large as progressDeadlineSeconds. |
@@ -284,7 +282,6 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].image | string | `""` | Falls back to windmill.image when not set. |
 | windmill.workerGroups[0].initContainers | list | `[]` | Init containers |
 | windmill.workerGroups[0].labels | object | `{}` | Labels to apply to the pods |
-| windmill.workerGroups[0].livenessProbe | object | `{}` | Liveness probe for this worker group. Empty on purpose: a restart kills the jobs the worker is running, and /ready latches to healthy once the worker has started, so it cannot detect a wedged job loop anyway. Set one only with that trade-off in mind. |
 | windmill.workerGroups[0].mode | string | `"worker"` |  |
 | windmill.workerGroups[0].name | string | `"default"` |  |
 | windmill.workerGroups[0].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
@@ -292,7 +289,6 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].podSecurityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
 | windmill.workerGroups[0].podSecurityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
 | windmill.workerGroups[0].privileged | bool | `true` | Needed to use proper OOM killer on k8s v1.32+ and use unshare pid for security reasons. |
-| windmill.workerGroups[0].readinessProbe | object | `{}` | Readiness probe for this worker group. Empty keeps the default, a /ready check on the metrics port, which only exists on enterprise builds, so CE workers get no probe. |
 | windmill.workerGroups[0].replicas | int | `3` |  |
 | windmill.workerGroups[0].resources | object | `{"limits":{"memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.workerGroups[0].serviceAccountName | string | `""` | Falls back to the global service account when not set. |
@@ -319,7 +315,6 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[1].hostAliases | list | `[]` | Host aliases to apply to the pods (overrides global hostAliases if set) |
 | windmill.workerGroups[1].image | string | `""` | Falls back to windmill.image when not set. |
 | windmill.workerGroups[1].labels | object | `{}` | Labels to apply to the pods |
-| windmill.workerGroups[1].livenessProbe | object | `{}` | Liveness probe for this worker group. See windmill.workerGroups[0].livenessProbe. |
 | windmill.workerGroups[1].mode | string | `"worker"` |  |
 | windmill.workerGroups[1].name | string | `"native"` |  |
 | windmill.workerGroups[1].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
@@ -327,7 +322,6 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[1].podSecurityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
 | windmill.workerGroups[1].podSecurityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
 | windmill.workerGroups[1].privileged | bool | `false` | Not needed for native workers as they use a different memory management and isolation mechanism. |
-| windmill.workerGroups[1].readinessProbe | object | `{}` | Readiness probe for this worker group. See windmill.workerGroups[0].readinessProbe. |
 | windmill.workerGroups[1].replicas | int | `1` |  |
 | windmill.workerGroups[1].resources | object | `{"limits":{"memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.workerGroups[1].serviceAccountName | string | `""` | Falls back to the global service account when not set. |
@@ -352,7 +346,6 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[2].hostAliases | list | `[]` | Host aliases to apply to the pods (overrides global hostAliases if set) |
 | windmill.workerGroups[2].image | string | `""` | Falls back to windmill.image when not set. |
 | windmill.workerGroups[2].labels | object | `{}` | Labels to apply to the pods |
-| windmill.workerGroups[2].livenessProbe | object | `{}` | Liveness probe for this worker group. See windmill.workerGroups[0].livenessProbe. |
 | windmill.workerGroups[2].mode | string | `"worker"` |  |
 | windmill.workerGroups[2].name | string | `"gpu"` |  |
 | windmill.workerGroups[2].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
@@ -360,7 +353,6 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[2].podSecurityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
 | windmill.workerGroups[2].podSecurityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
 | windmill.workerGroups[2].privileged | bool | `true` | Needed to use proper OOM killer on k8s v1.32+ and use unshare pid for security reasons. |
-| windmill.workerGroups[2].readinessProbe | object | `{}` | Readiness probe for this worker group. See windmill.workerGroups[0].readinessProbe. |
 | windmill.workerGroups[2].replicas | int | `0` |  |
 | windmill.workerGroups[2].resources | object | `{"limits":{"memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.workerGroups[2].serviceAccountName | string | `""` | Falls back to the global service account when not set. |

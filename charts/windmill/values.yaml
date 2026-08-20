@@ -116,11 +116,6 @@ windmill:
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
       controller: "Deployment"
 
-      # -- Readiness probe for this worker group. Empty keeps the default, a /ready check on the metrics port, which only exists on enterprise builds, so CE workers get no probe.
-      readinessProbe: {}
-      # -- Liveness probe for this worker group. Empty on purpose: a restart kills the jobs the worker is running, and /ready latches to healthy once the worker has started, so it cannot detect a wedged job loop anyway. Set one only with that trade-off in mind.
-      livenessProbe: {}
-
       replicas: 3
       # -- Set to true when this worker group's replica count is managed by Windmill's
       # -- native Kubernetes autoscaler. The chart then omits spec.replicas so helm
@@ -237,11 +232,6 @@ windmill:
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
       controller: "Deployment"
 
-      # -- Readiness probe for this worker group. See windmill.workerGroups[0].readinessProbe.
-      readinessProbe: {}
-      # -- Liveness probe for this worker group. See windmill.workerGroups[0].livenessProbe.
-      livenessProbe: {}
-
       replicas: 1
       # -- Set to true when this worker group's replica count is managed by Windmill's
       # -- native Kubernetes autoscaler. The chart then omits spec.replicas so helm
@@ -343,11 +333,6 @@ windmill:
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
       controller: "Deployment"
 
-      # -- Readiness probe for this worker group. See windmill.workerGroups[0].readinessProbe.
-      readinessProbe: {}
-      # -- Liveness probe for this worker group. See windmill.workerGroups[0].livenessProbe.
-      livenessProbe: {}
-
       replicas: 0
       # -- Annotations to apply to the pods
       annotations: {}
@@ -437,21 +422,6 @@ windmill:
 
   # app configuration
   app:
-    # -- Readiness probe for the app pods. Set to {} to remove it. Point it at /api/health/status to also take a pod out of the service when its database connection is unhealthy, at the cost of removing every pod at once during a database outage.
-    readinessProbe:
-      timeoutSeconds: 1
-      successThreshold: 1
-      failureThreshold: 1
-      httpGet:
-        scheme: HTTP
-        path: /
-        httpHeaders:
-        - name: Host
-          value: localhost
-        port: 8000
-      initialDelaySeconds: 5
-      periodSeconds: 5
-
     # -- Startup probe for the app pods. Set to {} to remove it. It keeps the liveness probe disabled until the process serves HTTP, which it does not do while a long migration runs on upgrade. Without it a slow migration would restart every pod before it ever came up.
     startupProbe:
       httpGet:
@@ -619,21 +589,6 @@ windmill:
       periodSeconds: 10
       timeoutSeconds: 5
       failureThreshold: 180
-
-    # -- Readiness probe for the indexer pods. Set to {} to remove it.
-    readinessProbe:
-      timeoutSeconds: 1
-      successThreshold: 1
-      failureThreshold: 1
-      httpGet:
-        scheme: HTTP
-        path: /
-        httpHeaders:
-        - name: Host
-          value: localhost
-        port: 8000
-      initialDelaySeconds: 5
-      periodSeconds: 5
 
     # -- Liveness probe for the indexer pods. Set to {} to remove it. See windmill.app.livenessProbe for why this deliberately does not check the database.
     livenessProbe:
