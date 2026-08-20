@@ -88,7 +88,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | hub.resources | object | `{"limits":{"memory":"2Gi"}}` | Resource limits and requests for the pods |
 | hub.securityContext | string | `nil` | legacy, use podSecurityContext instead |
 | hub.serviceAccount.name | string | `""` | Name of an existing ServiceAccount to use for the hub pods. If empty, falls back to the chart's main ServiceAccount (see `serviceAccount` at the top level). Set this to bind a dedicated SA for IRSA (EKS) / Workload Identity (GKE). |
-| hub.tag | string | `"1.2.0"` |  |
+| hub.tag | string | `"2.10.0"` |  |
 | hub.tolerations | list | `[]` | Tolerations to apply to the pods |
 | hub.volumeMounts | list | `[]` | volumeMounts |
 | hub.volumes | list | `[]` | volumes |

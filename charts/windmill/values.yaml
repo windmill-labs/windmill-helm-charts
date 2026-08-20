@@ -809,7 +809,7 @@ hub:
   replicas: 1
   # -- image
   image: ""
-  tag: "1.2.0"
+  tag: "2.10.0"
   # -- name of the secret storing the database URI, take precedence over databaseUrl.
   databaseUrlSecretName: ""
   # -- name of the key in secret storing the database URI. The default key of the url is 'url'
