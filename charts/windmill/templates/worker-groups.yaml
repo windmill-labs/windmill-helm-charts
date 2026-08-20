@@ -148,6 +148,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         {{ end }}
+        {{- include "windmill.databaseUrlVolumeMount" (dict "root" $ "override" $v) | nindent 8 }}
         env:
         {{- with $v.extraEnv }}
         {{- toYaml . | nindent 8 }}
@@ -156,28 +157,7 @@ spec:
         - name : "METRICS_ADDR"
           value: "{{ $.Values.enterprise.metricsAddr }}"
         {{ end }}
-        {{ if $v.databaseUrlSecretName }}
-        - name: "DATABASE_URL"
-          valueFrom:
-            secretKeyRef:
-              name: "{{ $v.databaseUrlSecretName }}"
-              key: "{{ default "url" $v.databaseUrlSecretKey }}"
-        {{ else if $.Values.windmill.databaseSecret }}
-        - name: "DATABASE_URL"
-          valueFrom:
-            secretKeyRef:
-              name: "windmill-database"
-              key: "url"
-        {{ else if $.Values.windmill.databaseUrlSecretName }}
-        - name: "DATABASE_URL"
-          valueFrom:
-            secretKeyRef:
-              name: "{{ $.Values.windmill.databaseUrlSecretName }}"
-              key: "{{ $.Values.windmill.databaseUrlSecretKey }}"
-        {{ else }}
-        - name: "DATABASE_URL"
-          value: "{{ $.Values.windmill.databaseUrl }}"
-        {{ end }}
+        {{- include "windmill.databaseUrlEnv" (dict "root" $ "override" $v) | nindent 8 }}
         - name: "BASE_URL"
           value: "{{ if $v.baseUrl }}{{ $v.baseUrl }}{{ else }}{{ $.Values.windmill.baseProtocol }}://{{ $.Values.windmill.baseDomain }}{{ end }}"
         - name: "RUST_LOG"
@@ -240,6 +220,7 @@ spec:
     {{- with $v.volumes }}
     {{ toYaml . | nindent 6 }}
     {{- end }}
+    {{- include "windmill.databaseUrlVolume" (dict "root" $ "override" $v) | nindent 6 }}
     {{- with $v.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

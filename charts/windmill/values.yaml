@@ -51,6 +51,12 @@ windmill:
   databaseUrl: postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable
   # -- whether to create a secret containing the value of databaseUrl
   databaseSecret: false
+  # -- read the database URI from a file and set DATABASE_URL_FILE instead of injecting DATABASE_URL into the environment, so the connection string never appears in the pod spec. With databaseUrlSecretName or databaseSecret set, the chart mounts that secret at databaseUrlFilePath; without either, supply the file yourself with a per-component volume (an init container that decrypts it, a CSI driver, Vault Agent). Applies to the app, workers, indexer and operator; the hub reads DATABASE_URL from the environment only and is unaffected.
+  databaseUrlAsFile: false
+  # -- path the database URI is mounted at when databaseUrlAsFile is enabled. Its directory is the mount point, so keep it on a path of its own.
+  databaseUrlFilePath: /etc/windmill/secrets/database-url
+  # -- file mode of the mounted database URI, in octal. 0400 requires the pod to run as the owner of the projected file, so set an fsGroup matching runAsUser alongside it.
+  databaseUrlFileMode: 0444
   # -- domain as shown in browser. url of ths service is at: {baseProtocol}://{baseDomain}
   baseDomain: windmill
   # -- secondary domain that duplicates all ingress routes from baseDomain. Useful for having multiple domains point to the same services.
@@ -553,6 +559,12 @@ windmill:
     # large enough that upgrades still time out.
     progressDeadlineSeconds: 1800
 
+    # -- Extra volumes to add to the pods
+    volumes: []
+
+    # -- Extra volume mounts to add to the container
+    volumeMounts: []
+
     # -- Annotations to apply to the pods
     annotations: {}
 
@@ -603,6 +615,10 @@ windmill:
     enabled: false
     # -- number of operator replicas (typically 1)
     replicas: 1
+    # -- Extra volumes to add to the pods
+    volumes: []
+    # -- Extra volume mounts to add to the container
+    volumeMounts: []
     # -- instance spec for the operator. When set, the chart creates a ConfigMap
     # -- that the operator watches and syncs to the database. Leave empty/omit to manage it externally.
     # instanceSpec:
@@ -793,7 +809,7 @@ hub:
   replicas: 1
   # -- image
   image: ""
-  tag: "1.2.0"
+  tag: "2.10.0"
   # -- name of the secret storing the database URI, take precedence over databaseUrl.
   databaseUrlSecretName: ""
   # -- name of the key in secret storing the database URI. The default key of the url is 'url'

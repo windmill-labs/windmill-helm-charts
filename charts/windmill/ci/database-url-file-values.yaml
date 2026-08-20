@@ -1,0 +1,9 @@
+# Installs with the database url consumed from a mounted file rather than a DATABASE_URL
+# env var. Every other ci values file leaves databaseUrlAsFile off, so without this one the
+# file path is only ever covered by rendering, and a pod that cannot read the mounted secret
+# still installs green.
+windmill:
+  # Has the chart create the windmill-database secret from windmill.databaseUrl, giving
+  # databaseUrlAsFile a secret to project.
+  databaseSecret: true
+  databaseUrlAsFile: true

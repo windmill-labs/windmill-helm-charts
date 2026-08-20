@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 4.0.174](https://img.shields.io/badge/Version-4.0.174-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.721.0](https://img.shields.io/badge/AppVersion-1.721.0-informational?style=flat-square)
+![Version: 4.0.245](https://img.shields.io/badge/Version-4.0.245-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.792.2](https://img.shields.io/badge/AppVersion-1.792.2-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -88,7 +88,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | hub.resources | object | `{"limits":{"memory":"2Gi"}}` | Resource limits and requests for the pods |
 | hub.securityContext | string | `nil` | legacy, use podSecurityContext instead |
 | hub.serviceAccount.name | string | `""` | Name of an existing ServiceAccount to use for the hub pods. If empty, falls back to the chart's main ServiceAccount (see `serviceAccount` at the top level). Set this to bind a dedicated SA for IRSA (EKS) / Workload Identity (GKE). |
-| hub.tag | string | `"1.2.0"` |  |
+| hub.tag | string | `"2.10.0"` |  |
 | hub.tolerations | list | `[]` | Tolerations to apply to the pods |
 | hub.volumeMounts | list | `[]` | volumeMounts |
 | hub.volumes | list | `[]` | volumes |
@@ -172,14 +172,16 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.cookieDomain | string | `""` | domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance |
 | windmill.databaseSecret | bool | `false` | whether to create a secret containing the value of databaseUrl |
 | windmill.databaseUrl | string | `"postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container |
+| windmill.databaseUrlAsFile | bool | `false` | read the database URI from a file and set DATABASE_URL_FILE instead of injecting DATABASE_URL into the environment, so the connection string never appears in the pod spec. With databaseUrlSecretName or databaseSecret set, the chart mounts that secret at databaseUrlFilePath; without either, supply the file yourself with a per-component volume (an init container that decrypts it, a CSI driver, Vault Agent). Applies to the app, workers, indexer and operator; the hub reads DATABASE_URL from the environment only and is unaffected. |
+| windmill.databaseUrlFileMode | int | `292` | file mode of the mounted database URI, in octal. 0400 requires the pod to run as the owner of the projected file, so set an fsGroup matching runAsUser alongside it. |
+| windmill.databaseUrlFilePath | string | `"/etc/windmill/secrets/database-url"` | path the database URI is mounted at when databaseUrlAsFile is enabled. Its directory is the mount point, so keep it on a path of its own. |
 | windmill.databaseUrlSecretKey | string | `"url"` | name of the key in existing secret storing the database URI. The default key of the url is 'url' |
 | windmill.databaseUrlSecretName | string | `""` | name of the existing secret storing the database URI, take precedence over databaseUrl. |
 | windmill.disableUnsharePid | bool | `false` | Some systems like Bottlerocket AMI have max_user_namespaces=0 which prevents unshare from working. |
-| windmill.exposeHostDocker | bool | `false` | SECURITY RISK: mounts the host node's Docker socket into the worker, giving any user who can run a script root-equivalent control of the node's Docker daemon (and typically the cluster). Trusted, single-tenant use only — never enable for untrusted or multi-tenant workloads. Prefer a dedicated docker worker group with the rootless podman runtime (CONTAINER_RUNTIME=podman on a *-full image, run as a non-root user) instead. |
-| windmill.extraReplicas | int | `1` | replicas for the lsp smart assistant (not required but useful for the web IDE) |
 | windmill.dnsConfig | object | `{}` | DNS configuration for all Windmill pods. When dnsPolicy is "None", nameservers must include at least one resolver. Per-component dnsConfig replaces this value entirely (no deep merge) |
 | windmill.dnsPolicy | string | `""` | DNS policy for all Windmill pods (app, workers, indexer, operator, extra, hub). Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None". Can be overridden per component or per worker group |
-| windmill.exposeHostDocker | bool | `false` | mount the docker socket inside the container to be able to run docker command as docker client to the host docker daemon |
+| windmill.exposeHostDocker | bool | `false` | SECURITY RISK: mounts the host node's Docker socket into the worker, giving any user who can run a script root-equivalent control of the node's Docker daemon (and typically the cluster). Trusted, single-tenant use only — never enable for untrusted or multi-tenant workloads. Prefer a dedicated docker worker group with the rootless podman runtime (CONTAINER_RUNTIME=podman on a *-full image, run as a non-root user) instead. |
+| windmill.extraReplicas | int | `1` | replicas for windmill-extra (LSP, Multiplayer, Debugger). Set to 0 to disable. |
 | windmill.hostAliases | list | `[]` | host aliases for all pods (can be overridden by individual worker groups) |
 | windmill.image | string | `""` | windmill image tag, will use the Acorresponding ee or ce image from ghcr if not defined. Do not include tag in the image name. |
 | windmill.imagePullPolicy | string | `"Always"` | image pull policy for the app, worker, lsp and multiplayer containers |
@@ -202,6 +204,8 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.indexer.resources | object | `{"limits":{"ephemeral-storage":"50Gi","memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.indexer.securityContext | string | `nil` | legacy, use podSecurityContext instead |
 | windmill.indexer.tolerations | list | `[]` | Tolerations to apply to the pods |
+| windmill.indexer.volumeMounts | list | `[]` | Extra volume mounts to add to the container |
+| windmill.indexer.volumes | list | `[]` | Extra volumes to add to the pods |
 | windmill.instanceEventsWebhook | string | `""` | send instance events to a webhook. Can be hooked back to windmill |
 | windmill.multiplayerReplicas | int | `1` | replicas for the multiplayer containers used by the app (ee only and ignored if enterprise not enabled) |
 | windmill.npmConfigRegistry | string | `""` | pass the npm for private registries |
@@ -220,6 +224,8 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.operator.replicas | int | `1` | number of operator replicas (typically 1) |
 | windmill.operator.resources | object | `{"limits":{"memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}}` | Resource limits and requests for the pods |
 | windmill.operator.tolerations | list | `[]` | Tolerations to apply to the pods |
+| windmill.operator.volumeMounts | list | `[]` | Extra volume mounts to add to the container |
+| windmill.operator.volumes | list | `[]` | Extra volumes to add to the pods |
 | windmill.pipExtraIndexUrl | string | `""` | pass the extra index url to pip for private registries |
 | windmill.pipIndexUrl | string | `""` | pass the index url to pip for private registries |
 | windmill.pipTrustedHost | string | `""` | pass the trusted host to pip for private registries |
@@ -231,6 +237,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.windmillExtra.affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.windmillExtra.annotations | object | `{}` | Annotations to apply to the pods |
 | windmill.windmillExtra.containerSecurityContext | object | `{}` | Security context to apply to the container |
+| windmill.windmillExtra.debugAllowedOrigins | string | `""` | comma-separated allowlist of browser Origins permitted to open debug WebSockets (cross-site WebSocket hijacking hardening). Empty = rely on signed-token verification only; set to your external URL(s), e.g. "https://windmill.example.com", to also reject cross-origin handshakes. |
 | windmill.windmillExtra.dnsConfig | object | `{}` | Custom DNS configuration for the pods. Falls back to windmill.dnsConfig when unset |
 | windmill.windmillExtra.dnsPolicy | string | `""` | DNS policy for the pods. Valid options are "ClusterFirst", "Default", "ClusterFirstWithHostNet", "None". Falls back to windmill.dnsPolicy when unset |
 | windmill.windmillExtra.enableDebugger | bool | `true` | enable Debugger for debugging scripts |
@@ -241,7 +248,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.windmillExtra.labels | object | `{}` | Labels to apply to the pods |
 | windmill.windmillExtra.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.windmillExtra.podSecurityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
-| windmill.windmillExtra.requireSignedDebugRequests | bool | `true` | require signed debug requests (JWT tokens for debug sessions) |
+| windmill.windmillExtra.requireSignedDebugRequests | bool | `true` | require signed debug requests (JWT tokens for debug sessions). Do NOT disable on internet-reachable deployments: it exposes an unauthenticated code-execution debugger. |
 | windmill.windmillExtra.requireSignedMultiplayerRequests | bool | `true` | require signed multiplayer requests (JWT tokens for collaborative editing sessions). Keep enabled in production. |
 | windmill.windmillExtra.resources | object | `{"limits":{"memory":"1Gi"}}` | Resource limits and requests for the pods |
 | windmill.windmillExtra.securityContext | object | `{}` | legacy, use podSecurityContext instead |
@@ -251,17 +258,22 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.windmillExtra.windmillBaseUrl | string | `""` | Set to your external URL (e.g. "https://windmill.example.com") if the debugger fails with token verification errors. |
 | windmill.workerGroups[0].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[0].annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.workerGroups[0].autoscalingManaged | bool | `false` | `replicas` value above is ignored and the deployment is rendered regardless. |
+| windmill.workerGroups[0].baseUrl | string | `""` | {windmill.baseProtocol}://{windmill.baseDomain} when not set. |
 | windmill.workerGroups[0].command | list | `[]` | command override |
 | windmill.workerGroups[0].containerSecurityContext | object | `{}` | Security context to apply to the pod |
 | windmill.workerGroups[0].controller | string | `"Deployment"` | Controller to use. Valid options are "Deployment" and "StatefulSet" |
+| windmill.workerGroups[0].databaseUrlSecretKey | string | `""` | Key within databaseUrlSecretName holding the database URL. Defaults to "url" when not set. |
+| windmill.workerGroups[0].databaseUrlSecretName | string | `""` | windmill.databaseUrlSecretName. |
 | windmill.workerGroups[0].deploymentAnnotations | object | `{}` | Annotations to apply to the controller (Deployment/StatefulSet) itself |
 | windmill.workerGroups[0].disableUnsharePid | bool | `false` | Set to true for nodes where user namespaces are disabled (e.g., Bottlerocket AMI with max_user_namespaces=0). |
-| windmill.workerGroups[0].dnsConfig | object | `{}` | Custom DNS configuration for the pods. Useful for pods with VPN sidecars that need to resolve external DNS names |
-| windmill.workerGroups[0].dnsPolicy | string | `""` | DNS policy for the pods. Set to "None" when using custom dnsConfig (e.g., for VPN sidecars or custom DNS resolution) |
+| windmill.workerGroups[0].dnsConfig | object | `{}` | Useful for pods with VPN sidecars that need to resolve external DNS names. Falls back to windmill.dnsConfig when unset |
+| windmill.workerGroups[0].dnsPolicy | string | `""` | Set to "None" when using custom dnsConfig (e.g., for VPN sidecars or custom DNS resolution). Falls back to windmill.dnsPolicy when unset |
 | windmill.workerGroups[0].exposeHostDocker | bool | `false` | SECURITY RISK: mounts the host node's Docker socket into this worker group, giving any script author root-equivalent control of the node's Docker daemon. Trusted, single-tenant use only. Prefer the rootless podman runtime (CONTAINER_RUNTIME=podman on a *-full image, non-root) instead. |
 | windmill.workerGroups[0].extraContainers | list | `[]` | Extra sidecar containers |
 | windmill.workerGroups[0].extraEnv | list | `[]` | value: "/tmp" |
 | windmill.workerGroups[0].hostAliases | list | `[]` | Host aliases to apply to the pods (overrides global hostAliases if set) |
+| windmill.workerGroups[0].image | string | `""` | Falls back to windmill.image when not set. |
 | windmill.workerGroups[0].initContainers | list | `[]` | Init containers |
 | windmill.workerGroups[0].labels | object | `{}` | Labels to apply to the pods |
 | windmill.workerGroups[0].mode | string | `"worker"` |  |
@@ -274,6 +286,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].replicas | int | `3` |  |
 | windmill.workerGroups[0].resources | object | `{"limits":{"memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.workerGroups[0].serviceAccountName | string | `""` | Falls back to the global service account when not set. |
+| windmill.workerGroups[0].tag | string | `""` | Falls back to windmill.tag (then the chart appVersion) when not set. |
 | windmill.workerGroups[0].terminationGracePeriodSeconds | int | `604800` | If a job is being ran, the container will wait for it to finish before terminating until this grace period |
 | windmill.workerGroups[0].tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.workerGroups[0].topologySpreadConstraints | list | `[]` |  |
@@ -282,14 +295,19 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].volumes | list | `[]` |  |
 | windmill.workerGroups[1].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[1].annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.workerGroups[1].autoscalingManaged | bool | `false` | `replicas` value above is ignored and the deployment is rendered regardless. |
+| windmill.workerGroups[1].baseUrl | string | `""` | {windmill.baseProtocol}://{windmill.baseDomain} when not set. |
 | windmill.workerGroups[1].containerSecurityContext | object | `{}` | Security context to apply to the pod |
 | windmill.workerGroups[1].controller | string | `"Deployment"` | Controller to use. Valid options are "Deployment" and "StatefulSet" |
+| windmill.workerGroups[1].databaseUrlSecretKey | string | `""` | Key within databaseUrlSecretName holding the database URL. Defaults to "url" when not set. |
+| windmill.workerGroups[1].databaseUrlSecretName | string | `""` | windmill.databaseUrlSecretName. |
 | windmill.workerGroups[1].deploymentAnnotations | object | `{}` | Annotations to apply to the controller (Deployment/StatefulSet) itself |
 | windmill.workerGroups[1].disableUnsharePid | bool | `false` | Set to true for nodes where user namespaces are disabled (e.g., Bottlerocket AMI with max_user_namespaces=0). |
 | windmill.workerGroups[1].exposeHostDocker | bool | `false` | SECURITY RISK: mounts the host node's Docker socket into this worker group, giving any script author root-equivalent control of the node's Docker daemon. Trusted, single-tenant use only. Prefer the rootless podman runtime (CONTAINER_RUNTIME=podman on a *-full image, non-root) instead. |
 | windmill.workerGroups[1].extraContainers | list | `[]` | Extra sidecar containers |
 | windmill.workerGroups[1].extraEnv | list | `[{"name":"NATIVE_MODE","value":"true"},{"name":"SLEEP_QUEUE","value":"200"}]` | Extra environment variables to apply to the pods |
 | windmill.workerGroups[1].hostAliases | list | `[]` | Host aliases to apply to the pods (overrides global hostAliases if set) |
+| windmill.workerGroups[1].image | string | `""` | Falls back to windmill.image when not set. |
 | windmill.workerGroups[1].labels | object | `{}` | Labels to apply to the pods |
 | windmill.workerGroups[1].mode | string | `"worker"` |  |
 | windmill.workerGroups[1].name | string | `"native"` |  |
@@ -301,6 +319,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[1].replicas | int | `1` |  |
 | windmill.workerGroups[1].resources | object | `{"limits":{"memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.workerGroups[1].serviceAccountName | string | `""` | Falls back to the global service account when not set. |
+| windmill.workerGroups[1].tag | string | `""` | Falls back to windmill.tag (then the chart appVersion) when not set. |
 | windmill.workerGroups[1].tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.workerGroups[1].topologySpreadConstraints | list | `[]` |  |
 | windmill.workerGroups[1].volumeClaimTemplates | list | `[]` | Volume claim templates. Only applies when controller is "StatefulSet" |
@@ -308,14 +327,18 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[1].volumes | list | `[]` |  |
 | windmill.workerGroups[2].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[2].annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.workerGroups[2].baseUrl | string | `""` | {windmill.baseProtocol}://{windmill.baseDomain} when not set. |
 | windmill.workerGroups[2].command | list | `[]` | command override |
 | windmill.workerGroups[2].containerSecurityContext | object | `{}` | Security context to apply to the pod |
 | windmill.workerGroups[2].controller | string | `"Deployment"` | Controller to use. Valid options are "Deployment" and "StatefulSet" |
+| windmill.workerGroups[2].databaseUrlSecretKey | string | `""` | Key within databaseUrlSecretName holding the database URL. Defaults to "url" when not set. |
+| windmill.workerGroups[2].databaseUrlSecretName | string | `""` | windmill.databaseUrlSecretName. |
 | windmill.workerGroups[2].disableUnsharePid | bool | `false` | Set to true for nodes where user namespaces are disabled (e.g., Bottlerocket AMI with max_user_namespaces=0). |
 | windmill.workerGroups[2].exposeHostDocker | bool | `false` | SECURITY RISK: mounts the host node's Docker socket into this worker group, giving any script author root-equivalent control of the node's Docker daemon. Trusted, single-tenant use only. Prefer the rootless podman runtime (CONTAINER_RUNTIME=podman on a *-full image, non-root) instead. |
 | windmill.workerGroups[2].extraContainers | list | `[]` | Extra sidecar containers |
 | windmill.workerGroups[2].extraEnv | list | `[]` | Extra environment variables to apply to the pods |
 | windmill.workerGroups[2].hostAliases | list | `[]` | Host aliases to apply to the pods (overrides global hostAliases if set) |
+| windmill.workerGroups[2].image | string | `""` | Falls back to windmill.image when not set. |
 | windmill.workerGroups[2].labels | object | `{}` | Labels to apply to the pods |
 | windmill.workerGroups[2].mode | string | `"worker"` |  |
 | windmill.workerGroups[2].name | string | `"gpu"` |  |
@@ -327,6 +350,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[2].replicas | int | `0` |  |
 | windmill.workerGroups[2].resources | object | `{"limits":{"memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.workerGroups[2].serviceAccountName | string | `""` | Falls back to the global service account when not set. |
+| windmill.workerGroups[2].tag | string | `""` | Falls back to windmill.tag (then the chart appVersion) when not set. |
 | windmill.workerGroups[2].tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.workerGroups[2].topologySpreadConstraints | list | `[]` |  |
 | windmill.workerGroups[2].volumeClaimTemplates | list | `[]` | Volume claim templates. Only applies when controller is "StatefulSet" |
@@ -363,4 +387,48 @@ windmill:
           name: windmill-postgres
           key: password
 ```
+
+## Keeping the connection string out of the environment
+
+Both approaches above still surface the connection string as a `DATABASE_URL` environment variable in the pod spec, which some compliance baselines disallow regardless of where the value came from. Set `windmill.databaseUrlAsFile` to mount the secret as a file and pass `DATABASE_URL_FILE` instead, so no component renders `DATABASE_URL` at all:
+
+```yaml
+windmill:
+  databaseUrlSecretName: windmill-database-url
+  databaseUrlSecretKey: url
+  databaseUrlAsFile: true
+```
+
+The secret is projected at `windmill.databaseUrlFilePath` (`/etc/windmill/secrets/database-url` by default), read-only, with mode `windmill.databaseUrlFileMode`.
+
+That still consumes a Kubernetes Secret, which lives in etcd unless the cluster encrypts Secrets at rest. To keep the connection string out of etcd entirely, leave `databaseUrlSecretName` and `databaseSecret` unset so the chart mounts nothing of its own, and deliver the file with a volume of your own: the [Secrets Store CSI driver](https://secrets-store-csi-driver.sigs.k8s.io/) without secret syncing, or Vault Agent injection, both write it to a tmpfs in the pod without creating a Secret object. External Secrets is not one of these: it materialises a Kubernetes Secret, so it belongs in the first form above.
+
+This applies to the app, worker groups, indexer and operator. The hub is unaffected: it reads `DATABASE_URL` from the environment only.
+
+If the connection string has to be decrypted or fetched by your own tooling first, point `windmill.databaseUrlFilePath` at a shared `emptyDir` and render it from an init container, which is also how Vault Agent and the CSI driver deliver secrets:
+
+```yaml
+windmill:
+  databaseUrlAsFile: true
+  databaseUrlFilePath: /etc/windmill/secrets/database-url
+  app:
+    volumes:
+      - name: dsn
+        emptyDir:
+          medium: Memory
+    volumeMounts:
+      - name: dsn
+        mountPath: /etc/windmill/secrets
+    initContainers:
+      - name: decrypt-dsn
+        image: <an image carrying your secret tooling>
+        command: ["sh", "-c", "sops -d /enc/db.enc > /etc/windmill/secrets/database-url"]
+        volumeMounts:
+          - name: dsn
+            mountPath: /etc/windmill/secrets
+```
+
+Repeat the volume keys for each component you run. With no `databaseUrlSecretName` and no `databaseSecret` the chart mounts nothing of its own at that path, so the volume you supply is the only one there.
+
+If the database credential itself is what you want to eliminate, an AWS RDS or Azure Postgres instance can authenticate the pod's own workload identity instead. Set the password component of the connection string to the sentinel `iamrds` (with `AWS_REGION`) or `entraid` (with `AZURE_TENANT_ID`, `AZURE_CLIENT_ID` and `AZURE_FEDERATED_TOKEN_FILE`) and Windmill Enterprise mints a short-lived token per connection, leaving no long-lived secret to protect.
 

@@ -68,8 +68,26 @@ spec:
       {{- end }}
         image: {{ default "ghcr.io/windmill-labs/windmill-ee" .Values.windmill.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
         imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
+        {{ if or .Values.windmill.indexer.volumeMounts .Values.windmill.databaseUrlAsFile }}
+        volumeMounts:
+        {{- with .Values.windmill.indexer.volumeMounts }}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
+        {{- include "windmill.databaseUrlVolumeMount" (dict "root" $) | nindent 8 }}
+        {{ end }}
         ports:
         - containerPort: 8000
+        # The indexer loads its index from object storage before it serves HTTP, so the
+        # liveness probe has to stay off until that finishes or a large index restarts the
+        # pod forever. Same wait progressDeadlineSeconds covers, so it tracks that budget.
+        startupProbe:
+          httpGet:
+            scheme: HTTP
+            path: /api/version
+            port: 8000
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: {{ max 1 (div (.Values.windmill.indexer.progressDeadlineSeconds | default 1800) 10) }}
         readinessProbe:
           timeoutSeconds: 1
           successThreshold: 1
@@ -83,6 +101,14 @@ spec:
             port: 8000
           initialDelaySeconds: 5
           periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /api/version
+            port: 8000
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
         env:
         {{- with .Values.windmill.indexer.extraEnv }}
         {{- toYaml . | nindent 8 }}
@@ -91,22 +117,7 @@ spec:
         - name : "METRICS_ADDR"
           value: "{{ .Values.enterprise.metricsAddr }}"
         {{ end }}
-        {{ if .Values.windmill.databaseSecret }}
-        - name: "DATABASE_URL"
-          valueFrom:
-            secretKeyRef:
-              name: "windmill-database"
-              key: "url"
-        {{ else if .Values.windmill.databaseUrlSecretName }}
-        - name: "DATABASE_URL"
-          valueFrom:
-            secretKeyRef:
-              name: "{{ .Values.windmill.databaseUrlSecretName }}"
-              key: "{{ .Values.windmill.databaseUrlSecretKey }}"
-        {{ else }}
-        - name: "DATABASE_URL"
-          value: "{{ .Values.windmill.databaseUrl }}"
-        {{ end }}
+        {{- include "windmill.databaseUrlEnv" (dict "root" $) | nindent 8 }}
         - name: "BASE_URL"
           value: "{{ .Values.windmill.baseProtocol }}://{{ .Values.windmill.baseDomain }}"
         - name: "RUST_LOG"
@@ -141,6 +152,13 @@ spec:
         {{ end }}
         resources:
 {{ toYaml .Values.windmill.indexer.resources | indent 12 }}
+    {{ if or .Values.windmill.indexer.volumes .Values.windmill.databaseUrlAsFile }}
+      volumes:
+      {{- with .Values.windmill.indexer.volumes }}
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- include "windmill.databaseUrlVolume" (dict "root" $) | nindent 8 }}
+    {{ end }}
     {{- with .Values.windmill.indexer.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
