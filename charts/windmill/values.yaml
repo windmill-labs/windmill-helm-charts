@@ -452,6 +452,16 @@ windmill:
       initialDelaySeconds: 5
       periodSeconds: 5
 
+    # -- Startup probe for the app pods. Set to {} to remove it. It keeps the liveness probe disabled until the process serves HTTP, which it does not do while a long migration runs on upgrade. Without it a slow migration would restart every pod before it ever came up.
+    startupProbe:
+      httpGet:
+        scheme: HTTP
+        path: /api/version
+        port: 8000
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 60
+
     # -- Liveness probe for the app pods. Set to {} to remove it. /api/version is a static handler that touches no dependency, so only a wedged process fails it: a probe that depended on the database would restart every pod at once during a database outage.
     livenessProbe:
       httpGet:
@@ -593,6 +603,22 @@ windmill:
   indexer:
     # -- enable or disable indexer
     enabled: true
+
+    # -- How long a rollout may take before Kubernetes reports ProgressDeadlineExceeded.
+    # The incoming pod waits for the outgoing one to hand over the index write lock and
+    # then loads the index from object storage, so raise this further if your index is
+    # large enough that upgrades still time out.
+    progressDeadlineSeconds: 1800
+
+    # -- Startup probe for the indexer pods. Set to {} to remove it. The indexer loads its index from object storage before it starts serving HTTP, so the liveness probe must stay disabled until that finishes or a large index restarts the pod forever. Keep the budget (periodSeconds x failureThreshold) at least as large as progressDeadlineSeconds.
+    startupProbe:
+      httpGet:
+        scheme: HTTP
+        path: /api/version
+        port: 8000
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 180
 
     # -- Readiness probe for the indexer pods. Set to {} to remove it.
     readinessProbe:

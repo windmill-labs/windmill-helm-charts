@@ -95,6 +95,10 @@ spec:
         ports:
         - containerPort: 8000
         - containerPort: 8001
+        {{- with .Values.windmill.app.startupProbe }}
+        startupProbe:
+        {{- toYaml . | nindent 10 }}
+        {{- end }}
         {{- with .Values.windmill.app.readinessProbe }}
         readinessProbe:
         {{- toYaml . | nindent 10 }}
