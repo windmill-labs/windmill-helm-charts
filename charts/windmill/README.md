@@ -413,7 +413,9 @@ windmill:
   databaseUrlAsFile: true
 ```
 
-The secret is projected at `windmill.databaseUrlFilePath` (`/etc/windmill/secrets/database-url` by default), read-only, with mode `windmill.databaseUrlFileMode`. Because the mount is an ordinary secret volume, it can equally be backed by the [Secrets Store CSI driver](https://secrets-store-csi-driver.sigs.k8s.io/), Vault Agent or External Secrets, in which case the value reaches a tmpfs in the pod and never lands in etcd.
+The secret is projected at `windmill.databaseUrlFilePath` (`/etc/windmill/secrets/database-url` by default), read-only, with mode `windmill.databaseUrlFileMode`.
+
+That still consumes a Kubernetes Secret, which lives in etcd unless the cluster encrypts Secrets at rest. To keep the connection string out of etcd entirely, leave `databaseUrlSecretName` and `databaseSecret` unset so the chart mounts nothing of its own, and deliver the file with a volume of your own: the [Secrets Store CSI driver](https://secrets-store-csi-driver.sigs.k8s.io/) without secret syncing, or Vault Agent injection, both write it to a tmpfs in the pod without creating a Secret object. External Secrets is not one of these: it materialises a Kubernetes Secret, so it belongs in the first form above.
 
 This applies to the app, worker groups, indexer and operator. The hub is unaffected: it reads `DATABASE_URL` from the environment only.
 
