@@ -51,6 +51,12 @@ windmill:
   databaseUrl: postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable
   # -- whether to create a secret containing the value of databaseUrl
   databaseSecret: false
+  # -- read the database URI from a file and set DATABASE_URL_FILE instead of injecting DATABASE_URL into the environment, so the connection string never appears in the pod spec. With databaseUrlSecretName or databaseSecret set, the chart mounts that secret at databaseUrlFilePath; without either, supply the file yourself with a per-component volume (an init container that decrypts it, a CSI driver, Vault Agent). Applies to the app, workers, indexer and operator; the hub reads DATABASE_URL from the environment only and is unaffected.
+  databaseUrlAsFile: false
+  # -- path the database URI is mounted at when databaseUrlAsFile is enabled. Its directory is the mount point, so keep it on a path of its own.
+  databaseUrlFilePath: /etc/windmill/secrets/database-url
+  # -- file mode of the mounted database URI, in octal. 0400 requires the pod to run as the owner of the projected file, so set an fsGroup matching runAsUser alongside it.
+  databaseUrlFileMode: 0444
   # -- domain as shown in browser. url of ths service is at: {baseProtocol}://{baseDomain}
   baseDomain: windmill
   # -- secondary domain that duplicates all ingress routes from baseDomain. Useful for having multiple domains point to the same services.
@@ -109,6 +115,11 @@ windmill:
     - name: "default"
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
       controller: "Deployment"
+
+      # -- Readiness probe for this worker group. Empty keeps the default, a /ready check on the metrics port, which only exists on enterprise builds, so CE workers get no probe.
+      readinessProbe: {}
+      # -- Liveness probe for this worker group. Empty on purpose: a restart kills the jobs the worker is running, and /ready latches to healthy once the worker has started, so it cannot detect a wedged job loop anyway. Set one only with that trade-off in mind.
+      livenessProbe: {}
 
       replicas: 3
       # -- Set to true when this worker group's replica count is managed by Windmill's
@@ -226,6 +237,11 @@ windmill:
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
       controller: "Deployment"
 
+      # -- Readiness probe for this worker group. See windmill.workerGroups[0].readinessProbe.
+      readinessProbe: {}
+      # -- Liveness probe for this worker group. See windmill.workerGroups[0].livenessProbe.
+      livenessProbe: {}
+
       replicas: 1
       # -- Set to true when this worker group's replica count is managed by Windmill's
       # -- native Kubernetes autoscaler. The chart then omits spec.replicas so helm
@@ -327,6 +343,11 @@ windmill:
       # -- Controller to use. Valid options are "Deployment" and "StatefulSet"
       controller: "Deployment"
 
+      # -- Readiness probe for this worker group. See windmill.workerGroups[0].readinessProbe.
+      readinessProbe: {}
+      # -- Liveness probe for this worker group. See windmill.workerGroups[0].livenessProbe.
+      livenessProbe: {}
+
       replicas: 0
       # -- Annotations to apply to the pods
       annotations: {}
@@ -416,6 +437,32 @@ windmill:
 
   # app configuration
   app:
+    # -- Readiness probe for the app pods. Set to {} to remove it. Point it at /api/health/status to also take a pod out of the service when its database connection is unhealthy, at the cost of removing every pod at once during a database outage.
+    readinessProbe:
+      timeoutSeconds: 1
+      successThreshold: 1
+      failureThreshold: 1
+      httpGet:
+        scheme: HTTP
+        path: /
+        httpHeaders:
+        - name: Host
+          value: localhost
+        port: 8000
+      initialDelaySeconds: 5
+      periodSeconds: 5
+
+    # -- Liveness probe for the app pods. Set to {} to remove it. /api/version is a static handler that touches no dependency, so only a wedged process fails it: a probe that depended on the database would restart every pod at once during a database outage.
+    livenessProbe:
+      httpGet:
+        scheme: HTTP
+        path: /api/version
+        port: 8000
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 6
+
     # -- Annotations to apply to the pods
     annotations: {}
 
@@ -547,6 +594,38 @@ windmill:
     # -- enable or disable indexer
     enabled: true
 
+    # -- Readiness probe for the indexer pods. Set to {} to remove it.
+    readinessProbe:
+      timeoutSeconds: 1
+      successThreshold: 1
+      failureThreshold: 1
+      httpGet:
+        scheme: HTTP
+        path: /
+        httpHeaders:
+        - name: Host
+          value: localhost
+        port: 8000
+      initialDelaySeconds: 5
+      periodSeconds: 5
+
+    # -- Liveness probe for the indexer pods. Set to {} to remove it. See windmill.app.livenessProbe for why this deliberately does not check the database.
+    livenessProbe:
+      httpGet:
+        scheme: HTTP
+        path: /api/version
+        port: 8000
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 6
+
+    # -- Extra volumes to add to the pods
+    volumes: []
+
+    # -- Extra volume mounts to add to the container
+    volumeMounts: []
+
     # -- Annotations to apply to the pods
     annotations: {}
 
@@ -597,6 +676,10 @@ windmill:
     enabled: false
     # -- number of operator replicas (typically 1)
     replicas: 1
+    # -- Extra volumes to add to the pods
+    volumes: []
+    # -- Extra volume mounts to add to the container
+    volumeMounts: []
     # -- instance spec for the operator. When set, the chart creates a ConfigMap
     # -- that the operator watches and syncs to the database. Leave empty/omit to manage it externally.
     # instanceSpec:
@@ -781,6 +864,26 @@ serviceAccount:
 hub:
   # -- enable Windmill Hub, requires Windmill Enterprise and license key
   enabled: false
+
+  # -- Readiness probe for the hub pods. Set to {} to remove it. /ready reports 503 until the embeddings database has finished loading, which can take a while on a cold start.
+  readinessProbe:
+    httpGet:
+      scheme: HTTP
+      path: /ready
+      port: 3000
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  # -- Liveness probe for the hub pods. Set to {} to remove it. Deliberately a socket check rather than /ready: a slow embeddings load is not a reason to restart the pod.
+  livenessProbe:
+    tcpSocket:
+      port: 3000
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
   # -- enterprise license key, deprecated use the enterprise values instead
   licenseKey: ""
   # -- replicas for the hub

@@ -60,32 +60,31 @@ spec:
         {{ end }}
         imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
         command: ["windmill", "operator"]
+        {{ if or .Values.windmill.operator.volumeMounts .Values.windmill.databaseUrlAsFile }}
+        volumeMounts:
+        {{- with .Values.windmill.operator.volumeMounts }}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
+        {{- include "windmill.databaseUrlVolumeMount" (dict "root" $) | nindent 8 }}
+        {{ end }}
         env:
         {{- with .Values.windmill.operator.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{ if .Values.windmill.databaseSecret }}
-        - name: "DATABASE_URL"
-          valueFrom:
-            secretKeyRef:
-              name: "windmill-database"
-              key: "url"
-        {{ else if .Values.windmill.databaseUrlSecretName }}
-        - name: "DATABASE_URL"
-          valueFrom:
-            secretKeyRef:
-              name: "{{ .Values.windmill.databaseUrlSecretName }}"
-              key: "{{ .Values.windmill.databaseUrlSecretKey }}"
-        {{ else }}
-        - name: "DATABASE_URL"
-          value: "{{ .Values.windmill.databaseUrl }}"
-        {{ end }}
+        {{- include "windmill.databaseUrlEnv" (dict "root" $) | nindent 8 }}
         - name: "RUST_LOG"
           value: "{{ .Values.windmill.rustLog }}"
         - name: "JSON_FMT"
           value: "true"
         resources:
 {{ toYaml .Values.windmill.operator.resources | indent 12 }}
+    {{ if or .Values.windmill.operator.volumes .Values.windmill.databaseUrlAsFile }}
+      volumes:
+      {{- with .Values.windmill.operator.volumes }}
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- include "windmill.databaseUrlVolume" (dict "root" $) | nindent 8 }}
+    {{ end }}
     {{- with .Values.windmill.operator.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

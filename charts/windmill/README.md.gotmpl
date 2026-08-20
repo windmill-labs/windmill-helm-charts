@@ -46,4 +46,46 @@ windmill:
           key: password
 ```
 
+## Keeping the connection string out of the environment
+
+Both approaches above still surface the connection string as a `DATABASE_URL` environment variable in the pod spec, which some compliance baselines disallow regardless of where the value came from. Set `windmill.databaseUrlAsFile` to mount the secret as a file and pass `DATABASE_URL_FILE` instead, so no component renders `DATABASE_URL` at all:
+
+```yaml
+windmill:
+  databaseUrlSecretName: windmill-database-url
+  databaseUrlSecretKey: url
+  databaseUrlAsFile: true
+```
+
+The secret is projected at `windmill.databaseUrlFilePath` (`/etc/windmill/secrets/database-url` by default), read-only, with mode `windmill.databaseUrlFileMode`. Because the mount is an ordinary secret volume, it can equally be backed by the [Secrets Store CSI driver](https://secrets-store-csi-driver.sigs.k8s.io/), Vault Agent or External Secrets, in which case the value reaches a tmpfs in the pod and never lands in etcd.
+
+This applies to the app, worker groups, indexer and operator. The hub is unaffected: it reads `DATABASE_URL` from the environment only.
+
+If the connection string has to be decrypted or fetched by your own tooling first, point `windmill.databaseUrlFilePath` at a shared `emptyDir` and render it from an init container, which is also how Vault Agent and the CSI driver deliver secrets:
+
+```yaml
+windmill:
+  databaseUrlAsFile: true
+  databaseUrlFilePath: /etc/windmill/secrets/database-url
+  app:
+    volumes:
+      - name: dsn
+        emptyDir:
+          medium: Memory
+    volumeMounts:
+      - name: dsn
+        mountPath: /etc/windmill/secrets
+    initContainers:
+      - name: decrypt-dsn
+        image: <an image carrying your secret tooling>
+        command: ["sh", "-c", "sops -d /enc/db.enc > /etc/windmill/secrets/database-url"]
+        volumeMounts:
+          - name: dsn
+            mountPath: /etc/windmill/secrets
+```
+
+Repeat the volume keys for each component you run. With no `databaseUrlSecretName` and no `databaseSecret` the chart mounts nothing of its own at that path, so the volume you supply is the only one there.
+
+If the database credential itself is what you want to eliminate, an AWS RDS or Azure Postgres instance can authenticate the pod's own workload identity instead. Set the password component of the connection string to the sentinel `iamrds` (with `AWS_REGION`) or `entraid` (with `AZURE_TENANT_ID`, `AZURE_CLIENT_ID` and `AZURE_FEDERATED_TOKEN_FILE`) and Windmill Enterprise mints a short-lived token per connection, leaving no long-lived secret to protect.
+
 {{ template "helm-docs.versionFooter" . }}

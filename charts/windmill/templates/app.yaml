@@ -80,7 +80,7 @@ spec:
         image: {{ default "ghcr.io/windmill-labs/windmill" .Values.windmill.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
         {{ end }}
         imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
-        {{ if or .Values.windmill.app.volumeMounts .Values.windmill.app.smtpTls.enabled }}
+        {{ if or .Values.windmill.app.volumeMounts .Values.windmill.app.smtpTls.enabled .Values.windmill.databaseUrlAsFile }}
         volumeMounts:
         {{- with .Values.windmill.app.volumeMounts }}
         {{ toYaml . | nindent 8 }}
@@ -90,23 +90,19 @@ spec:
           mountPath: /etc/windmill/smtp-tls
           readOnly: true
         {{ end }}
+        {{- include "windmill.databaseUrlVolumeMount" (dict "root" $) | nindent 8 }}
         {{ end }}
         ports:
         - containerPort: 8000
         - containerPort: 8001
+        {{- with .Values.windmill.app.readinessProbe }}
         readinessProbe:
-          timeoutSeconds: 1
-          successThreshold: 1
-          failureThreshold: 1
-          httpGet:
-            scheme: HTTP
-            path: /
-            httpHeaders:
-            - name: Host
-              value: localhost
-            port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.windmill.app.livenessProbe }}
+        livenessProbe:
+        {{- toYaml . | nindent 10 }}
+        {{- end }}
         env:
         {{- with .Values.windmill.app.extraEnv }}
         {{- toYaml . | nindent 8 }}
@@ -119,22 +115,7 @@ spec:
         - name : "METRICS_ADDR"
           value: "{{ .Values.enterprise.metricsAddr }}"
         {{ end }}
-        {{ if .Values.windmill.databaseSecret }}
-        - name: "DATABASE_URL"
-          valueFrom:
-            secretKeyRef:
-              name: "windmill-database"
-              key: "url"
-        {{ else if .Values.windmill.databaseUrlSecretName }}
-        - name: "DATABASE_URL"
-          valueFrom:
-            secretKeyRef:
-              name: "{{ .Values.windmill.databaseUrlSecretName }}"
-              key: "{{ .Values.windmill.databaseUrlSecretKey }}"
-        {{ else }}
-        - name: "DATABASE_URL"
-          value: "{{ .Values.windmill.databaseUrl }}"
-        {{ end }}
+        {{- include "windmill.databaseUrlEnv" (dict "root" $) | nindent 8 }}
         - name: "BASE_URL"
           value: "{{ .Values.windmill.baseProtocol }}://{{ .Values.windmill.baseDomain }}"
         - name: "RUST_LOG"
@@ -197,7 +178,7 @@ spec:
       nodeSelector:
 {{ toYaml . | indent 8 }}
     {{- end }}
-    {{ if or .Values.windmill.app.volumes .Values.windmill.app.smtpTls.enabled }}
+    {{ if or .Values.windmill.app.volumes .Values.windmill.app.smtpTls.enabled .Values.windmill.databaseUrlAsFile }}
       volumes:
       {{- with .Values.windmill.app.volumes }}
 {{ toYaml . | indent 8 }}
@@ -207,6 +188,7 @@ spec:
           secret:
             secretName: {{ .Values.windmill.app.smtpTls.certSecretName }}
       {{ end }}
+      {{- include "windmill.databaseUrlVolume" (dict "root" $) | nindent 8 }}
     {{ end }}
     {{- with .Values.windmill.app.affinity }}
       affinity:

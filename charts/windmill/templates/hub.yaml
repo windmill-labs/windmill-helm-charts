@@ -61,6 +61,14 @@ spec:
         imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
         ports:
         - containerPort: 3000
+        {{- with .Values.hub.readinessProbe }}
+        readinessProbe:
+        {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.hub.livenessProbe }}
+        livenessProbe:
+        {{- toYaml . | nindent 10 }}
+        {{- end }}
         env:
         {{- with .Values.hub.extraEnv }}
         {{- toYaml . | nindent 8 }}
