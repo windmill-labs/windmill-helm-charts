@@ -77,10 +77,17 @@ spec:
         {{ end }}
         ports:
         - containerPort: 8000
-        {{- with .Values.windmill.indexer.startupProbe }}
+        # The indexer loads its index from object storage before it serves HTTP, so the
+        # liveness probe has to stay off until that finishes or a large index restarts the
+        # pod forever. Same wait progressDeadlineSeconds covers, so it tracks that budget.
         startupProbe:
-        {{- toYaml . | nindent 10 }}
-        {{- end }}
+          httpGet:
+            scheme: HTTP
+            path: /api/version
+            port: 8000
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: {{ max 1 (div (.Values.windmill.indexer.progressDeadlineSeconds | default 1800) 10) }}
         readinessProbe:
           timeoutSeconds: 1
           successThreshold: 1
@@ -94,10 +101,14 @@ spec:
             port: 8000
           initialDelaySeconds: 5
           periodSeconds: 5
-        {{- with .Values.windmill.indexer.livenessProbe }}
         livenessProbe:
-        {{- toYaml . | nindent 10 }}
-        {{- end }}
+          httpGet:
+            scheme: HTTP
+            path: /api/version
+            port: 8000
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
         env:
         {{- with .Values.windmill.indexer.extraEnv }}
         {{- toYaml . | nindent 8 }}

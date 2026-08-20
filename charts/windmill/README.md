@@ -80,12 +80,10 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | hub.initContainers | list | `[]` | Extra init containers |
 | hub.labels | object | `{}` | Annotations to apply to the pods |
 | hub.licenseKey | string | `""` | enterprise license key, deprecated use the enterprise values instead |
-| hub.livenessProbe | object | `{"failureThreshold":6,"initialDelaySeconds":30,"periodSeconds":10,"tcpSocket":{"port":3000},"timeoutSeconds":5}` | Liveness probe for the hub pods. Set to {} to remove it. Deliberately a socket check rather than /ready: a slow embeddings load is not a reason to restart the pod. |
 | hub.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | hub.podSecurityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
 | hub.podSecurityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
 | hub.podSecurityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
-| hub.readinessProbe | object | `{"failureThreshold":3,"httpGet":{"path":"/ready","port":3000,"scheme":"HTTP"},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":5}` | Readiness probe for the hub pods. Set to {} to remove it. /ready reports 503 until the embeddings database has finished loading, which can take a while on a cold start. |
 | hub.replicas | int | `1` | replicas for the hub |
 | hub.resources | object | `{"limits":{"memory":"2Gi"}}` | Resource limits and requests for the pods |
 | hub.securityContext | string | `nil` | legacy, use podSecurityContext instead |
@@ -135,7 +133,6 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.app.hostAliases | list | `[]` | Host aliases to apply to the pods (overrides global hostAliases if set) |
 | windmill.app.initContainers | list | `[]` | Init containers |
 | windmill.app.labels | object | `{}` | Annotations to apply to the pods |
-| windmill.app.livenessProbe | object | `{"failureThreshold":6,"httpGet":{"path":"/api/version","port":8000,"scheme":"HTTP"},"initialDelaySeconds":30,"periodSeconds":10,"timeoutSeconds":5}` | Liveness probe for the app pods. Set to {} to remove it. /api/version is a static handler that touches no dependency, so only a wedged process fails it: a probe that depended on the database would restart every pod at once during a database outage. |
 | windmill.app.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.app.podSecurityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
 | windmill.app.podSecurityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
@@ -165,7 +162,6 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.app.smtpTls.certSecretName | string | `""` | name of the Kubernetes Secret containing the certificate and key |
 | windmill.app.smtpTls.enabled | bool | `false` | enable mounting a TLS certificate for the SMTP server |
 | windmill.app.smtpTls.keySecretKey | string | `"tls.key"` | key in the Secret for the private key PEM file (must be PKCS#8 format) |
-| windmill.app.startupProbe | object | `{"failureThreshold":60,"httpGet":{"path":"/api/version","port":8000,"scheme":"HTTP"},"periodSeconds":10,"timeoutSeconds":5}` | Startup probe for the app pods. Set to {} to remove it. It keeps the liveness probe disabled until the process serves HTTP, which it does not do while a long migration runs on upgrade. Without it a slow migration would restart every pod before it ever came up. |
 | windmill.app.tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.app.topologySpreadConstraints | list | `[]` | Topology spread constraints |
 | windmill.app.volumeMounts | list | `[]` |  |
@@ -200,7 +196,6 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.indexer.extraEnv | list | `[]` | Extra environment variables to apply to the pods |
 | windmill.indexer.initContainers | list | `[]` | Extra init containers |
 | windmill.indexer.labels | object | `{}` | Annotations to apply to the pods |
-| windmill.indexer.livenessProbe | object | `{"failureThreshold":6,"httpGet":{"path":"/api/version","port":8000,"scheme":"HTTP"},"initialDelaySeconds":30,"periodSeconds":10,"timeoutSeconds":5}` | Liveness probe for the indexer pods. Set to {} to remove it. See windmill.app.livenessProbe for why this deliberately does not check the database. |
 | windmill.indexer.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.indexer.podSecurityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
 | windmill.indexer.podSecurityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
@@ -208,7 +203,6 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.indexer.progressDeadlineSeconds | int | `1800` | How long a rollout may take before Kubernetes reports ProgressDeadlineExceeded. The incoming pod waits for the outgoing one to hand over the index write lock and then loads the index from object storage, so raise this further if your index is large enough that upgrades still time out. |
 | windmill.indexer.resources | object | `{"limits":{"ephemeral-storage":"50Gi","memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.indexer.securityContext | string | `nil` | legacy, use podSecurityContext instead |
-| windmill.indexer.startupProbe | object | `{"failureThreshold":180,"httpGet":{"path":"/api/version","port":8000,"scheme":"HTTP"},"periodSeconds":10,"timeoutSeconds":5}` | Startup probe for the indexer pods. Set to {} to remove it. The indexer loads its index from object storage before it starts serving HTTP, so the liveness probe must stay disabled until that finishes or a large index restarts the pod forever. Keep the budget (periodSeconds x failureThreshold) at least as large as progressDeadlineSeconds. |
 | windmill.indexer.tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.indexer.volumeMounts | list | `[]` | Extra volume mounts to add to the container |
 | windmill.indexer.volumes | list | `[]` | Extra volumes to add to the pods |

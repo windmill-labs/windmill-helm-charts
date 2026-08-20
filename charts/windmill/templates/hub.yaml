@@ -61,14 +61,24 @@ spec:
         imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
         ports:
         - containerPort: 3000
-        {{- with .Values.hub.readinessProbe }}
         readinessProbe:
-        {{- toYaml . | nindent 10 }}
-        {{- end }}
-        {{- with .Values.hub.livenessProbe }}
+          httpGet:
+            scheme: HTTP
+            path: /ready
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        # A socket check rather than /ready, which reports 503 while the embeddings database
+        # loads: a slow load is not a reason to restart the pod.
         livenessProbe:
-        {{- toYaml . | nindent 10 }}
-        {{- end }}
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
         env:
         {{- with .Values.hub.extraEnv }}
         {{- toYaml . | nindent 8 }}
