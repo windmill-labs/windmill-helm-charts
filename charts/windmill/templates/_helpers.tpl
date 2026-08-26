@@ -118,16 +118,19 @@ Usage:
 {{/*
 Name of the secret holding the database url, or empty when the url is only configured as a
 literal. Worker groups may point at another instance's database, so their own secret wins.
+"source" is the values block the url is configured in, for a component with one of its own
+(the hub); it defaults to windmill.
 Usage: {{ include "windmill.databaseUrlSecretName" (dict "root" $ "override" $v) }}
 */}}
 {{- define "windmill.databaseUrlSecretName" -}}
 {{- $override := .override | default dict -}}
+{{- $source := .source | default .root.Values.windmill -}}
 {{- if $override.databaseUrlSecretName -}}
 {{- $override.databaseUrlSecretName -}}
-{{- else if .root.Values.windmill.databaseSecret -}}
+{{- else if $source.databaseSecret -}}
 windmill-database
-{{- else if .root.Values.windmill.databaseUrlSecretName -}}
-{{- .root.Values.windmill.databaseUrlSecretName -}}
+{{- else if $source.databaseUrlSecretName -}}
+{{- $source.databaseUrlSecretName -}}
 {{- end -}}
 {{- end -}}
 
@@ -136,23 +139,24 @@ Key within the secret resolved by windmill.databaseUrlSecretName.
 */}}
 {{- define "windmill.databaseUrlSecretKey" -}}
 {{- $override := .override | default dict -}}
+{{- $source := .source | default .root.Values.windmill -}}
 {{- if $override.databaseUrlSecretName -}}
 {{- default "url" $override.databaseUrlSecretKey -}}
-{{- else if .root.Values.windmill.databaseSecret -}}
+{{- else if $source.databaseSecret -}}
 url
-{{- else if .root.Values.windmill.databaseUrlSecretName -}}
-{{- default "url" .root.Values.windmill.databaseUrlSecretKey -}}
+{{- else if $source.databaseUrlSecretName -}}
+{{- default "url" $source.databaseUrlSecretKey -}}
 {{- end -}}
 {{- end -}}
 
 {{/*
-Database url env entry for a windmill component. With databaseUrlAsFile the connection
-string is read from a mounted secret file and no DATABASE_URL is rendered at all, so it
-never appears in the pod spec. The backend prefers DATABASE_URL_FILE over DATABASE_URL.
-Not for the hub, which reads DATABASE_URL from the environment only.
+Database url env entry for a component. With databaseUrlAsFile the connection string is read
+from a mounted secret file and no DATABASE_URL is rendered at all, so it never appears in the
+pod spec. Both the server and the hub prefer DATABASE_URL_FILE over DATABASE_URL.
 Usage: {{- include "windmill.databaseUrlEnv" (dict "root" $ "override" $v) | nindent 8 }}
 */}}
 {{- define "windmill.databaseUrlEnv" -}}
+{{- $source := .source | default .root.Values.windmill -}}
 {{- $secretName := include "windmill.databaseUrlSecretName" . -}}
 {{- if .root.Values.windmill.databaseUrlAsFile -}}
 {{- if not (hasPrefix "/" .root.Values.windmill.databaseUrlFilePath) -}}
@@ -168,7 +172,7 @@ Usage: {{- include "windmill.databaseUrlEnv" (dict "root" $ "override" $v) | nin
       key: "{{ include "windmill.databaseUrlSecretKey" . }}"
 {{- else }}
 - name: "DATABASE_URL"
-  value: "{{ .root.Values.windmill.databaseUrl }}"
+  value: "{{ $source.databaseUrl }}"
 {{- end -}}
 {{- end -}}
 

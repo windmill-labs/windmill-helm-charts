@@ -51,7 +51,7 @@ windmill:
   databaseUrl: postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable
   # -- whether to create a secret containing the value of databaseUrl
   databaseSecret: false
-  # -- read the database URI from a file and set DATABASE_URL_FILE instead of injecting DATABASE_URL into the environment, so the connection string never appears in the pod spec. With databaseUrlSecretName or databaseSecret set, the chart mounts that secret at databaseUrlFilePath; without either, supply the file yourself with a per-component volume (an init container that decrypts it, a CSI driver, Vault Agent). Applies to the app, workers, indexer and operator; the hub reads DATABASE_URL from the environment only and is unaffected.
+  # -- read the database URI from a file and set DATABASE_URL_FILE instead of injecting DATABASE_URL into the environment, so the connection string never appears in the pod spec. With databaseUrlSecretName or databaseSecret set, the chart mounts that secret at databaseUrlFilePath; without either, supply the file yourself with a per-component volume (an init container that decrypts it, a CSI driver, Vault Agent). Applies to every component, the hub included: the hub resolves its own secret from hub.databaseUrlSecretName, and needs image 2.12.0 or later to read the file.
   databaseUrlAsFile: false
   # -- path the database URI is mounted at when databaseUrlAsFile is enabled. Its directory is the mount point, so keep it on a path of its own.
   databaseUrlFilePath: /etc/windmill/secrets/database-url
