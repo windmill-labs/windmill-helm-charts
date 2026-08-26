@@ -69,6 +69,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | hub.containerSecurityContext | object | `{}` |  |
 | hub.databaseSecret | bool | `false` | whether to create a secret containing the value of databaseUrl |
 | hub.databaseUrl | string | `"postgres://postgres:windmill@windmill-hub-postgresql/windmillhub?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container |
+| hub.databaseUrlAsFile | bool | `false` | read the database URI from a file and set DATABASE_URL_FILE instead of injecting DATABASE_URL into the environment, the hub's half of windmill.databaseUrlAsFile. Separate because the hub is a separately versioned image: enable it only on hub 2.12.0 or later, since an older one reads DATABASE_URL only and would start with no database configured at all. Mounts hub.databaseUrlSecretName at windmill.databaseUrlFilePath; without a secret, supply the file yourself with a hub.volumes entry. |
 | hub.databaseUrlSecretKey | string | `"url"` | name of the key in secret storing the database URI. The default key of the url is 'url' |
 | hub.databaseUrlSecretName | string | `""` | name of the secret storing the database URI, take precedence over databaseUrl. |
 | hub.dnsConfig | object | `{}` | Custom DNS configuration for the pods. Falls back to windmill.dnsConfig when unset |
@@ -172,7 +173,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.cookieDomain | string | `""` | domain to use for the cookies. Use it if windmill is hosted on a subdomain and you need to share the cookies with the hub for instance |
 | windmill.databaseSecret | bool | `false` | whether to create a secret containing the value of databaseUrl |
 | windmill.databaseUrl | string | `"postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container |
-| windmill.databaseUrlAsFile | bool | `false` | read the database URI from a file and set DATABASE_URL_FILE instead of injecting DATABASE_URL into the environment, so the connection string never appears in the pod spec. With databaseUrlSecretName or databaseSecret set, the chart mounts that secret at databaseUrlFilePath; without either, supply the file yourself with a per-component volume (an init container that decrypts it, a CSI driver, Vault Agent). Applies to every component, the hub included: the hub resolves its own secret from hub.databaseUrlSecretName, and needs image 2.12.0 or later to read the file. |
+| windmill.databaseUrlAsFile | bool | `false` | read the database URI from a file and set DATABASE_URL_FILE instead of injecting DATABASE_URL into the environment, so the connection string never appears in the pod spec. With databaseUrlSecretName or databaseSecret set, the chart mounts that secret at databaseUrlFilePath; without either, supply the file yourself with a per-component volume (an init container that decrypts it, a CSI driver, Vault Agent). Applies to the app, workers, indexer and operator; the hub has its own hub.databaseUrlAsFile, since it is a separately versioned image. |
 | windmill.databaseUrlFileMode | int | `292` | file mode of the mounted database URI, in octal. 0400 requires the pod to run as the owner of the projected file, so set an fsGroup matching runAsUser alongside it. |
 | windmill.databaseUrlFilePath | string | `"/etc/windmill/secrets/database-url"` | path the database URI is mounted at when databaseUrlAsFile is enabled. Its directory is the mount point, so keep it on a path of its own. |
 | windmill.databaseUrlSecretKey | string | `"url"` | name of the key in existing secret storing the database URI. The default key of the url is 'url' |
@@ -403,7 +404,11 @@ The secret is projected at `windmill.databaseUrlFilePath` (`/etc/windmill/secret
 
 That still consumes a Kubernetes Secret, which lives in etcd unless the cluster encrypts Secrets at rest. To keep the connection string out of etcd entirely, leave `databaseUrlSecretName` and `databaseSecret` unset so the chart mounts nothing of its own, and deliver the file with a volume of your own: the [Secrets Store CSI driver](https://secrets-store-csi-driver.sigs.k8s.io/) without secret syncing, or Vault Agent injection, both write it to a tmpfs in the pod without creating a Secret object. External Secrets is not one of these: it materialises a Kubernetes Secret, so it belongs in the first form above.
 
-This applies to every component, the hub included. The hub resolves its own secret from `hub.databaseUrlSecretName` (or `hub.databaseSecret`) rather than the release-global one, since it runs against its own database, and needs hub image 2.12.0 or later: earlier images read `DATABASE_URL` from the environment only, and start with no database at all when it is absent.
+This applies to the app, worker groups, indexer and operator. The hub has a switch of its own,
+`hub.databaseUrlAsFile`, because it is a separately versioned image: set it only on hub 2.12.0
+or later, since an earlier one reads `DATABASE_URL` from the environment only and would start
+with no database configured at all. It projects `hub.databaseUrlSecretName`, its own database
+being a different one from the server's.
 
 If the connection string has to be decrypted or fetched by your own tooling first, point `windmill.databaseUrlFilePath` at a shared `emptyDir` and render it from an init container, which is also how Vault Agent and the CSI driver deliver secrets:
 

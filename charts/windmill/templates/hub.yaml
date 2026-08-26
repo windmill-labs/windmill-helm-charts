@@ -117,7 +117,7 @@ spec:
           value: "{{ .Values.hub.licenseKey }}" #DEPRECATED
         {{ end }}
         {{ end }}
-        {{ if or .Values.hub.volumeMounts .Values.windmill.databaseUrlAsFile }}
+        {{ if or .Values.hub.volumeMounts .Values.hub.databaseUrlAsFile }}
         volumeMounts:
         {{- with .Values.hub.volumeMounts }}
         {{ toYaml . | nindent 8 }}
@@ -126,7 +126,7 @@ spec:
         {{ end }}
         resources:
 {{ toYaml .Values.hub.resources | indent 12 }}
-    {{ if or .Values.hub.volumes .Values.windmill.databaseUrlAsFile }}
+    {{ if or .Values.hub.volumes .Values.hub.databaseUrlAsFile }}
       volumes:
       {{- with .Values.hub.volumes }}
 {{ toYaml . | indent 8 }}

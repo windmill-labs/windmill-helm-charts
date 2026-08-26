@@ -152,13 +152,15 @@ url
 {{/*
 Database url env entry for a component. With databaseUrlAsFile the connection string is read
 from a mounted secret file and no DATABASE_URL is rendered at all, so it never appears in the
-pod spec. Both the server and the hub prefer DATABASE_URL_FILE over DATABASE_URL.
+pod spec. Both the server and the hub prefer DATABASE_URL_FILE over DATABASE_URL. The switch
+is read off "source", so the hub opts in separately: it is a separately versioned image, and
+one too old to read the file would see no database setting at all.
 Usage: {{- include "windmill.databaseUrlEnv" (dict "root" $ "override" $v) | nindent 8 }}
 */}}
 {{- define "windmill.databaseUrlEnv" -}}
 {{- $source := .source | default .root.Values.windmill -}}
 {{- $secretName := include "windmill.databaseUrlSecretName" . -}}
-{{- if .root.Values.windmill.databaseUrlAsFile -}}
+{{- if $source.databaseUrlAsFile -}}
 {{- if not (hasPrefix "/" .root.Values.windmill.databaseUrlFilePath) -}}
 {{- fail "windmill.databaseUrlFilePath must be an absolute path: its directory becomes the mount point" -}}
 {{- end -}}
@@ -182,7 +184,8 @@ the file is then supplied by the deployment itself (an init container, a CSI dri
 mounting anything here would collide with the volume it already mounts at that path.
 */}}
 {{- define "windmill.databaseUrlVolumeMount" -}}
-{{- if and .root.Values.windmill.databaseUrlAsFile (include "windmill.databaseUrlSecretName" .) -}}
+{{- $source := .source | default .root.Values.windmill -}}
+{{- if and $source.databaseUrlAsFile (include "windmill.databaseUrlSecretName" .) -}}
 - name: windmill-database-url
   mountPath: {{ dir .root.Values.windmill.databaseUrlFilePath | quote }}
   readOnly: true
@@ -195,7 +198,8 @@ a fixed filename so the path stays the one the operator configured, whatever the
 is called.
 */}}
 {{- define "windmill.databaseUrlVolume" -}}
-{{- if and .root.Values.windmill.databaseUrlAsFile (include "windmill.databaseUrlSecretName" .) -}}
+{{- $source := .source | default .root.Values.windmill -}}
+{{- if and $source.databaseUrlAsFile (include "windmill.databaseUrlSecretName" .) -}}
 - name: windmill-database-url
   secret:
     secretName: {{ include "windmill.databaseUrlSecretName" . | quote }}
