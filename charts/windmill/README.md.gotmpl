@@ -61,7 +61,11 @@ The secret is projected at `windmill.databaseUrlFilePath` (`/etc/windmill/secret
 
 That still consumes a Kubernetes Secret, which lives in etcd unless the cluster encrypts Secrets at rest. To keep the connection string out of etcd entirely, leave `databaseUrlSecretName` and `databaseSecret` unset so the chart mounts nothing of its own, and deliver the file with a volume of your own: the [Secrets Store CSI driver](https://secrets-store-csi-driver.sigs.k8s.io/) without secret syncing, or Vault Agent injection, both write it to a tmpfs in the pod without creating a Secret object. External Secrets is not one of these: it materialises a Kubernetes Secret, so it belongs in the first form above.
 
-This applies to the app, worker groups, indexer and operator. The hub is unaffected: it reads `DATABASE_URL` from the environment only.
+This applies to the app, worker groups, indexer and operator. The hub has a switch of its own,
+`hub.databaseUrlAsFile`, because it is a separately versioned image: set it only on hub 2.12.0
+or later, since an earlier one reads `DATABASE_URL` from the environment only and would start
+with no database configured at all. It projects `hub.databaseUrlSecretName`, its own database
+being a different one from the server's.
 
 If the connection string has to be decrypted or fetched by your own tooling first, point `windmill.databaseUrlFilePath` at a shared `emptyDir` and render it from an init container, which is also how Vault Agent and the CSI driver deliver secrets:
 
