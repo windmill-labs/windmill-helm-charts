@@ -40,6 +40,11 @@ helm repo update windmill
 helm upgrade mywindmill windmill/windmill -n windmill --values values.yaml
 ```
 
+A new chart version is published with every Windmill release, so a GitOps setup that tracks the
+chart with `*` or an open version range upgrades Windmill on each one. Pin an exact chart version,
+and optionally the image digest: see
+[Pin the chart and image versions](charts/windmill/README.md#pin-the-chart-and-image-versions).
+
 You do not need to provide a values.yaml to be able to test it on minikube.
 Follow the steps below.
 
