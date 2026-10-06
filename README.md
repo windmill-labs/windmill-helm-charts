@@ -40,6 +40,25 @@ helm repo update windmill
 helm upgrade mywindmill windmill/windmill -n windmill --values values.yaml
 ```
 
+### Pin the chart and image versions
+
+Each chart version deploys the Windmill release named by its `appVersion`, and a new chart version is published with every Windmill release. A GitOps source that tracks the chart with `*` or an open range (Argo CD `targetRevision: "*"`, a Flux `HelmRelease` with `version: "4.x"`) therefore upgrades Windmill, database migrations included, whenever a release is published. Set an exact chart version and move it deliberately:
+
+```sh
+helm upgrade mywindmill windmill/windmill -n windmill --version 4.0.274 --values values.yaml
+```
+
+Release images are signed with cosign (keyless, through GitHub OIDC) and carry an SBOM and SLSA build provenance since Windmill 1.804.0. To verify one (the community image is `ghcr.io/windmill-labs/windmill`):
+
+```sh
+cosign verify \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  --certificate-identity-regexp '^https://github\.com/windmill-labs/windmill/\.github/workflows/docker-image\.yml@refs/tags/v' \
+  ghcr.io/windmill-labs/windmill-ee:<version>
+
+gh attestation verify oci://ghcr.io/windmill-labs/windmill-ee:<version> --owner windmill-labs
+```
+
 You do not need to provide a values.yaml to be able to test it on minikube.
 Follow the steps below.
 
