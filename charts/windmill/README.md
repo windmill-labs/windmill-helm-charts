@@ -281,7 +281,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].hostAliases | list | `[]` | Host aliases to apply to the pods (overrides global hostAliases if set) |
 | windmill.workerGroups[0].image | string | `""` | Falls back to windmill.image when not set. |
 | windmill.workerGroups[0].initContainers | list | `[]` | Init containers |
-| windmill.workerGroups[0].isolationSecurity | string | `""` | Both give up unshare PID isolation and the per-job out-of-memory kill, so turn nsjail on with the "Job isolation" instance setting. See "Running nsjail without privileged workers" in the README. |
+| windmill.workerGroups[0].isolationSecurity | string | `""` | Both turn nsjail on for the group and give up unshare PID isolation and the per-job out-of-memory kill. See "Running nsjail without privileged workers" in the README. |
 | windmill.workerGroups[0].labels | object | `{}` | Labels to apply to the pods |
 | windmill.workerGroups[0].localhostProfiles | object | `{}` | A layer without a profile is `Unconfined`, since the runtime default blocks nsjail. |
 | windmill.workerGroups[0].mode | string | `"worker"` |  |

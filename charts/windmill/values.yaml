@@ -152,9 +152,9 @@ windmill:
       # -- A group that sandboxes its jobs with nsjail can use `isolationSecurity` below instead.
       privileged: true
 
-      # -- Run the worker without `privileged` while keeping what nsjail needs. Empty (default) keeps the `privileged` setting above.
+      # -- Run the worker without `privileged`, with only what nsjail needs. Empty (default) keeps the `privileged` setting above.
       # -- `capabilities`: root with only SYS_ADMIN, SETPCAP and SYS_RESOURCE. `userNamespaces`: non-root with no capability in a pod user namespace (Kubernetes 1.33+).
-      # -- Both give up unshare PID isolation and the per-job out-of-memory kill, so turn nsjail on with the "Job isolation" instance setting. See "Running nsjail without privileged workers" in the README.
+      # -- Both turn nsjail on for the group and give up unshare PID isolation and the per-job out-of-memory kill. See "Running nsjail without privileged workers" in the README.
       isolationSecurity: ""
 
       # -- Seccomp and AppArmor profiles installed on the nodes, used when `isolationSecurity` is set, e.g. `{seccomp: profiles/windmill-nsjail.json, appArmor: windmill-nsjail}`.

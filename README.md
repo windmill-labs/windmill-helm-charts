@@ -101,7 +101,7 @@ Worker groups are `privileged: true` by default because two things only work out
 - **Killing only the job that runs out of memory.** From Kubernetes 1.32, when a container exceeds its memory limit the kernel kills all of its processes together. A privileged worker turns that off for itself at startup, so only the job is lost.
 - **Unshare PID isolation**, the default job isolation, which keeps a job from seeing the worker process and the other jobs. It needs to create namespaces and mount `/proc`.
 
-A privileged container is a weak boundary, though: it has every capability, sees the host's devices, and runs without seccomp or AppArmor. A worker group that uses [nsjail sandboxing](https://www.windmill.dev/docs/advanced/security_isolation#nsjail-sandboxing) for its jobs can trade the two points above for a much smaller set of privileges by setting `isolationSecurity`:
+A privileged container is a weak boundary, though: it has every capability, sees the host's devices, and runs without seccomp or AppArmor. A worker group can instead sandbox its jobs with [nsjail](https://www.windmill.dev/docs/advanced/security_isolation#nsjail-sandboxing) and trade the two points above for a much smaller set of privileges by setting `isolationSecurity`:
 
 ```yaml
 windmill:
@@ -118,7 +118,7 @@ windmill:
 | Host devices | visible | hidden | hidden |
 | Privilege escalation | allowed | disallowed | disallowed |
 | Seccomp and AppArmor | none | `Unconfined`, or the profiles named in `localhostProfiles` | `Unconfined`, or the profiles named in `localhostProfiles` |
-| nsjail | works | works | works |
+| nsjail | optional | always on | always on |
 | Unshare PID isolation | works | not available | not available |
 | A job exceeds the memory limit | the job is killed | the worker pod is killed and restarts | the worker pod is killed and restarts |
 | Needs on the nodes | nothing | nothing | Kubernetes 1.33+ with [user namespaces](https://kubernetes.io/docs/concepts/workloads/pods/user-namespaces/), volumes that support ID-mapped mounts, and on Ubuntu 23.10+ the AppArmor profile |
@@ -126,9 +126,9 @@ windmill:
 
 What to know before switching a group:
 
-- **Turn nsjail on**, with the **Job isolation** instance setting. Unshare PID isolation does not start in these groups and the chart does not enable it for them, so until nsjail is on their jobs run with no isolation.
+- **nsjail is always on for these groups.** The chart sets `DISABLE_NSJAIL=false` on them, whatever the **Job isolation** instance setting says, because unshare PID isolation does not start in these containers: without nsjail their jobs would run with no isolation.
 - **A job that runs out of memory takes its worker down with it.** The pod restarts and the job is retried until it fails on its restart limit; other jobs running on that worker are interrupted. Setting `singleProcessOOMKill: true` in the kubelet configuration of the nodes restores the per-job kill. This is the same behavior as `privileged: false`.
-- **Seccomp and AppArmor are `Unconfined` by default**, because the runtime's default profiles block nsjail. `localhostProfiles` names profiles installed on the nodes instead. The [profiles published in the Windmill repository](https://github.com/windmill-labs/windmill/tree/main/examples/deploy/nsjail-security-profiles) are the runtime defaults plus what nsjail needs:
+- **Seccomp and AppArmor are `Unconfined` by default**, because the runtime's default profiles block nsjail. `localhostProfiles` names profiles installed on the nodes instead. The [profiles in `nsjail-security-profiles/`](nsjail-security-profiles/) are the runtime defaults plus what nsjail needs, with the steps to install them:
 
   ```yaml
         isolationSecurity: userNamespaces

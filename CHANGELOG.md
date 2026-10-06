@@ -11,7 +11,7 @@ By default, cgroup v2 on Kubernetes 1.32+ uses `oom.group=1`, which results in k
 
 To disable privileged mode for a worker group, set `privileged: false` in the worker group configuration.
 
-Worker groups accept `isolationSecurity` (`capabilities` or `userNamespaces`) to run nsjail without a privileged container, and `localhostProfiles` to name seccomp and AppArmor profiles installed on the nodes. Nothing changes for groups that do not set it. A group that sets it gives up the `oom.group` override above: see [Running nsjail without privileged workers](README.md#running-nsjail-without-privileged-workers).
+Worker groups accept `isolationSecurity` (`capabilities` or `userNamespaces`) to run nsjail without a privileged container, and `localhostProfiles` to name seccomp and AppArmor profiles installed on the nodes (published in `nsjail-security-profiles/`). Nothing changes for groups that do not set it. A group that sets it always runs its jobs in nsjail and gives up the `oom.group` override above: see [Running nsjail without privileged workers](README.md#running-nsjail-without-privileged-workers).
 
 `enterprise.nsjail` is no longer documented: nsjail is not Enterprise only and is turned on with the "Job isolation" instance setting. Existing values that set it keep working.
 

@@ -231,9 +231,15 @@ spec:
           value: "false"
         {{ end }}
         {{ end }}
+        {{- if $isolationSecurity }}
+        {{- if not (and $.Values.enterprise.enabled $.Values.enterprise.nsjail) }}
+        - name: "DISABLE_NSJAIL"
+          value: "false"
+        {{- end }}
         {{- if eq $isolationSecurity "capabilities" }}
         - name: "DISABLE_NUSER"
           value: "true"
+        {{- end }}
         {{- end }}
         - name: "WORKER_GROUP"
           value: "{{ $v.name }}"
