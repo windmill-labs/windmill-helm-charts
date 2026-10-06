@@ -221,6 +221,54 @@ is called.
 {{- end -}}
 {{- end -}}
 
+{{/*
+Whether the cluster has the appArmorProfile field (Kubernetes 1.30+). Older clusters only
+read the AppArmor profile from a pod annotation.
+*/}}
+{{- define "windmill.hasAppArmorField" -}}
+{{- if semverCompare ">=1.30-0" .Capabilities.KubeVersion.Version -}}true{{- end -}}
+{{- end -}}
+
+{{/*
+Container security context of a worker group whose isolationSecurity is set: the least a
+worker needs to run nsjail without privileged. A profile named in localhostProfiles is used
+as a Localhost profile, otherwise that layer is Unconfined, since the runtime default
+blocks nsjail. Keys of the group's own security contexts replace the generated ones.
+*/}}
+{{- define "windmill.workerIsolationSecurityContext" -}}
+{{- $v := .group -}}
+{{- $profiles := default dict $v.localhostProfiles -}}
+{{- $ctx := dict "allowPrivilegeEscalation" false -}}
+{{- if eq $v.isolationSecurity "capabilities" -}}
+{{- $_ := set $ctx "runAsUser" 0 -}}
+{{- $_ := set $ctx "capabilities" (dict "drop" (list "ALL") "add" (list "SYS_ADMIN" "SETPCAP" "SYS_RESOURCE")) -}}
+{{- else -}}
+{{- $_ := set $ctx "runAsUser" 1000 -}}
+{{- $_ := set $ctx "runAsGroup" 1000 -}}
+{{- $_ := set $ctx "runAsNonRoot" true -}}
+{{- $_ := set $ctx "capabilities" (dict "drop" (list "ALL")) -}}
+{{- $_ := set $ctx "procMount" "Unmasked" -}}
+{{- end -}}
+{{- if $profiles.seccomp -}}
+{{- $_ := set $ctx "seccompProfile" (dict "type" "Localhost" "localhostProfile" $profiles.seccomp) -}}
+{{- else -}}
+{{- $_ := set $ctx "seccompProfile" (dict "type" "Unconfined") -}}
+{{- end -}}
+{{- if include "windmill.hasAppArmorField" .root -}}
+{{- if $profiles.appArmor -}}
+{{- $_ := set $ctx "appArmorProfile" (dict "type" "Localhost" "localhostProfile" $profiles.appArmor) -}}
+{{- else -}}
+{{- $_ := set $ctx "appArmorProfile" (dict "type" "Unconfined") -}}
+{{- end -}}
+{{- end -}}
+{{- range $override := list $v.securityContext $v.containerSecurityContext -}}
+{{- range $key, $value := (default dict $override) -}}
+{{- $_ := set $ctx $key $value -}}
+{{- end -}}
+{{- end -}}
+{{- toYaml $ctx -}}
+{{- end -}}
+
 {{/*   Routing exclusivity check   */}}
 {{- if and .Values.httproute.enabled .Values.ingress.enabled }}
 {{- fail "Both ingress.enabled and httproute.enabled are true. Disable one to avoid conflicts." }}

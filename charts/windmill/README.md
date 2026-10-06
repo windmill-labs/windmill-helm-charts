@@ -33,7 +33,6 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | enterprise.licenseKeySecretKey | string | `"licenseKey"` | name of the key in secret storing the enterprise license key. The default key is 'licenseKey' |
 | enterprise.licenseKeySecretName | string | `""` | name of the secret storing the enterprise license key, take precedence over licenseKey string. |
 | enterprise.metricsAddr | string | `"true"` | Bind address for metrics server. Sets METRICS_ADDR environment variable. |
-| enterprise.nsjail | bool | `false` | Consider using Amazon Linux 2/2023 AMI or configure Bottlerocket kernel parameters via launch template. |
 | enterprise.s3CacheBucket | string | `""` | S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container |
 | enterprise.samlMetadata | string | `""` | SAML Metadata URL/Content to enable SAML SSO (Can be set in the Instance Settings UI which is the recommended method) |
 | enterprise.scimToken | string | `""` | SCIM token (Can be set in the instance settings UI which is the recommended method) |
@@ -282,14 +281,16 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].hostAliases | list | `[]` | Host aliases to apply to the pods (overrides global hostAliases if set) |
 | windmill.workerGroups[0].image | string | `""` | Falls back to windmill.image when not set. |
 | windmill.workerGroups[0].initContainers | list | `[]` | Init containers |
+| windmill.workerGroups[0].isolationSecurity | string | `""` | Both turn nsjail on for the group and give up unshare PID isolation and the per-job out-of-memory kill. See "Running nsjail without privileged workers" in the README. |
 | windmill.workerGroups[0].labels | object | `{}` | Labels to apply to the pods |
+| windmill.workerGroups[0].localhostProfiles | object | `{}` | A layer without a profile is `Unconfined`, since the runtime default blocks nsjail. |
 | windmill.workerGroups[0].mode | string | `"worker"` |  |
 | windmill.workerGroups[0].name | string | `"default"` |  |
 | windmill.workerGroups[0].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.workerGroups[0].podSecurityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the container |
 | windmill.workerGroups[0].podSecurityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
 | windmill.workerGroups[0].podSecurityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
-| windmill.workerGroups[0].privileged | bool | `true` | Needed to use proper OOM killer on k8s v1.32+ and use unshare pid for security reasons. |
+| windmill.workerGroups[0].privileged | bool | `true` | A group that sandboxes its jobs with nsjail can use `isolationSecurity` below instead. |
 | windmill.workerGroups[0].replicas | int | `3` |  |
 | windmill.workerGroups[0].resources | object | `{"limits":{"memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.workerGroups[0].serviceAccountName | string | `""` | Falls back to the global service account when not set, unless windmill.workerGroupsRequireServiceAccount is on, which fails the render instead. |

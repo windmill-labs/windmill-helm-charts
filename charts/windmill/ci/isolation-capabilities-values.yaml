@@ -1,0 +1,6 @@
+# exercises a worker group that runs with capabilities instead of privileged
+windmill:
+  workerGroups:
+    - name: "default"
+      replicas: 1
+      isolationSecurity: capabilities

@@ -18,6 +18,19 @@ Normalize both into a list of objects that each carry a `name` field.
 {{ if or $v.autoscalingManaged (and $v.replicas (ge (int $v.replicas) 0)) }}
 ---
 {{- $controllerType := include "validateControllerKind" $v.controller }}
+{{- $isolationSecurity := default "" $v.isolationSecurity }}
+{{- if not (has $isolationSecurity (list "" "capabilities" "userNamespaces")) }}
+{{- fail (printf "worker group %q: isolationSecurity must be \"capabilities\" or \"userNamespaces\", got %q" $v.name $isolationSecurity) }}
+{{- end }}
+{{- if and (eq $isolationSecurity "userNamespaces") (not (semverCompare ">=1.33-0" $.Capabilities.KubeVersion.Version)) }}
+{{- fail (printf "worker group %q: isolationSecurity \"userNamespaces\" needs Kubernetes 1.33 or later, this cluster is %s" $v.name $.Capabilities.KubeVersion.Version) }}
+{{- end }}
+{{- /* Before Kubernetes 1.30 the AppArmor profile is only read from this pod annotation. */ -}}
+{{- $podAnnotations := merge (dict) (default dict $v.annotations) }}
+{{- if and $isolationSecurity (not (include "windmill.hasAppArmorField" $)) }}
+{{- $appArmor := (default dict $v.localhostProfiles).appArmor }}
+{{- $_ := set $podAnnotations "container.apparmor.security.beta.kubernetes.io/windmill-worker" (ternary (printf "localhost/%s" $appArmor) "unconfined" (not (empty $appArmor))) }}
+{{- end }}
 apiVersion: apps/v1
 kind: {{ $controllerType }}
 metadata:
@@ -65,11 +78,14 @@ spec:
 {{- with $v.labels }}
 {{ toYaml . | indent 8 }}
 {{- end }}
-{{- with $v.annotations }}
+{{- with $podAnnotations }}
       annotations:
 {{ toYaml . | indent 8 }}
 {{- end }}
     spec:
+      {{- if eq $isolationSecurity "userNamespaces" }}
+      hostUsers: false
+      {{- end }}
       {{- if and $.Values.windmill.workerGroupsRequireServiceAccount (not $v.serviceAccountName) }}
       {{- fail (printf "windmill.workerGroupsRequireServiceAccount is set: worker group %q has no serviceAccountName and would inherit the global service account %q" $v.name (include "windmill.serviceAccountName" $)) }}
       {{- end }}
@@ -103,7 +119,10 @@ spec:
       {{- toYaml . | nindent 6 }}
       {{- end }}
       - name: windmill-worker
-       {{ if or $.Values.enterprise.nsjail (ternary $v.privileged true (and (hasKey $v "privileged") (kindIs "bool" $v.privileged))) }}
+       {{ if $isolationSecurity }}
+        securityContext:
+          {{- include "windmill.workerIsolationSecurityContext" (dict "root" $ "group" $v) | nindent 10 }}
+       {{ else if or $.Values.enterprise.nsjail (ternary $v.privileged true (and (hasKey $v "privileged") (kindIs "bool" $v.privileged))) }}
        #because nsjail requires privileged access
         securityContext:
           privileged: true
@@ -203,7 +222,7 @@ spec:
         - name: "S3_CACHE_BUCKET"
           value: "{{ $.Values.enterprise.s3CacheBucket }}"
         {{ end }}
-        {{ if and (not $.Values.enterprise.nsjail) (ternary $v.privileged true (and (hasKey $v "privileged") (kindIs "bool" $v.privileged))) (not (or (default false $.Values.windmill.disableUnsharePid) (default false $v.disableUnsharePid))) }}
+        {{ if and (not $isolationSecurity) (not $.Values.enterprise.nsjail) (ternary $v.privileged true (and (hasKey $v "privileged") (kindIs "bool" $v.privileged))) (not (or (default false $.Values.windmill.disableUnsharePid) (default false $v.disableUnsharePid))) }}
         - name: "FAVOR_UNSHARE_PID"
           value: "true"
         {{ end }}
@@ -212,6 +231,16 @@ spec:
           value: "false"
         {{ end }}
         {{ end }}
+        {{- if $isolationSecurity }}
+        {{- if not (and $.Values.enterprise.enabled $.Values.enterprise.nsjail) }}
+        - name: "DISABLE_NSJAIL"
+          value: "false"
+        {{- end }}
+        {{- if eq $isolationSecurity "capabilities" }}
+        - name: "DISABLE_NUSER"
+          value: "true"
+        {{- end }}
+        {{- end }}
         - name: "WORKER_GROUP"
           value: "{{ $v.name }}"
         resources:
