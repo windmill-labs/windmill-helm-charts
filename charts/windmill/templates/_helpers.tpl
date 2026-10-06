@@ -62,6 +62,17 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+Service account of a server component (app, indexer, operator): its own
+serviceAccountName, else the global one. RBAC bindings must use the same helper as the pod
+they serve, so a Role never lands on an account the component does not run as.
+Usage: {{ include "windmill.componentServiceAccountName" (dict "root" $ "component" "app") }}
+*/}}
+{{- define "windmill.componentServiceAccountName" -}}
+{{- $component := index .root.Values.windmill .component | default dict -}}
+{{- default (include "windmill.serviceAccountName" .root) $component.serviceAccountName -}}
+{{- end }}
+
+{{/*
 Validate controller kind, defaulting to "Deployment"
 */}}
 {{- define "validateControllerKind" -}}

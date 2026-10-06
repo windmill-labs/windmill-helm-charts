@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 4.0.245](https://img.shields.io/badge/Version-4.0.245-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.792.2](https://img.shields.io/badge/AppVersion-1.792.2-informational?style=flat-square)
+![Version: 4.0.274](https://img.shields.io/badge/Version-4.0.274-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.824.1](https://img.shields.io/badge/AppVersion-1.824.1-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -141,11 +141,12 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.app.resources | object | `{"limits":{"memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.app.securityContext | object | `{}` | legacy, use podSecurityContext instead |
 | windmill.app.service.annotations | object | `{}` | Annotations to apply to the service |
+| windmill.app.serviceAccountName | string | `""` | Optional, leave empty for a standard install: the app then runs as the chart's main ServiceAccount (see `serviceAccount` at the top level). Set it to the name of an existing ServiceAccount to give the app (server) pods their own. The deployment-scaler RoleBinding (enterprise.createKubernetesAutoscalingRolesAndBindings) follows this account. The chart does not create it: pre-create it or add it through extraDeploy. |
 | windmill.app.smtpService | object | `{"annotations":{},"enabled":false}` | smtp service configuration for email triggers |
 | windmill.app.smtpService.annotations | object | `{}` | annotations to apply to the service |
 | windmill.app.smtpService.enabled | bool | `false` | whether to expose the smtp port of the app using a load balancer service |
-| windmill.app.smtpTls | object | `{"acme":{"dnsProvider":"dns_cf","dnsSecretName":"","domain":"","enabled":false,"image":"neilpang/acme.sh","imageTag":"latest","keyLength":2048,"nodeSelector":{},"renewBeforeDays":30,"resources":{"limits":{"cpu":"200m","memory":"128Mi"},"requests":{"cpu":"50m","memory":"64Mi"}},"schedule":"0 3 * * *","server":"https://acme-v02.api.letsencrypt.org/directory","tolerations":[]},"certSecretKey":"tls.crt","certSecretName":"","enabled":false,"keySecretKey":"tls.key"}` | SMTP TLS certificate configuration for the inbound email server (port 2525). Mount a TLS certificate from a Kubernetes Secret so acme.sh / cert-manager issued certs are used instead of the auto-generated self-signed certificate. The private key must be in PKCS#8 PEM format (openssl pkcs8 -topk8 -nocrypt -in key.pem -out key_pkcs8.pem). Certificates are hot-reloaded from disk every 12 hours (no restart needed on renewal). |
-| windmill.app.smtpTls.acme | object | `{"dnsProvider":"dns_cf","dnsSecretName":"","domain":"","enabled":false,"image":"neilpang/acme.sh","imageTag":"latest","keyLength":2048,"nodeSelector":{},"renewBeforeDays":30,"resources":{"limits":{"cpu":"200m","memory":"128Mi"},"requests":{"cpu":"50m","memory":"64Mi"}},"schedule":"0 3 * * *","server":"https://acme-v02.api.letsencrypt.org/directory","tolerations":[]}` | Automated certificate issuance/renewal via acme.sh with DNS-01 challenge. Stores the cert in the same K8s Secret referenced by certSecretName above. |
+| windmill.app.smtpTls | object | `{"acme":{"dnsProvider":"dns_cf","dnsSecretName":"","domain":"","enabled":false,"image":"neilpang/acme.sh","imageTag":"latest","keyLength":2048,"nodeSelector":{},"renewBeforeDays":30,"resources":{"limits":{"cpu":"200m","memory":"128Mi"},"requests":{"cpu":"50m","memory":"64Mi"}},"schedule":"0 3 * * *","server":"https://acme-v02.api.letsencrypt.org/directory","serviceAccountName":"","tolerations":[]},"certSecretKey":"tls.crt","certSecretName":"","enabled":false,"keySecretKey":"tls.key"}` | SMTP TLS certificate configuration for the inbound email server (port 2525). Mount a TLS certificate from a Kubernetes Secret so acme.sh / cert-manager issued certs are used instead of the auto-generated self-signed certificate. The private key must be in PKCS#8 PEM format (openssl pkcs8 -topk8 -nocrypt -in key.pem -out key_pkcs8.pem). Certificates are hot-reloaded from disk every 12 hours (no restart needed on renewal). |
+| windmill.app.smtpTls.acme | object | `{"dnsProvider":"dns_cf","dnsSecretName":"","domain":"","enabled":false,"image":"neilpang/acme.sh","imageTag":"latest","keyLength":2048,"nodeSelector":{},"renewBeforeDays":30,"resources":{"limits":{"cpu":"200m","memory":"128Mi"},"requests":{"cpu":"50m","memory":"64Mi"}},"schedule":"0 3 * * *","server":"https://acme-v02.api.letsencrypt.org/directory","serviceAccountName":"","tolerations":[]}` | Automated certificate issuance/renewal via acme.sh with DNS-01 challenge. Stores the cert in the same K8s Secret referenced by certSecretName above. |
 | windmill.app.smtpTls.acme.dnsProvider | string | `"dns_cf"` | acme.sh DNS plugin name (e.g., dns_cf, dns_aws, dns_gd) |
 | windmill.app.smtpTls.acme.dnsSecretName | string | `""` | name of an existing Secret containing DNS provider credentials (e.g., CF_Token, CF_Zone_ID) |
 | windmill.app.smtpTls.acme.domain | string | `""` | domain to issue the certificate for (e.g., mx.example.com) |
@@ -158,6 +159,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.app.smtpTls.acme.resources | object | `{"limits":{"cpu":"200m","memory":"128Mi"},"requests":{"cpu":"50m","memory":"64Mi"}}` | resource limits and requests for the CronJob pod |
 | windmill.app.smtpTls.acme.schedule | string | `"0 3 * * *"` | cron schedule for the renewal check (default: daily at 03:00 UTC) |
 | windmill.app.smtpTls.acme.server | string | `"https://acme-v02.api.letsencrypt.org/directory"` | ACME server URL (default: Let's Encrypt production) |
+| windmill.app.smtpTls.acme.serviceAccountName | string | `""` | Optional, leave empty to run the acme.sh CronJob as the chart's main ServiceAccount. Set it to the name of an existing ServiceAccount to give the job its own. The Role that lets the job write the certificate Secret is bound to this account. |
 | windmill.app.smtpTls.acme.tolerations | list | `[]` | tolerations for the CronJob pod |
 | windmill.app.smtpTls.certSecretKey | string | `"tls.crt"` | key in the Secret for the certificate PEM file |
 | windmill.app.smtpTls.certSecretName | string | `""` | name of the Kubernetes Secret containing the certificate and key |
@@ -204,6 +206,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.indexer.progressDeadlineSeconds | int | `1800` | How long a rollout may take before Kubernetes reports ProgressDeadlineExceeded. The incoming pod waits for the outgoing one to hand over the index write lock and then loads the index from object storage, so raise this further if your index is large enough that upgrades still time out. |
 | windmill.indexer.resources | object | `{"limits":{"ephemeral-storage":"50Gi","memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.indexer.securityContext | string | `nil` | legacy, use podSecurityContext instead |
+| windmill.indexer.serviceAccountName | string | `""` | Optional, leave empty for a standard install: the indexer then runs as the chart's main ServiceAccount (see `serviceAccount` at the top level). Set it to the name of an existing ServiceAccount to give the indexer pods their own. |
 | windmill.indexer.tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.indexer.volumeMounts | list | `[]` | Extra volume mounts to add to the container |
 | windmill.indexer.volumes | list | `[]` | Extra volumes to add to the pods |
@@ -224,6 +227,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.operator.podSecurityContext | object | `{}` | Security context to apply to the pods |
 | windmill.operator.replicas | int | `1` | number of operator replicas (typically 1) |
 | windmill.operator.resources | object | `{"limits":{"memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}}` | Resource limits and requests for the pods |
+| windmill.operator.serviceAccountName | string | `""` | Optional, leave empty for a standard install: the operator then runs as the chart's main ServiceAccount (see `serviceAccount` at the top level). Set it to the name of an existing ServiceAccount to give the operator pods their own. The operator Role (read ConfigMaps and Secrets, write events) is bound to this account. |
 | windmill.operator.tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.operator.volumeMounts | list | `[]` | Extra volume mounts to add to the container |
 | windmill.operator.volumes | list | `[]` | Extra volumes to add to the pods |
@@ -257,8 +261,10 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.windmillExtra.tag | string | `""` | custom image tag (defaults to the App version) |
 | windmill.windmillExtra.tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.windmillExtra.windmillBaseUrl | string | `""` | Set to your external URL (e.g. "https://windmill.example.com") if the debugger fails with token verification errors. |
+| windmill.workerGroupsRequireServiceAccount | bool | `false` | Optional hardening, off by default and not needed for a standard install. When true, fail the render when a deployed worker group has no serviceAccountName of its own, instead of letting it inherit the global service account. Turn this on when the global service account carries anything workers must not hold: a cloud identity (EKS IRSA, GKE Workload Identity) or the Roles this chart binds to it (deployment scaler, operator, SMTP ACME job), which include reading the namespace's Secrets. Jobs run arbitrary user code with the worker pod's service account. |
 | windmill.workerGroups[0].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[0].annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.workerGroups[0].automountServiceAccountToken | string | `nil` | Optional, leave unset for a standard install: the ServiceAccount's own setting then applies. Set to false to keep the Kubernetes API token out of this worker group's pods, true to force it in. Workers do not call the Kubernetes API, but a projected cloud identity token (IRSA, Workload Identity) is mounted separately and is unaffected. |
 | windmill.workerGroups[0].autoscalingManaged | bool | `false` | `replicas` value above is ignored and the deployment is rendered regardless. |
 | windmill.workerGroups[0].baseUrl | string | `""` | {windmill.baseProtocol}://{windmill.baseDomain} when not set. |
 | windmill.workerGroups[0].command | list | `[]` | command override |
@@ -286,7 +292,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].privileged | bool | `true` | Needed to use proper OOM killer on k8s v1.32+ and use unshare pid for security reasons. |
 | windmill.workerGroups[0].replicas | int | `3` |  |
 | windmill.workerGroups[0].resources | object | `{"limits":{"memory":"2Gi"}}` | Resource limits and requests for the pods |
-| windmill.workerGroups[0].serviceAccountName | string | `""` | Falls back to the global service account when not set. |
+| windmill.workerGroups[0].serviceAccountName | string | `""` | Falls back to the global service account when not set, unless windmill.workerGroupsRequireServiceAccount is on, which fails the render instead. |
 | windmill.workerGroups[0].tag | string | `""` | Falls back to windmill.tag (then the chart appVersion) when not set. |
 | windmill.workerGroups[0].terminationGracePeriodSeconds | int | `604800` | If a job is being ran, the container will wait for it to finish before terminating until this grace period |
 | windmill.workerGroups[0].tolerations | list | `[]` | Tolerations to apply to the pods |
@@ -296,6 +302,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].volumes | list | `[]` |  |
 | windmill.workerGroups[1].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[1].annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.workerGroups[1].automountServiceAccountToken | string | `nil` | Optional, leave unset for a standard install: the ServiceAccount's own setting then applies. Set to false to keep the Kubernetes API token out of this worker group's pods. |
 | windmill.workerGroups[1].autoscalingManaged | bool | `false` | `replicas` value above is ignored and the deployment is rendered regardless. |
 | windmill.workerGroups[1].baseUrl | string | `""` | {windmill.baseProtocol}://{windmill.baseDomain} when not set. |
 | windmill.workerGroups[1].containerSecurityContext | object | `{}` | Security context to apply to the pod |
@@ -319,7 +326,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[1].privileged | bool | `false` | Not needed for native workers as they use a different memory management and isolation mechanism. |
 | windmill.workerGroups[1].replicas | int | `1` |  |
 | windmill.workerGroups[1].resources | object | `{"limits":{"memory":"2Gi"}}` | Resource limits and requests for the pods |
-| windmill.workerGroups[1].serviceAccountName | string | `""` | Falls back to the global service account when not set. |
+| windmill.workerGroups[1].serviceAccountName | string | `""` | Falls back to the global service account when not set, unless windmill.workerGroupsRequireServiceAccount is on, which fails the render instead. |
 | windmill.workerGroups[1].tag | string | `""` | Falls back to windmill.tag (then the chart appVersion) when not set. |
 | windmill.workerGroups[1].tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.workerGroups[1].topologySpreadConstraints | list | `[]` |  |
@@ -328,6 +335,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[1].volumes | list | `[]` |  |
 | windmill.workerGroups[2].affinity | object | `{}` | Affinity rules to apply to the pods |
 | windmill.workerGroups[2].annotations | object | `{}` | Annotations to apply to the pods |
+| windmill.workerGroups[2].automountServiceAccountToken | string | `nil` | Optional, leave unset for a standard install: the ServiceAccount's own setting then applies. Set to false to keep the Kubernetes API token out of this worker group's pods. |
 | windmill.workerGroups[2].baseUrl | string | `""` | {windmill.baseProtocol}://{windmill.baseDomain} when not set. |
 | windmill.workerGroups[2].command | list | `[]` | command override |
 | windmill.workerGroups[2].containerSecurityContext | object | `{}` | Security context to apply to the pod |
@@ -350,7 +358,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[2].privileged | bool | `true` | Needed to use proper OOM killer on k8s v1.32+ and use unshare pid for security reasons. |
 | windmill.workerGroups[2].replicas | int | `0` |  |
 | windmill.workerGroups[2].resources | object | `{"limits":{"memory":"2Gi"}}` | Resource limits and requests for the pods |
-| windmill.workerGroups[2].serviceAccountName | string | `""` | Falls back to the global service account when not set. |
+| windmill.workerGroups[2].serviceAccountName | string | `""` | Falls back to the global service account when not set, unless windmill.workerGroupsRequireServiceAccount is on, which fails the render instead. |
 | windmill.workerGroups[2].tag | string | `""` | Falls back to windmill.tag (then the chart appVersion) when not set. |
 | windmill.workerGroups[2].tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.workerGroups[2].topologySpreadConstraints | list | `[]` |  |
@@ -436,4 +444,57 @@ windmill:
 Repeat the volume keys for each component you run. With no `databaseUrlSecretName` and no `databaseSecret` the chart mounts nothing of its own at that path, so the volume you supply is the only one there.
 
 If the database credential itself is what you want to eliminate, an AWS RDS or Azure Postgres instance can authenticate the pod's own workload identity instead. Set the password component of the connection string to the sentinel `iamrds` (with `AWS_REGION`) or `entraid` (with `AZURE_TENANT_ID`, `AZURE_CLIENT_ID` and `AZURE_FEDERATED_TOKEN_FILE`) and Windmill Enterprise mints a short-lived token per connection, leaving no long-lived secret to protect.
+
+## Service accounts
+
+**Most installs need nothing from this section.** By default the chart creates one service account (`serviceAccount`) and every pod runs as it. If you attach no cloud identity to that account and enable none of the three features in the table below, it carries no permissions, and the settings described here can all stay at their defaults.
+
+Read on if the main service account carries a cloud identity (EKS IRSA, GKE Workload Identity, Azure Workload Identity) or one of the chart's Roles, and you do not want jobs to be able to use it.
+
+Jobs run arbitrary user code inside the worker pods, with whatever the worker pod's service account can do. The main service account is the subject of the Roles the chart creates:
+
+| Role | Created when | Grants |
+|------|--------------|--------|
+| `windmill-operator` | `windmill.operator.enabled` | get/list/watch on the namespace's ConfigMaps and Secrets |
+| `windmill-deployment-scaler-role` | `enterprise.createKubernetesAutoscalingRolesAndBindings` | get/patch on Deployments |
+| `windmill-smtp-tls-acme` | `windmill.app.smtpTls.acme.enabled` | get/create/update/patch on Secrets |
+
+A worker group that inherits the main service account inherits those grants, and any cloud identity annotated onto it (EKS IRSA, GKE Workload Identity, Azure Workload Identity). Two settings keep the two apart.
+
+**Give the server pods their own account.** `windmill.app.serviceAccountName`, `windmill.indexer.serviceAccountName`, `windmill.operator.serviceAccountName` and `windmill.app.smtpTls.acme.serviceAccountName` each name an existing ServiceAccount for that component, falling back to the main one when empty. Each RoleBinding follows the component that uses it: the operator Role binds to the operator's account, the deployment scaler to the app's, the ACME Role to the ACME job's. The chart only creates the main service account; create the others yourself or through `extraDeploy`.
+
+**Make worker groups fail closed.** With `windmill.workerGroupsRequireServiceAccount: true`, a deployed worker group (one with replicas, or `autoscalingManaged`) that has no `serviceAccountName` fails the render with an error naming the group, instead of silently running as the main account. A group added later cannot inherit the server's identity by omission.
+
+```yaml
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/windmill-server
+
+windmill:
+  workerGroupsRequireServiceAccount: true
+  workerGroups:
+    - name: "default"
+      replicas: 3
+      serviceAccountName: windmill-worker
+      automountServiceAccountToken: false
+    - name: "native"
+      replicas: 1
+      serviceAccountName: windmill-worker
+      automountServiceAccountToken: false
+      extraEnv:
+        - name: "NATIVE_MODE"
+          value: "true"
+        - name: "SLEEP_QUEUE"
+          value: "200"
+
+extraDeploy:
+  - apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: windmill-worker
+```
+
+The check is on the value being set, not on what it names: a group that explicitly names the main service account passes. `automountServiceAccountToken: false` on a worker group keeps the Kubernetes API token out of its pods altogether; workers do not call the Kubernetes API. It does not remove a cloud identity token, which the platform's webhook projects as a separate volume, so a worker that needs no cloud identity should run as an account without those annotations.
+
+`windmill-extra` (LSP, multiplayer) sets no service account and runs as the namespace's `default` one. The hub follows `hub.serviceAccount.name`.
 

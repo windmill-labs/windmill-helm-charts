@@ -70,7 +70,13 @@ spec:
 {{ toYaml . | indent 8 }}
 {{- end }}
     spec:
+      {{- if and $.Values.windmill.workerGroupsRequireServiceAccount (not $v.serviceAccountName) }}
+      {{- fail (printf "windmill.workerGroupsRequireServiceAccount is set: worker group %q has no serviceAccountName and would inherit the global service account %q" $v.name (include "windmill.serviceAccountName" $)) }}
+      {{- end }}
       serviceAccountName: {{ default (include "windmill.serviceAccountName" $) $v.serviceAccountName }}
+      {{- if kindIs "bool" $v.automountServiceAccountToken }}
+      automountServiceAccountToken: {{ $v.automountServiceAccountToken }}
+      {{- end }}
       {{- if $.Values.windmill.imagePullSecrets }}
       imagePullSecrets:
       - name: {{ $.Values.windmill.imagePullSecrets }}

@@ -37,7 +37,7 @@ spec:
 {{- end }}
     spec:
       terminationGracePeriodSeconds: 40
-      serviceAccountName: {{ template "windmill.serviceAccountName" . }}
+      serviceAccountName: {{ include "windmill.componentServiceAccountName" (dict "root" $ "component" "app") }}
       {{- with include "windmill.podDns" (dict "root" $ "component" "app" "dnsPolicy" .Values.windmill.app.dnsPolicy "dnsConfig" .Values.windmill.app.dnsConfig) }}
       {{- . | nindent 6 }}
       {{- end }}

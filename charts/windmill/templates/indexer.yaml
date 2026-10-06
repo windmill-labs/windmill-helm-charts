@@ -45,7 +45,7 @@ spec:
 {{ toYaml . | indent 8 }}
   {{- end }}
     spec:
-      serviceAccountName: {{ template "windmill.serviceAccountName" . }}
+      serviceAccountName: {{ include "windmill.componentServiceAccountName" (dict "root" $ "component" "indexer") }}
       {{- with include "windmill.podDns" (dict "root" $ "component" "indexer" "dnsPolicy" .Values.windmill.indexer.dnsPolicy "dnsConfig" .Values.windmill.indexer.dnsConfig) }}
       {{- . | nindent 6 }}
       {{- end }}

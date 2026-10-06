@@ -94,4 +94,57 @@ Repeat the volume keys for each component you run. With no `databaseUrlSecretNam
 
 If the database credential itself is what you want to eliminate, an AWS RDS or Azure Postgres instance can authenticate the pod's own workload identity instead. Set the password component of the connection string to the sentinel `iamrds` (with `AWS_REGION`) or `entraid` (with `AZURE_TENANT_ID`, `AZURE_CLIENT_ID` and `AZURE_FEDERATED_TOKEN_FILE`) and Windmill Enterprise mints a short-lived token per connection, leaving no long-lived secret to protect.
 
+## Service accounts
+
+**Most installs need nothing from this section.** By default the chart creates one service account (`serviceAccount`) and every pod runs as it. If you attach no cloud identity to that account and enable none of the three features in the table below, it carries no permissions, and the settings described here can all stay at their defaults.
+
+Read on if the main service account carries a cloud identity (EKS IRSA, GKE Workload Identity, Azure Workload Identity) or one of the chart's Roles, and you do not want jobs to be able to use it.
+
+Jobs run arbitrary user code inside the worker pods, with whatever the worker pod's service account can do. The main service account is the subject of the Roles the chart creates:
+
+| Role | Created when | Grants |
+|------|--------------|--------|
+| `windmill-operator` | `windmill.operator.enabled` | get/list/watch on the namespace's ConfigMaps and Secrets |
+| `windmill-deployment-scaler-role` | `enterprise.createKubernetesAutoscalingRolesAndBindings` | get/patch on Deployments |
+| `windmill-smtp-tls-acme` | `windmill.app.smtpTls.acme.enabled` | get/create/update/patch on Secrets |
+
+A worker group that inherits the main service account inherits those grants, and any cloud identity annotated onto it (EKS IRSA, GKE Workload Identity, Azure Workload Identity). Two settings keep the two apart.
+
+**Give the server pods their own account.** `windmill.app.serviceAccountName`, `windmill.indexer.serviceAccountName`, `windmill.operator.serviceAccountName` and `windmill.app.smtpTls.acme.serviceAccountName` each name an existing ServiceAccount for that component, falling back to the main one when empty. Each RoleBinding follows the component that uses it: the operator Role binds to the operator's account, the deployment scaler to the app's, the ACME Role to the ACME job's. The chart only creates the main service account; create the others yourself or through `extraDeploy`.
+
+**Make worker groups fail closed.** With `windmill.workerGroupsRequireServiceAccount: true`, a deployed worker group (one with replicas, or `autoscalingManaged`) that has no `serviceAccountName` fails the render with an error naming the group, instead of silently running as the main account. A group added later cannot inherit the server's identity by omission.
+
+```yaml
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/windmill-server
+
+windmill:
+  workerGroupsRequireServiceAccount: true
+  workerGroups:
+    - name: "default"
+      replicas: 3
+      serviceAccountName: windmill-worker
+      automountServiceAccountToken: false
+    - name: "native"
+      replicas: 1
+      serviceAccountName: windmill-worker
+      automountServiceAccountToken: false
+      extraEnv:
+        - name: "NATIVE_MODE"
+          value: "true"
+        - name: "SLEEP_QUEUE"
+          value: "200"
+
+extraDeploy:
+  - apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: windmill-worker
+```
+
+The check is on the value being set, not on what it names: a group that explicitly names the main service account passes. `automountServiceAccountToken: false` on a worker group keeps the Kubernetes API token out of its pods altogether; workers do not call the Kubernetes API. It does not remove a cloud identity token, which the platform's webhook projects as a separate volume, so a worker that needs no cloud identity should run as an account without those annotations.
+
+`windmill-extra` (LSP, multiplayer) sets no service account and runs as the namespace's `default` one. The hub follows `hub.serviceAccount.name`.
+
 {{ template "helm-docs.versionFooter" . }}
