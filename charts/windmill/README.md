@@ -281,7 +281,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].hostAliases | list | `[]` | Host aliases to apply to the pods (overrides global hostAliases if set) |
 | windmill.workerGroups[0].image | string | `""` | Falls back to windmill.image when not set. |
 | windmill.workerGroups[0].initContainers | list | `[]` | Init containers |
-| windmill.workerGroups[0].isolationSecurity | string | `""` | Both replace `privileged` and unshare PID isolation, so turn nsjail on with the "Job isolation" instance setting. See "Running nsjail without privileged workers" in the README for the tradeoffs. |
+| windmill.workerGroups[0].isolationSecurity | string | `""` | Both give up unshare PID isolation and the per-job out-of-memory kill, so turn nsjail on with the "Job isolation" instance setting. See "Running nsjail without privileged workers" in the README. |
 | windmill.workerGroups[0].labels | object | `{}` | Labels to apply to the pods |
 | windmill.workerGroups[0].localhostProfiles | object | `{}` | A layer without a profile is `Unconfined`, since the runtime default blocks nsjail. |
 | windmill.workerGroups[0].mode | string | `"worker"` |  |
@@ -290,7 +290,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].podSecurityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the container |
 | windmill.workerGroups[0].podSecurityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
 | windmill.workerGroups[0].podSecurityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
-| windmill.workerGroups[0].privileged | bool | `true` | Needed to use proper OOM killer on k8s v1.32+ and use unshare pid for security reasons. |
+| windmill.workerGroups[0].privileged | bool | `true` | A group that sandboxes its jobs with nsjail can use `isolationSecurity` below instead. |
 | windmill.workerGroups[0].replicas | int | `3` |  |
 | windmill.workerGroups[0].resources | object | `{"limits":{"memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.workerGroups[0].serviceAccountName | string | `""` | Falls back to the global service account when not set, unless windmill.workerGroupsRequireServiceAccount is on, which fails the render instead. |

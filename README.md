@@ -96,7 +96,12 @@ windmill
 
 ### Running nsjail without privileged workers
 
-[nsjail sandboxing](https://www.windmill.dev/docs/advanced/security_isolation#nsjail-sandboxing) is turned on with the **Job isolation** instance setting. It does not need a privileged container: a worker group can set `isolationSecurity` to get only what nsjail needs.
+Worker groups are `privileged: true` by default because two things only work out of the box in a privileged container:
+
+- **Killing only the job that runs out of memory.** From Kubernetes 1.32, when a container exceeds its memory limit the kernel kills all of its processes together. A privileged worker turns that off for itself at startup, so only the job is lost.
+- **Unshare PID isolation**, the default job isolation, which keeps a job from seeing the worker process and the other jobs. It needs to create namespaces and mount `/proc`.
+
+A privileged container is a weak boundary, though: it has every capability, sees the host's devices, and runs without seccomp or AppArmor. A worker group that uses [nsjail sandboxing](https://www.windmill.dev/docs/advanced/security_isolation#nsjail-sandboxing) for its jobs can trade the two points above for a much smaller set of privileges by setting `isolationSecurity`:
 
 ```yaml
 windmill:
@@ -106,30 +111,33 @@ windmill:
       isolationSecurity: capabilities
 ```
 
-| | `capabilities` | `userNamespaces` |
-| --- | --- | --- |
-| Worker user | root | uid 1000, in a user namespace for the pod (`hostUsers: false`) |
-| Capabilities | `SYS_ADMIN`, `SETPCAP`, `SYS_RESOURCE`, all others dropped | none |
-| Privilege escalation | disallowed | disallowed |
-| Needs | nothing on the nodes | Kubernetes 1.33+ with [user namespaces](https://kubernetes.io/docs/concepts/workloads/pods/user-namespaces/), and volumes that support ID-mapped mounts |
-| Other settings | `DISABLE_NUSER=true` | `procMount: Unmasked` |
-
-The runtime's default seccomp and AppArmor profiles block nsjail, so both are `Unconfined` unless `localhostProfiles` names a profile installed on the nodes. The [profiles published in the Windmill repository](https://github.com/windmill-labs/windmill/tree/main/examples/deploy/nsjail-security-profiles) are the runtime defaults plus what nsjail needs:
-
-```yaml
-      isolationSecurity: userNamespaces
-      localhostProfiles:
-        seccomp: profiles/windmill-nsjail.json
-        appArmor: windmill-nsjail
-```
-
-With both profiles, a `userNamespaces` group is admitted by the `baseline` [Pod Security Standard](https://kubernetes.io/docs/concepts/security/pod-security-standards/) on Kubernetes 1.35+. A `capabilities` group always needs an exemption for `SYS_ADMIN`.
+| | `privileged: true` (default) | `isolationSecurity: capabilities` | `isolationSecurity: userNamespaces` |
+| --- | --- | --- | --- |
+| Worker user | root | root | uid 1000; root in the pod is not root on the node (`hostUsers: false`) |
+| Capabilities | all | `SYS_ADMIN`, `SETPCAP`, `SYS_RESOURCE` | none |
+| Host devices | visible | hidden | hidden |
+| Privilege escalation | allowed | disallowed | disallowed |
+| Seccomp and AppArmor | none | `Unconfined`, or the profiles named in `localhostProfiles` | `Unconfined`, or the profiles named in `localhostProfiles` |
+| nsjail | works | works | works |
+| Unshare PID isolation | works | not available | not available |
+| A job exceeds the memory limit | the job is killed | the worker pod is killed and restarts | the worker pod is killed and restarts |
+| Needs on the nodes | nothing | nothing | Kubernetes 1.33+ with [user namespaces](https://kubernetes.io/docs/concepts/workloads/pods/user-namespaces/), volumes that support ID-mapped mounts, and on Ubuntu 23.10+ the AppArmor profile |
+| [Pod Security Standard](https://kubernetes.io/docs/concepts/security/pod-security-standards/) | needs `privileged` | needs an exemption for `SYS_ADMIN` | `baseline` on Kubernetes 1.35+ with both profiles |
 
 What to know before switching a group:
 
-- **A job that runs out of memory takes its worker down with it.** From Kubernetes 1.32 the kernel kills every process of a container that exceeds its memory limit, and only a privileged worker can turn that off for itself. The pod restarts and the job is retried until it fails on its restart limit; other jobs running on that worker are interrupted. Setting `singleProcessOOMKill: true` in the kubelet configuration of the nodes restores the per-job kill. This is the same behavior as `privileged: false`.
+- **Turn nsjail on**, with the **Job isolation** instance setting. Unshare PID isolation does not start in these groups and the chart does not enable it for them, so until nsjail is on their jobs run with no isolation.
+- **A job that runs out of memory takes its worker down with it.** The pod restarts and the job is retried until it fails on its restart limit; other jobs running on that worker are interrupted. Setting `singleProcessOOMKill: true` in the kubelet configuration of the nodes restores the per-job kill. This is the same behavior as `privileged: false`.
+- **Seccomp and AppArmor are `Unconfined` by default**, because the runtime's default profiles block nsjail. `localhostProfiles` names profiles installed on the nodes instead. The [profiles published in the Windmill repository](https://github.com/windmill-labs/windmill/tree/main/examples/deploy/nsjail-security-profiles) are the runtime defaults plus what nsjail needs:
+
+  ```yaml
+        isolationSecurity: userNamespaces
+        localhostProfiles:
+          seccomp: profiles/windmill-nsjail.json
+          appArmor: windmill-nsjail
+  ```
+
 - **`userNamespaces` needs the AppArmor profile on nodes that restrict unprivileged user namespaces**, which Ubuntu does by default since 23.10 (`kernel.apparmor_restrict_unprivileged_userns=1`). With AppArmor `Unconfined` there, nsjail fails on its first mount. The seccomp profile stays optional.
-- **Unshare PID isolation is not enabled** for these groups (`FAVOR_UNSHARE_PID` is not set), so their jobs are only isolated once nsjail is on.
 - Keys set in the group's `containerSecurityContext` replace the generated ones. On Kubernetes older than 1.30 the AppArmor profile is set with the pod annotation instead of `appArmorProfile`.
 
 ### Test it on minikube

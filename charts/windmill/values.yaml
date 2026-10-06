@@ -149,11 +149,12 @@ windmill:
 
       # -- Whether to run the container as privileged (true by default).
       # -- Needed to use proper OOM killer on k8s v1.32+ and use unshare pid for security reasons.
+      # -- A group that sandboxes its jobs with nsjail can use `isolationSecurity` below instead.
       privileged: true
 
       # -- Run the worker without `privileged` while keeping what nsjail needs. Empty (default) keeps the `privileged` setting above.
       # -- `capabilities`: root with only SYS_ADMIN, SETPCAP and SYS_RESOURCE. `userNamespaces`: non-root with no capability in a pod user namespace (Kubernetes 1.33+).
-      # -- Both replace `privileged` and unshare PID isolation, so turn nsjail on with the "Job isolation" instance setting. See "Running nsjail without privileged workers" in the README for the tradeoffs.
+      # -- Both give up unshare PID isolation and the per-job out-of-memory kill, so turn nsjail on with the "Job isolation" instance setting. See "Running nsjail without privileged workers" in the README.
       isolationSecurity: ""
 
       # -- Seccomp and AppArmor profiles installed on the nodes, used when `isolationSecurity` is set, e.g. `{seccomp: profiles/windmill-nsjail.json, appArmor: windmill-nsjail}`.
