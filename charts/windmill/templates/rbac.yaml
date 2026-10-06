@@ -16,7 +16,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 subjects:
   - kind: ServiceAccount
-    name: {{ template "windmill.serviceAccountName" . }}
+    name: {{ include "windmill.componentServiceAccountName" (dict "root" $ "component" "app") }}
     namespace: {{ .Release.Namespace }}
 roleRef:
   kind: Role
@@ -61,7 +61,7 @@ metadata:
     heritage: {{ .Release.Service }}
 subjects:
   - kind: ServiceAccount
-    name: {{ template "windmill.serviceAccountName" . }}
+    name: {{ include "windmill.componentServiceAccountName" (dict "root" $ "component" "operator") }}
     namespace: {{ .Release.Namespace }}
 roleRef:
   kind: Role

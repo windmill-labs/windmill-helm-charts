@@ -98,6 +98,9 @@ windmill:
   # -- Some systems like Bottlerocket AMI have max_user_namespaces=0 which prevents unshare from working.
   disableUnsharePid: false
 
+  # -- fail the render when a deployed worker group has no serviceAccountName of its own, instead of letting it inherit the global service account. Turn this on when the global service account carries anything workers must not hold: a cloud identity (EKS IRSA, GKE Workload Identity) or the Roles this chart binds to it (deployment scaler, operator, SMTP ACME job), which include reading the namespace's Secrets. Jobs run arbitrary user code with the worker pod's service account.
+  workerGroupsRequireServiceAccount: false
+
   # worker groups
   # NOTE: workerGroups may be provided either as a list (the form documented below)
   # or as a dict/map keyed by the worker group name, e.g.:
@@ -204,8 +207,11 @@ windmill:
 
       # -- Optional override of the ServiceAccount name for this worker group.
       # -- Useful for EKS IRSA where each worker group needs its own SA annotated with a distinct IAM role ARN.
-      # -- Falls back to the global service account when not set.
+      # -- Falls back to the global service account when not set, unless windmill.workerGroupsRequireServiceAccount is on, which fails the render instead.
       serviceAccountName: ""
+
+      # -- Set to false to keep the Kubernetes API token out of this worker group's pods, true to force it in. Left unset, the ServiceAccount's own setting applies. Workers do not call the Kubernetes API, but a projected cloud identity token (IRSA, Workload Identity) is mounted separately and is unaffected.
+      automountServiceAccountToken: null
 
       # -- Optional override of the container image for this worker group.
       # -- Useful for running a custom image (e.g. with pre-installed binaries) on some
@@ -305,8 +311,11 @@ windmill:
       topologySpreadConstraints: []
 
       # -- Optional override of the ServiceAccount name for this worker group.
-      # -- Falls back to the global service account when not set.
+      # -- Falls back to the global service account when not set, unless windmill.workerGroupsRequireServiceAccount is on, which fails the render instead.
       serviceAccountName: ""
+
+      # -- Set to false to keep the Kubernetes API token out of this worker group's pods. Left unset, the ServiceAccount's own setting applies.
+      automountServiceAccountToken: null
 
       # -- Optional override of the container image for this worker group.
       # -- Useful for running a custom image (e.g. with pre-installed binaries) on some
@@ -396,8 +405,11 @@ windmill:
       topologySpreadConstraints: []
 
       # -- Optional override of the ServiceAccount name for this worker group.
-      # -- Falls back to the global service account when not set.
+      # -- Falls back to the global service account when not set, unless windmill.workerGroupsRequireServiceAccount is on, which fails the render instead.
       serviceAccountName: ""
+
+      # -- Set to false to keep the Kubernetes API token out of this worker group's pods. Left unset, the ServiceAccount's own setting applies.
+      automountServiceAccountToken: null
 
       # -- Optional override of the container image for this worker group.
       # -- Useful for running a custom image (e.g. with pre-installed binaries) on some
@@ -422,6 +434,9 @@ windmill:
 
   # app configuration
   app:
+    # -- Name of an existing ServiceAccount for the app (server) pods. If empty, falls back to the chart's main ServiceAccount (see `serviceAccount` at the top level). The deployment-scaler RoleBinding (enterprise.createKubernetesAutoscalingRolesAndBindings) follows this account. The chart does not create it: pre-create it or add it through extraDeploy.
+    serviceAccountName: ""
+
     # -- Annotations to apply to the pods
     annotations: {}
 
@@ -514,6 +529,8 @@ windmill:
       acme:
         # -- enable the acme.sh CronJob for automatic cert issuance/renewal
         enabled: false
+        # -- Name of an existing ServiceAccount for the acme.sh CronJob. If empty, falls back to the chart's main ServiceAccount. The Role that lets the job write the certificate Secret is bound to this account.
+        serviceAccountName: ""
         # -- domain to issue the certificate for (e.g., mx.example.com)
         domain: ""
         # -- cron schedule for the renewal check (default: daily at 03:00 UTC)
@@ -552,6 +569,9 @@ windmill:
   indexer:
     # -- enable or disable indexer
     enabled: true
+
+    # -- Name of an existing ServiceAccount for the indexer pods. If empty, falls back to the chart's main ServiceAccount (see `serviceAccount` at the top level).
+    serviceAccountName: ""
 
     # -- How long a rollout may take before Kubernetes reports ProgressDeadlineExceeded.
     # The incoming pod waits for the outgoing one to hand over the index write lock and
@@ -613,6 +633,8 @@ windmill:
   operator:
     # -- enable the Windmill Kubernetes operator
     enabled: false
+    # -- Name of an existing ServiceAccount for the operator pods. If empty, falls back to the chart's main ServiceAccount (see `serviceAccount` at the top level). The operator Role (read ConfigMaps and Secrets, write events) is bound to this account.
+    serviceAccountName: ""
     # -- number of operator replicas (typically 1)
     replicas: 1
     # -- Extra volumes to add to the pods
@@ -791,6 +813,11 @@ enterprise:
   # -- Bind address for metrics server. Sets METRICS_ADDR environment variable.
   metricsAddr: "true"
 
+# The chart's main ServiceAccount. The app, indexer, operator, hub and SMTP ACME job run as it
+# unless they name their own (windmill.app.serviceAccountName, windmill.indexer.serviceAccountName,
+# windmill.operator.serviceAccountName, hub.serviceAccount.name,
+# windmill.app.smtpTls.acme.serviceAccountName), and so does every worker group without a
+# serviceAccountName unless windmill.workerGroupsRequireServiceAccount forbids it.
 serviceAccount:
   # Specifies whether a ServiceAccount should be created
   create: true

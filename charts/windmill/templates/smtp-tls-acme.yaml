@@ -35,7 +35,7 @@ metadata:
     heritage: {{ .Release.Service }}
 subjects:
   - kind: ServiceAccount
-    name: {{ template "windmill.serviceAccountName" . }}
+    name: {{ default (include "windmill.serviceAccountName" .) .Values.windmill.app.smtpTls.acme.serviceAccountName }}
     namespace: {{ .Release.Namespace }}
 roleRef:
   kind: Role
@@ -64,7 +64,7 @@ spec:
           labels:
             app.kubernetes.io/name: windmill-smtp-tls-acme
         spec:
-          serviceAccountName: {{ template "windmill.serviceAccountName" . }}
+          serviceAccountName: {{ default (include "windmill.serviceAccountName" .) .Values.windmill.app.smtpTls.acme.serviceAccountName }}
           automountServiceAccountToken: true
           restartPolicy: Never
           {{- with .Values.windmill.app.smtpTls.acme.nodeSelector }}
