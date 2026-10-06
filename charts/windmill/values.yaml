@@ -151,6 +151,15 @@ windmill:
       # -- Needed to use proper OOM killer on k8s v1.32+ and use unshare pid for security reasons.
       privileged: true
 
+      # -- Run the worker without `privileged` while keeping what nsjail needs. Empty (default) keeps the `privileged` setting above.
+      # -- `capabilities`: root with only SYS_ADMIN, SETPCAP and SYS_RESOURCE. `userNamespaces`: non-root with no capability in a pod user namespace (Kubernetes 1.33+).
+      # -- Both replace `privileged` and unshare PID isolation, so turn nsjail on with the "Job isolation" instance setting. See "Running nsjail without privileged workers" in the README for the tradeoffs.
+      isolationSecurity: ""
+
+      # -- Seccomp and AppArmor profiles installed on the nodes, used when `isolationSecurity` is set, e.g. `{seccomp: profiles/windmill-nsjail.json, appArmor: windmill-nsjail}`.
+      # -- A layer without a profile is `Unconfined`, since the runtime default blocks nsjail.
+      localhostProfiles: {}
+
       # -- Disable PID namespace isolation (unshare) for this worker group.
       # -- Set to true for nodes where user namespaces are disabled (e.g., Bottlerocket AMI with max_user_namespaces=0).
       disableUnsharePid: false
@@ -804,10 +813,6 @@ enterprise:
   scimTokenSecretName: ""
   # -- name of the key in secret storing the SCIM token. The default key of the SCIM token is 'scimToken'
   scimTokenSecretKey: scimToken
-  # -- use nsjail for sandboxing (EE only). Requires user namespaces to be enabled.
-  # -- Some systems like Bottlerocket AMI have max_user_namespaces=0 which prevents nsjail from working.
-  # -- Consider using Amazon Linux 2/2023 AMI or configure Bottlerocket kernel parameters via launch template.
-  nsjail: false
   # -- Create RBAC Roles and RoleBindings needed for native k8s autoscaling integration.
   createKubernetesAutoscalingRolesAndBindings: false
   # -- Bind address for metrics server. Sets METRICS_ADDR environment variable.

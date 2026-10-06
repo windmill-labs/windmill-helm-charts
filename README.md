@@ -94,6 +94,44 @@ windmill
       runAsNonRoot: true
 ```
 
+### Running nsjail without privileged workers
+
+[nsjail sandboxing](https://www.windmill.dev/docs/advanced/security_isolation#nsjail-sandboxing) is turned on with the **Job isolation** instance setting. It does not need a privileged container: a worker group can set `isolationSecurity` to get only what nsjail needs.
+
+```yaml
+windmill:
+  workerGroups:
+    - name: "default"
+      replicas: 3
+      isolationSecurity: capabilities
+```
+
+| | `capabilities` | `userNamespaces` |
+| --- | --- | --- |
+| Worker user | root | uid 1000, in a user namespace for the pod (`hostUsers: false`) |
+| Capabilities | `SYS_ADMIN`, `SETPCAP`, `SYS_RESOURCE`, all others dropped | none |
+| Privilege escalation | disallowed | disallowed |
+| Needs | nothing on the nodes | Kubernetes 1.33+ with [user namespaces](https://kubernetes.io/docs/concepts/workloads/pods/user-namespaces/), and volumes that support ID-mapped mounts |
+| Other settings | `DISABLE_NUSER=true` | `procMount: Unmasked` |
+
+The runtime's default seccomp and AppArmor profiles block nsjail, so both are `Unconfined` unless `localhostProfiles` names a profile installed on the nodes. The [profiles published in the Windmill repository](https://github.com/windmill-labs/windmill/tree/main/examples/deploy/nsjail-security-profiles) are the runtime defaults plus what nsjail needs:
+
+```yaml
+      isolationSecurity: userNamespaces
+      localhostProfiles:
+        seccomp: profiles/windmill-nsjail.json
+        appArmor: windmill-nsjail
+```
+
+With both profiles, a `userNamespaces` group is admitted by the `baseline` [Pod Security Standard](https://kubernetes.io/docs/concepts/security/pod-security-standards/) on Kubernetes 1.35+. A `capabilities` group always needs an exemption for `SYS_ADMIN`.
+
+What to know before switching a group:
+
+- **A job that runs out of memory takes its worker down with it.** From Kubernetes 1.32 the kernel kills every process of a container that exceeds its memory limit, and only a privileged worker can turn that off for itself. The pod restarts and the job is retried until it fails on its restart limit; other jobs running on that worker are interrupted. Setting `singleProcessOOMKill: true` in the kubelet configuration of the nodes restores the per-job kill. This is the same behavior as `privileged: false`.
+- **`userNamespaces` needs the AppArmor profile on nodes that restrict unprivileged user namespaces**, which Ubuntu does by default since 23.10 (`kernel.apparmor_restrict_unprivileged_userns=1`). With AppArmor `Unconfined` there, nsjail fails on its first mount. The seccomp profile stays optional.
+- **Unshare PID isolation is not enabled** for these groups (`FAVOR_UNSHARE_PID` is not set), so their jobs are only isolated once nsjail is on.
+- Keys set in the group's `containerSecurityContext` replace the generated ones. On Kubernetes older than 1.30 the AppArmor profile is set with the pod annotation instead of `appArmorProfile`.
+
 ### Test it on minikube
 
 To make it work on a local minkube to test. Get the ip address of the ingress:
@@ -326,7 +364,6 @@ enterprise:
 | enterprise.enabledS3DistributedCache                            | bool   | `false`                                                                                    |                                                                                                                                                                                                                  |
 | enterprise.licenseKey                                           | string | `"123456F"`                                                                                | Windmill provided Enterprise license key. Sets LICENSE_KEY environment variable in app and worker container.                                                                                                     |
 | enterprise.licenseKeySecretName                                 | string | `""`                                                                                       | name of the secret storing the Enterprise license key, take precedence over licenseKey. The default key is `"licenseKey"`                                                                                        |
-| enterprise.nsjail                                               | bool   | `false`                                                                                    | use nsjail for sandboxing                                                                                                                                                                                        |
 | enterprise.s3CacheBucket                                        | string | `"mybucketname"`                                                                           | S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container                                                                                                             |
 | enterprise.samlMetadata                                         | string | `""`                                                                                       | SAML Metadata URL to enable SAML SSO (Can be set in the Instance Settings UI, which is the recommended method)                                                                                                   |
 | enterprise.scimToken                                            | string | `""`                                                                                       |                                                                                                                                                                                                                  |

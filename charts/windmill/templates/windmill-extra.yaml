@@ -72,7 +72,7 @@ spec:
         - name: ENABLE_GATEWAY
           value: {{ .Values.windmill.windmillExtra.enableGateway | quote }}
         - name: ENABLE_NSJAIL
-          value: {{ .Values.enterprise.nsjail | quote }}
+          value: {{ default false .Values.enterprise.nsjail | quote }}
         - name: REQUIRE_SIGNED_DEBUG_REQUESTS
           value: {{ .Values.windmill.windmillExtra.requireSignedDebugRequests | quote }}
         - name: REQUIRE_SIGNED_MULTIPLAYER_REQUESTS

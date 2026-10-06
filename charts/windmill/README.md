@@ -33,7 +33,6 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | enterprise.licenseKeySecretKey | string | `"licenseKey"` | name of the key in secret storing the enterprise license key. The default key is 'licenseKey' |
 | enterprise.licenseKeySecretName | string | `""` | name of the secret storing the enterprise license key, take precedence over licenseKey string. |
 | enterprise.metricsAddr | string | `"true"` | Bind address for metrics server. Sets METRICS_ADDR environment variable. |
-| enterprise.nsjail | bool | `false` | Consider using Amazon Linux 2/2023 AMI or configure Bottlerocket kernel parameters via launch template. |
 | enterprise.s3CacheBucket | string | `""` | S3 bucket to use for dependency cache. Sets S3_CACHE_BUCKET environment variable in worker container |
 | enterprise.samlMetadata | string | `""` | SAML Metadata URL/Content to enable SAML SSO (Can be set in the Instance Settings UI which is the recommended method) |
 | enterprise.scimToken | string | `""` | SCIM token (Can be set in the instance settings UI which is the recommended method) |
@@ -282,7 +281,9 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].hostAliases | list | `[]` | Host aliases to apply to the pods (overrides global hostAliases if set) |
 | windmill.workerGroups[0].image | string | `""` | Falls back to windmill.image when not set. |
 | windmill.workerGroups[0].initContainers | list | `[]` | Init containers |
+| windmill.workerGroups[0].isolationSecurity | string | `""` | Both replace `privileged` and unshare PID isolation, so turn nsjail on with the "Job isolation" instance setting. See "Running nsjail without privileged workers" in the README for the tradeoffs. |
 | windmill.workerGroups[0].labels | object | `{}` | Labels to apply to the pods |
+| windmill.workerGroups[0].localhostProfiles | object | `{}` | A layer without a profile is `Unconfined`, since the runtime default blocks nsjail. |
 | windmill.workerGroups[0].mode | string | `"worker"` |  |
 | windmill.workerGroups[0].name | string | `"default"` |  |
 | windmill.workerGroups[0].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
