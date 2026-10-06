@@ -1,6 +1,6 @@
 # windmill
 
-![Version: 4.0.275](https://img.shields.io/badge/Version-4.0.275-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.824.1](https://img.shields.io/badge/AppVersion-1.824.1-informational?style=flat-square)
+![Version: 4.0.274](https://img.shields.io/badge/Version-4.0.274-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.824.1](https://img.shields.io/badge/AppVersion-1.824.1-informational?style=flat-square)
 
 Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 
@@ -497,32 +497,4 @@ extraDeploy:
 The check is on the value being set, not on what it names: a group that explicitly names the main service account passes. `automountServiceAccountToken: false` on a worker group keeps the Kubernetes API token out of its pods altogether; workers do not call the Kubernetes API. It does not remove a cloud identity token, which the platform's webhook projects as a separate volume, so a worker that needs no cloud identity should run as an account without those annotations.
 
 `windmill-extra` (LSP, multiplayer) sets no service account and runs as the namespace's `default` one. The hub follows `hub.serviceAccount.name`.
-
-## Pin the chart and image versions
-
-Each chart version deploys the Windmill release named by its `appVersion`, and a new chart version is published with every Windmill release. A GitOps source that tracks the chart with `*` or an open range (Argo CD `targetRevision: "*"`, a Flux `HelmRelease` with `version: "4.x"`) therefore upgrades Windmill, database migrations included, whenever a release is published. Set an exact chart version and move it deliberately:
-
-```sh
-helm upgrade mywindmill windmill/windmill -n windmill --version 4.0.275 --values values.yaml
-```
-
-A tag can be repointed; a digest cannot. To pin the image as well, append the digest to the tag. The container runtime then pulls by digest and the tag is only a label:
-
-```yaml
-windmill:
-  tag: "1.824.1@sha256:<digest>"
-```
-
-`windmill.tag` covers the app, workers, indexer and operator. A worker group with its own `tag`, and `windmill.windmillExtra.tag`, take the same form with the digest of their own image.
-
-Release images are signed with cosign (keyless, through GitHub OIDC) and carry an SBOM and SLSA build provenance since Windmill 1.804.0. Verify a version before pinning it; `cosign verify` prints the digest it verified. The community image is `ghcr.io/windmill-labs/windmill`.
-
-```sh
-cosign verify \
-  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp '^https://github\.com/windmill-labs/windmill/\.github/workflows/docker-image\.yml@refs/tags/v' \
-  ghcr.io/windmill-labs/windmill-ee:<version>
-
-gh attestation verify oci://ghcr.io/windmill-labs/windmill-ee:<version> --owner windmill-labs
-```
 
