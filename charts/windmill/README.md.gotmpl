@@ -96,7 +96,11 @@ If the database credential itself is what you want to eliminate, an AWS RDS or A
 
 ## Service accounts
 
-Jobs run arbitrary user code inside the worker pods, with whatever the worker pod's service account can do. By default every pod of the release shares the chart's main service account (`serviceAccount`), and that account is also the subject of the Roles the chart creates:
+**Most installs need nothing from this section.** By default the chart creates one service account (`serviceAccount`) and every pod runs as it. If you attach no cloud identity to that account and enable none of the three features in the table below, it carries no permissions, and the settings described here can all stay at their defaults.
+
+Read on if the main service account carries a cloud identity (EKS IRSA, GKE Workload Identity, Azure Workload Identity) or one of the chart's Roles, and you do not want jobs to be able to use it.
+
+Jobs run arbitrary user code inside the worker pods, with whatever the worker pod's service account can do. The main service account is the subject of the Roles the chart creates:
 
 | Role | Created when | Grants |
 |------|--------------|--------|
