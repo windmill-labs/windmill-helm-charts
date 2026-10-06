@@ -48,16 +48,7 @@ Each chart version deploys the Windmill release named by its `appVersion`, and a
 helm upgrade mywindmill windmill/windmill -n windmill --version 4.0.274 --values values.yaml
 ```
 
-A tag can be repointed; a digest cannot. To pin the image as well, append the digest to the tag. The container runtime then pulls by digest and the tag is only a label:
-
-```yaml
-windmill:
-  tag: "1.824.1@sha256:<digest>"
-```
-
-`windmill.tag` covers the app, workers, indexer and operator. A worker group with its own `tag`, and `windmill.windmillExtra.tag`, take the same form with the digest of their own image.
-
-Release images are signed with cosign (keyless, through GitHub OIDC) and carry an SBOM and SLSA build provenance since Windmill 1.804.0. Verify a version before pinning it; `cosign verify` prints the digest it verified. The community image is `ghcr.io/windmill-labs/windmill`.
+Release images are signed with cosign (keyless, through GitHub OIDC) and carry an SBOM and SLSA build provenance since Windmill 1.804.0. To verify one (the community image is `ghcr.io/windmill-labs/windmill`):
 
 ```sh
 cosign verify \
