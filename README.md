@@ -53,11 +53,21 @@ Release images are signed with cosign (keyless, through GitHub OIDC) and carry a
 ```sh
 cosign verify \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp '^https://github\.com/windmill-labs/windmill/\.github/workflows/docker-image\.yml@refs/tags/v' \
+  --certificate-identity-regexp '^https://github\.com/windmill-labs/windmill/\.github/workflows/(docker-image|publish_extra|build_cli_image)\.yml@refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$' \
   ghcr.io/windmill-labs/windmill-ee:<version>
 
 gh attestation verify oci://ghcr.io/windmill-labs/windmill-ee:<version> --owner windmill-labs
 ```
+
+The signing identity is the workflow that published the image, at the release tag, so it depends on the image:
+
+| Image | Workflow in the identity |
+| --- | --- |
+| `windmill`, `windmill-ee` and their `-slim`, `-full` and `-cuda` variants | `docker-image.yml` |
+| `windmill-extra` (LSP, multiplayer, debugger) | `publish_extra.yml` |
+| `windmill-cli` | `build_cli_image.yml` |
+
+The expression above accepts all three, which is what a cluster-wide admission policy needs. Narrow the alternation to one workflow to pin a single image. The RHEL, rpi and `caddy-l4` images are built by other workflows, on a manual dispatch or a `main` push instead of a release tag; their identities are listed in [Verifying image signatures, SBOMs and provenance](https://github.com/windmill-labs/windmill/blob/main/docs/docker-security.md#verifying-image-signatures-sboms-and-provenance).
 
 You do not need to provide a values.yaml to be able to test it on minikube.
 Follow the steps below.
