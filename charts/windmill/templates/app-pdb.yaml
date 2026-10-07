@@ -1,0 +1,28 @@
+{{- $app := .Values.windmill.app | default dict }}
+{{- $pdb := $app.podDisruptionBudget | default dict }}
+{{- $autoscaling := $app.autoscaling | default dict }}
+{{- $replicas := int (.Values.windmill.appReplicas | default 0) }}
+{{- $multiPod := or (ge $replicas 2) (and $autoscaling.enabled (ge (int ($autoscaling.maxReplicas | default 0)) 2)) }}
+{{- if and $pdb.enabled (gt $replicas 0) $multiPod (.Capabilities.APIVersions.Has "policy/v1") }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: windmill-app
+  labels:
+    app: windmill-app
+    app.kubernetes.io/name: windmill-app
+    chart: {{ template "windmill.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  maxUnavailable: {{ hasKey $pdb "maxUnavailable" | ternary $pdb.maxUnavailable 1 }}
+  {{- /* Older API schemas reject the field, and Helm validates against them */}}
+  {{- if and $pdb.unhealthyPodEvictionPolicy (semverCompare ">=1.27-0" .Capabilities.KubeVersion.Version) }}
+  unhealthyPodEvictionPolicy: {{ $pdb.unhealthyPodEvictionPolicy }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: windmill-app
+      release: {{ .Release.Name }}
+{{- end }}

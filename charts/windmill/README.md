@@ -134,6 +134,9 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.app.initContainers | list | `[]` | Init containers |
 | windmill.app.labels | object | `{}` | Annotations to apply to the pods |
 | windmill.app.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
+| windmill.app.podDisruptionBudget.enabled | bool | `true` | Create a PodDisruptionBudget so node drains (cluster autoscaler scale-down, node pool upgrades, `kubectl drain`) evict the app pods one at a time instead of all at once. Only created when the app can run 2 or more pods. Disable it if you already have a PodDisruptionBudget covering the app pods: Kubernetes refuses to evict a pod covered by two of them. |
+| windmill.app.podDisruptionBudget.maxUnavailable | int | `1` | How many app pods a drain may take down at once (a number or a percentage) |
+| windmill.app.podDisruptionBudget.unhealthyPodEvictionPolicy | string | `"AlwaysAllow"` | Lets a drain evict app pods that are not Ready even when the budget is used up, so a crashlooping pod cannot block it. Only set on Kubernetes 1.27+. Set to "" to leave it out. |
 | windmill.app.podSecurityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
 | windmill.app.podSecurityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
 | windmill.app.podSecurityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
@@ -165,7 +168,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.app.smtpTls.enabled | bool | `false` | enable mounting a TLS certificate for the SMTP server |
 | windmill.app.smtpTls.keySecretKey | string | `"tls.key"` | key in the Secret for the private key PEM file (must be PKCS#8 format) |
 | windmill.app.tolerations | list | `[]` | Tolerations to apply to the pods |
-| windmill.app.topologySpreadConstraints | list | `[]` | Topology spread constraints |
+| windmill.app.topologySpreadConstraints | list | `[{"labelSelector":{"matchLabels":{"app":"windmill-app"}},"maxSkew":1,"topologyKey":"kubernetes.io/hostname","whenUnsatisfiable":"ScheduleAnyway"}]` | Topology spread constraints. The default prefers a different node for each app pod, so losing one node does not take every app pod down. `ScheduleAnyway` keeps it a preference: pods still schedule when they cannot be spread (single node, not enough capacity). Set your own list to replace it, or `[]` to drop it. |
 | windmill.app.volumeMounts | list | `[]` |  |
 | windmill.app.volumes | list | `[]` | volumes |
 | windmill.appReplicas | int | `2` | replica for the application app |

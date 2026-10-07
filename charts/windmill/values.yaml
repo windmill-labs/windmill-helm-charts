@@ -572,8 +572,23 @@ windmill:
         # -- tolerations for the CronJob pod
         tolerations: []
 
-    # -- Topology spread constraints
-    topologySpreadConstraints: []
+    # -- Topology spread constraints. The default prefers a different node for each app pod, so losing one node does not take every app pod down. `ScheduleAnyway` keeps it a preference: pods still schedule when they cannot be spread (single node, not enough capacity). Set your own list to replace it, or `[]` to drop it.
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: windmill-app
+
+    # app PodDisruptionBudget configuration
+    podDisruptionBudget:
+      # -- Create a PodDisruptionBudget so node drains (cluster autoscaler scale-down, node pool upgrades, `kubectl drain`) evict the app pods one at a time instead of all at once. Only created when the app can run 2 or more pods. Disable it if you already have a PodDisruptionBudget covering the app pods: Kubernetes refuses to evict a pod covered by two of them.
+      enabled: true
+      # -- How many app pods a drain may take down at once (a number or a percentage)
+      maxUnavailable: 1
+      # -- Lets a drain evict app pods that are not Ready even when the budget is used up, so a crashlooping pod cannot block it. Only set on Kubernetes 1.27+. Set to "" to leave it out.
+      unhealthyPodEvictionPolicy: AlwaysAllow
 
   # indexer configuration
   indexer:
