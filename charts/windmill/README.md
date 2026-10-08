@@ -176,7 +176,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.databaseUrl | string | `"postgres://postgres:windmill@windmill-postgresql/windmill?sslmode=disable"` | Postgres URI, pods will crashloop if database is unreachable, sets DATABASE_URL environment variable in app and worker container |
 | windmill.databaseUrlAsFile | bool | `false` | read the database URI from a file and set DATABASE_URL_FILE instead of injecting DATABASE_URL into the environment, so the connection string never appears in the pod spec. With databaseUrlSecretName or databaseSecret set, the chart mounts that secret at databaseUrlFilePath; without either, supply the file yourself with a per-component volume (an init container that decrypts it, a CSI driver, Vault Agent). Applies to the app, workers, indexer and operator; the hub has its own hub.databaseUrlAsFile, since it is a separately versioned image. |
 | windmill.databaseUrlFileMode | int | `292` | file mode of the mounted database URI, in octal. 0400 requires the pod to run as the owner of the projected file, so set an fsGroup matching runAsUser alongside it. |
-| windmill.databaseUrlFilePath | string | `"/etc/windmill/secrets/database-url"` | path the database URI is mounted at when databaseUrlAsFile is enabled. Its directory is the mount point, so keep it on a path of its own. |
+| windmill.databaseUrlFilePath | string | `"/run/secrets/windmill/database-url"` | path the database URI is mounted at when databaseUrlAsFile is enabled. Its directory is the mount point, so keep it on a path of its own. Keep it out of /etc, /usr, /bin and /lib: nsjail exposes those worker directories to jobs, so a job could read the file there. |
 | windmill.databaseUrlSecretKey | string | `"url"` | name of the key in existing secret storing the database URI. The default key of the url is 'url' |
 | windmill.databaseUrlSecretName | string | `""` | name of the existing secret storing the database URI, take precedence over databaseUrl. |
 | windmill.disableUnsharePid | bool | `false` | Some systems like Bottlerocket AMI have max_user_namespaces=0 which prevents unshare from working. |
@@ -284,7 +284,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.workerGroups[0].isolationSecurity | string | `""` | Both turn nsjail on for the group and give up unshare PID isolation and the per-job out-of-memory kill. See "Running nsjail without privileged workers" in the README. |
 | windmill.workerGroups[0].labels | object | `{}` | Labels to apply to the pods |
 | windmill.workerGroups[0].localhostProfiles | object | `{}` | A layer without a profile is `Unconfined`, since the runtime default blocks nsjail. |
-| windmill.workerGroups[0].mode | string | `"worker"` |  |
+| windmill.workerGroups[0].mode | string | `"worker"` | `worker`, or `agent` for an agent worker (set AGENT_TOKEN and BASE_INTERNAL_URL in extraEnv). An agent group gets no database url, as env var or as file. |
 | windmill.workerGroups[0].name | string | `"default"` |  |
 | windmill.workerGroups[0].nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.workerGroups[0].podSecurityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the container |
@@ -409,7 +409,9 @@ windmill:
   databaseUrlAsFile: true
 ```
 
-The secret is projected at `windmill.databaseUrlFilePath` (`/etc/windmill/secrets/database-url` by default), read-only, with mode `windmill.databaseUrlFileMode`.
+The secret is projected at `windmill.databaseUrlFilePath` (`/run/secrets/windmill/database-url` by default), read-only, with mode `windmill.databaseUrlFileMode`.
+
+Keep that path out of `/etc`, `/usr`, `/bin`, `/lib` and `/lib64`. nsjail builds each job's filesystem from those worker directories, so a file mounted under one of them is readable by any job, which defeats the isolation on a worker group that runs nsjail. Worker groups in `mode: agent` get no database url at all, as environment variable or as file.
 
 That still consumes a Kubernetes Secret, which lives in etcd unless the cluster encrypts Secrets at rest. To keep the connection string out of etcd entirely, leave `databaseUrlSecretName` and `databaseSecret` unset so the chart mounts nothing of its own, and deliver the file with a volume of your own: the [Secrets Store CSI driver](https://secrets-store-csi-driver.sigs.k8s.io/) without secret syncing, or Vault Agent injection, both write it to a tmpfs in the pod without creating a Secret object. External Secrets is not one of these: it materialises a Kubernetes Secret, so it belongs in the first form above.
 
@@ -424,7 +426,7 @@ If the connection string has to be decrypted or fetched by your own tooling firs
 ```yaml
 windmill:
   databaseUrlAsFile: true
-  databaseUrlFilePath: /etc/windmill/secrets/database-url
+  databaseUrlFilePath: /run/secrets/windmill/database-url
   app:
     volumes:
       - name: dsn
@@ -432,14 +434,14 @@ windmill:
           medium: Memory
     volumeMounts:
       - name: dsn
-        mountPath: /etc/windmill/secrets
+        mountPath: /run/secrets/windmill
     initContainers:
       - name: decrypt-dsn
         image: <an image carrying your secret tooling>
-        command: ["sh", "-c", "sops -d /enc/db.enc > /etc/windmill/secrets/database-url"]
+        command: ["sh", "-c", "sops -d /enc/db.enc > /run/secrets/windmill/database-url"]
         volumeMounts:
           - name: dsn
-            mountPath: /etc/windmill/secrets
+            mountPath: /run/secrets/windmill
 ```
 
 Repeat the volume keys for each component you run. With no `databaseUrlSecretName` and no `databaseSecret` the chart mounts nothing of its own at that path, so the volume you supply is the only one there.

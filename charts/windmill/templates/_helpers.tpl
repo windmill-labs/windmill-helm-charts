@@ -161,6 +161,14 @@ url
 {{- end -}}
 
 {{/*
+Non-empty for a worker group in agent mode. An agent worker reaches the database through the
+API only, so it gets no database url in any form: a job on that worker has nothing to read.
+*/}}
+{{- define "windmill.isAgentWorker" -}}
+{{- if eq (toString (.override | default dict).mode) "agent" -}}true{{- end -}}
+{{- end -}}
+
+{{/*
 Database url env entry for a component. With databaseUrlAsFile the connection string is read
 from a mounted secret file and no DATABASE_URL is rendered at all, so it never appears in the
 pod spec. Both the server and the hub prefer DATABASE_URL_FILE over DATABASE_URL. The switch
@@ -171,7 +179,8 @@ Usage: {{- include "windmill.databaseUrlEnv" (dict "root" $ "override" $v) | nin
 {{- define "windmill.databaseUrlEnv" -}}
 {{- $source := .source | default .root.Values.windmill -}}
 {{- $secretName := include "windmill.databaseUrlSecretName" . -}}
-{{- if $source.databaseUrlAsFile -}}
+{{- if include "windmill.isAgentWorker" . -}}
+{{- else if $source.databaseUrlAsFile -}}
 {{- if not (hasPrefix "/" .root.Values.windmill.databaseUrlFilePath) -}}
 {{- fail "windmill.databaseUrlFilePath must be an absolute path: its directory becomes the mount point" -}}
 {{- end -}}
@@ -196,7 +205,7 @@ mounting anything here would collide with the volume it already mounts at that p
 */}}
 {{- define "windmill.databaseUrlVolumeMount" -}}
 {{- $source := .source | default .root.Values.windmill -}}
-{{- if and $source.databaseUrlAsFile (include "windmill.databaseUrlSecretName" .) -}}
+{{- if and $source.databaseUrlAsFile (include "windmill.databaseUrlSecretName" .) (not (include "windmill.isAgentWorker" .)) -}}
 - name: windmill-database-url
   mountPath: {{ dir .root.Values.windmill.databaseUrlFilePath | quote }}
   readOnly: true
@@ -210,7 +219,7 @@ is called.
 */}}
 {{- define "windmill.databaseUrlVolume" -}}
 {{- $source := .source | default .root.Values.windmill -}}
-{{- if and $source.databaseUrlAsFile (include "windmill.databaseUrlSecretName" .) -}}
+{{- if and $source.databaseUrlAsFile (include "windmill.databaseUrlSecretName" .) (not (include "windmill.isAgentWorker" .)) -}}
 - name: windmill-database-url
   secret:
     secretName: {{ include "windmill.databaseUrlSecretName" . | quote }}

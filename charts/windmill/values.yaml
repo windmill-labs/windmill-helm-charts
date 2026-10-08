@@ -53,8 +53,8 @@ windmill:
   databaseSecret: false
   # -- read the database URI from a file and set DATABASE_URL_FILE instead of injecting DATABASE_URL into the environment, so the connection string never appears in the pod spec. With databaseUrlSecretName or databaseSecret set, the chart mounts that secret at databaseUrlFilePath; without either, supply the file yourself with a per-component volume (an init container that decrypts it, a CSI driver, Vault Agent). Applies to the app, workers, indexer and operator; the hub has its own hub.databaseUrlAsFile, since it is a separately versioned image.
   databaseUrlAsFile: false
-  # -- path the database URI is mounted at when databaseUrlAsFile is enabled. Its directory is the mount point, so keep it on a path of its own.
-  databaseUrlFilePath: /etc/windmill/secrets/database-url
+  # -- path the database URI is mounted at when databaseUrlAsFile is enabled. Its directory is the mount point, so keep it on a path of its own. Keep it out of /etc, /usr, /bin and /lib: nsjail exposes those worker directories to jobs, so a job could read the file there.
+  databaseUrlFilePath: /run/secrets/windmill/database-url
   # -- file mode of the mounted database URI, in octal. 0400 requires the pod to run as the owner of the projected file, so set an fsGroup matching runAsUser alongside it.
   databaseUrlFileMode: 0444
   # -- domain as shown in browser. url of ths service is at: {baseProtocol}://{baseDomain}
@@ -189,6 +189,7 @@ windmill:
       extraEnv: []
       # -- Extra sidecar containers
       extraContainers: []
+      # -- `worker`, or `agent` for an agent worker (set AGENT_TOKEN and BASE_INTERNAL_URL in extraEnv). An agent group gets no database url, as env var or as file.
       mode: "worker"
 
       # -- Init containers
