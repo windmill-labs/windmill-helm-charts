@@ -13,6 +13,10 @@ To disable privileged mode for a worker group, set `privileged: false` in the wo
 
 Worker groups accept `isolationSecurity` (`capabilities` or `userNamespaces`) to run nsjail without a privileged container, and `localhostProfiles` to name seccomp and AppArmor profiles installed on the nodes (published in `nsjail-security-profiles/`). Nothing changes for groups that do not set it. A group that sets it always runs its jobs in nsjail and gives up the `oom.group` override above: see [Running nsjail without privileged workers](README.md#running-nsjail-without-privileged-workers).
 
+`windmill.databaseUrlFilePath` defaults to `/run/secrets/windmill/database-url` instead of `/etc/windmill/secrets/database-url`. nsjail exposes the worker's `/etc` to jobs, so with `databaseUrlAsFile` a job on an nsjail worker group could read the connection string at the old path. If you set the path yourself under `/etc`, `/usr`, `/bin` or `/lib`, move it. If you supply the file with your own volume and relied on the default path, either move your volume to the new directory or set `databaseUrlFilePath` to where you mount it.
+
+Worker groups with `mode: agent` no longer get the database url, as `DATABASE_URL` or as a mounted file: an agent worker only talks to the API.
+
 `enterprise.nsjail` is no longer documented: nsjail is not Enterprise only and is turned on with the "Job isolation" instance setting. Existing values that set it keep working.
 
 ## 3.x
