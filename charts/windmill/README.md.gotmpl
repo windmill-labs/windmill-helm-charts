@@ -57,7 +57,9 @@ windmill:
   databaseUrlAsFile: true
 ```
 
-The secret is projected at `windmill.databaseUrlFilePath` (`/etc/windmill/secrets/database-url` by default), read-only, with mode `windmill.databaseUrlFileMode`.
+The secret is projected at `windmill.databaseUrlFilePath` (`/run/secrets/windmill/database-url` by default), read-only, with mode `windmill.databaseUrlFileMode`.
+
+Keep that path out of `/etc`, `/usr`, `/bin`, `/lib` and `/lib64`. nsjail builds each job's filesystem from those worker directories, so a file mounted under one of them is readable by any job, which defeats the isolation on a worker group that runs nsjail. Worker groups in `mode: agent` get no database url at all, as environment variable or as file.
 
 That still consumes a Kubernetes Secret, which lives in etcd unless the cluster encrypts Secrets at rest. To keep the connection string out of etcd entirely, leave `databaseUrlSecretName` and `databaseSecret` unset so the chart mounts nothing of its own, and deliver the file with a volume of your own: the [Secrets Store CSI driver](https://secrets-store-csi-driver.sigs.k8s.io/) without secret syncing, or Vault Agent injection, both write it to a tmpfs in the pod without creating a Secret object. External Secrets is not one of these: it materialises a Kubernetes Secret, so it belongs in the first form above.
 
@@ -72,7 +74,7 @@ If the connection string has to be decrypted or fetched by your own tooling firs
 ```yaml
 windmill:
   databaseUrlAsFile: true
-  databaseUrlFilePath: /etc/windmill/secrets/database-url
+  databaseUrlFilePath: /run/secrets/windmill/database-url
   app:
     volumes:
       - name: dsn
@@ -80,14 +82,14 @@ windmill:
           medium: Memory
     volumeMounts:
       - name: dsn
-        mountPath: /etc/windmill/secrets
+        mountPath: /run/secrets/windmill
     initContainers:
       - name: decrypt-dsn
         image: <an image carrying your secret tooling>
-        command: ["sh", "-c", "sops -d /enc/db.enc > /etc/windmill/secrets/database-url"]
+        command: ["sh", "-c", "sops -d /enc/db.enc > /run/secrets/windmill/database-url"]
         volumeMounts:
           - name: dsn
-            mountPath: /etc/windmill/secrets
+            mountPath: /run/secrets/windmill
 ```
 
 Repeat the volume keys for each component you run. With no `databaseUrlSecretName` and no `databaseSecret` the chart mounts nothing of its own at that path, so the volume you supply is the only one there.
