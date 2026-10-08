@@ -19,6 +19,11 @@ Worker groups with `mode: agent` no longer get the database url, as `DATABASE_UR
 
 `enterprise.nsjail` is no longer documented: nsjail is not Enterprise only and is turned on with the "Job isolation" instance setting. Existing values that set it keep working.
 
+Since chart 4.0.278, the app (server) pods get a PodDisruptionBudget (`maxUnavailable: 1`) and prefer a different node each (`windmill.app.topologySpreadConstraints`, `ScheduleAnyway`), so node drains (cluster autoscaler scale-down, node pool upgrades, `kubectl drain`) no longer take every app pod down at once. The PodDisruptionBudget is only created when the app can run 2 or more pods, and Helm rollouts are not affected by it. The upgrade that brings it in restarts the app pods once, one at a time. Two setups need attention:
+
+- If you already manage a PodDisruptionBudget covering the app pods, set `windmill.app.podDisruptionBudget.enabled: false`. Kubernetes refuses to evict a pod covered by two of them, so drains would fail. One named `windmill-app` makes the upgrade fail instead.
+- On a single-node cluster, `kubectl drain` now waits indefinitely, because the evicted app pod has nowhere else to run. Drain with `--disable-eviction`, or disable the PodDisruptionBudget.
+
 ## 3.x
 
 > **⚠️ Breaking Change:**
