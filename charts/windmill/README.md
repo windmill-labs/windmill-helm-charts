@@ -260,7 +260,7 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.windmillExtra.resources | object | `{"limits":{"memory":"1Gi"}}` | Resource limits and requests for the pods |
 | windmill.windmillExtra.securityContext | object | `{}` | legacy, use podSecurityContext instead |
 | windmill.windmillExtra.service.annotations | object | `{}` | Annotations to apply to the service |
-| windmill.windmillExtra.tag | string | `""` | custom image tag (defaults to the App version) |
+| windmill.windmillExtra.tag | string | `""` | custom image tag. Falls back to windmill.tag (then the chart appVersion) when not set. |
 | windmill.windmillExtra.tolerations | list | `[]` | Tolerations to apply to the pods |
 | windmill.windmillExtra.windmillBaseUrl | string | `""` | Set to your external URL (e.g. "https://windmill.example.com") if the debugger fails with token verification errors. |
 | windmill.workerGroupsRequireServiceAccount | bool | `false` | Optional hardening, off by default and not needed for a standard install. When true, fail the render when a deployed worker group has no serviceAccountName of its own, instead of letting it inherit the global service account. Turn this on when the global service account carries anything workers must not hold: a cloud identity (EKS IRSA, GKE Workload Identity) or the Roles this chart binds to it (deployment scaler, operator, SMTP ACME job), which include reading the namespace's Secrets. Jobs run arbitrary user code with the worker pod's service account. |

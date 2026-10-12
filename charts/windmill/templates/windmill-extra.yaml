@@ -49,7 +49,7 @@ spec:
         securityContext:
         {{- toYaml . | nindent 10 }}
       {{- end }}
-        image: {{ default "ghcr.io/windmill-labs/windmill-extra" .Values.windmill.windmillExtra.image }}:{{ default .Chart.AppVersion .Values.windmill.windmillExtra.tag }}
+        image: {{ default "ghcr.io/windmill-labs/windmill-extra" .Values.windmill.windmillExtra.image }}:{{ default (default .Chart.AppVersion .Values.windmill.tag) .Values.windmill.windmillExtra.tag }}
         imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
         ports:
         - containerPort: 3000
