@@ -708,7 +708,7 @@ windmill:
     # -- custom image (defaults to ghcr.io/windmill-labs/windmill-extra)
     image: ""
 
-    # -- custom image tag (defaults to the App version)
+    # -- custom image tag. Falls back to windmill.tag (then the chart appVersion) when not set.
     tag: ""
 
     # -- Annotations to apply to the pods
