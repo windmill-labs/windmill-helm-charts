@@ -605,6 +605,12 @@ windmill:
     # large enough that upgrades still time out.
     progressDeadlineSeconds: 1800
 
+    # -- Optional, leave empty for a standard install. Timing overrides for the indexer readiness probe, merged over the defaults (timeoutSeconds: 1, successThreshold: 1, failureThreshold: 1, initialDelaySeconds: 5, periodSeconds: 5). Raise timeoutSeconds/failureThreshold when a busy indexer answers slowly and flaps out of the Service. The probe handler is fixed and cannot be overridden here.
+    readinessProbe: {}
+
+    # -- Optional, leave empty for a standard install. Timing overrides for the indexer liveness probe, merged over the defaults (periodSeconds: 10, timeoutSeconds: 5, failureThreshold: 6). Raise timeoutSeconds/failureThreshold when a busy indexer is restarted for answering slowly while it indexes. The probe handler is fixed and cannot be overridden here.
+    livenessProbe: {}
+
     # -- Extra volumes to add to the pods
     volumes: []
 
