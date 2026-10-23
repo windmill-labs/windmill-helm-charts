@@ -201,11 +201,13 @@ Windmill - Turn scripts into endpoints, workflows and UIs in minutes
 | windmill.indexer.extraEnv | list | `[]` | Extra environment variables to apply to the pods |
 | windmill.indexer.initContainers | list | `[]` | Extra init containers |
 | windmill.indexer.labels | object | `{}` | Annotations to apply to the pods |
+| windmill.indexer.livenessProbe | object | `{}` | Optional, leave empty for a standard install. Timing overrides for the indexer liveness probe, merged over the defaults (periodSeconds: 10, timeoutSeconds: 5, failureThreshold: 6). Raise timeoutSeconds/failureThreshold when a busy indexer is restarted for answering slowly while it indexes. The probe handler is fixed and cannot be overridden here. |
 | windmill.indexer.nodeSelector | object | `{}` | Node selector to use for scheduling the pods |
 | windmill.indexer.podSecurityContext | object | `{"runAsNonRoot":false,"runAsUser":0}` | Security context to apply to the pods |
 | windmill.indexer.podSecurityContext.runAsNonRoot | bool | `false` | run explicitly as a non-root user. The default is false. |
 | windmill.indexer.podSecurityContext.runAsUser | int | `0` | run as user. The default is 0 for root user |
 | windmill.indexer.progressDeadlineSeconds | int | `1800` | How long a rollout may take before Kubernetes reports ProgressDeadlineExceeded. The incoming pod waits for the outgoing one to hand over the index write lock and then loads the index from object storage, so raise this further if your index is large enough that upgrades still time out. |
+| windmill.indexer.readinessProbe | object | `{}` | Optional, leave empty for a standard install. Timing overrides for the indexer readiness probe, merged over the defaults (timeoutSeconds: 1, successThreshold: 1, failureThreshold: 1, initialDelaySeconds: 5, periodSeconds: 5). Raise timeoutSeconds/failureThreshold when a busy indexer answers slowly and flaps out of the Service. The probe handler is fixed and cannot be overridden here. |
 | windmill.indexer.resources | object | `{"limits":{"ephemeral-storage":"50Gi","memory":"2Gi"}}` | Resource limits and requests for the pods |
 | windmill.indexer.securityContext | string | `nil` | legacy, use podSecurityContext instead |
 | windmill.indexer.serviceAccountName | string | `""` | Optional, leave empty for a standard install: the indexer then runs as the chart's main ServiceAccount (see `serviceAccount` at the top level). Set it to the name of an existing ServiceAccount to give the indexer pods their own. |
