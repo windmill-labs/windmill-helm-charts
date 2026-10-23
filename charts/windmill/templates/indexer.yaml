@@ -88,10 +88,12 @@ spec:
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: {{ max 1 (div (.Values.windmill.indexer.progressDeadlineSeconds | default 1800) 10) }}
+        # A busy indexer can answer its probes slowly while it indexes a large backlog.
+        # windmill.indexer.readinessProbe / livenessProbe override the timing fields below;
+        # the handler stays fixed, so only timing keys from values are applied.
+        {{- $readiness := dict "timeoutSeconds" 1 "successThreshold" 1 "failureThreshold" 1 "initialDelaySeconds" 5 "periodSeconds" 5 }}
+        {{- $readiness = mergeOverwrite $readiness (omit (.Values.windmill.indexer.readinessProbe | default dict) "httpGet" "exec" "tcpSocket" "grpc") }}
         readinessProbe:
-          timeoutSeconds: 1
-          successThreshold: 1
-          failureThreshold: 1
           httpGet:
             scheme: HTTP
             path: /
@@ -99,16 +101,15 @@ spec:
             - name: Host
               value: localhost
             port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 5
+          {{- toYaml $readiness | nindent 10 }}
+        {{- $liveness := dict "periodSeconds" 10 "timeoutSeconds" 5 "failureThreshold" 6 }}
+        {{- $liveness = mergeOverwrite $liveness (omit (.Values.windmill.indexer.livenessProbe | default dict) "httpGet" "exec" "tcpSocket" "grpc") }}
         livenessProbe:
           httpGet:
             scheme: HTTP
             path: /api/version
             port: 8000
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 6
+          {{- toYaml $liveness | nindent 10 }}
         env:
         {{- with .Values.windmill.indexer.extraEnv }}
         {{- toYaml . | nindent 8 }}
