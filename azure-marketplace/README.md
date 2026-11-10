@@ -49,6 +49,10 @@ Marketplace customers only receive a new Windmill version when a new bundle is s
 4. In Partner Center, select the new bundle tag on the offer's technical configuration and
    submit.
 
+## Unreleased changes after bundle 1.0.0
+
+- `createUiDefinition.json` gained a `Microsoft.Common.InfoBox` (licence key needed, link to the free trial) at the top of the Windmill step. It was added after bundle 1.0.0 and ships with the next bundle version; re-run `cpa verify` on the build machine (step 3 above) before that bundle is published, as it has not been validated by the packaging tool yet.
+
 ## One-time registry setup (already done for `windmillmarketplace`)
 
 Microsoft's marketplace application (`32597670-3e15-4def-8851-614ff48c1efa`) has `AcrPull` on

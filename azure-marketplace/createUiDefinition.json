@@ -42,6 +42,16 @@
         "label": "Windmill",
         "elements": [
           {
+            "name": "licenceInfo",
+            "type": "Microsoft.Common.InfoBox",
+            "visible": true,
+            "options": {
+              "icon": "Info",
+              "text": "Windmill Enterprise needs a licence key. Don't have one yet? Start a free trial.",
+              "uri": "https://portal.windmill.dev/trial?from=Microsoft%20Marketplace"
+            }
+          },
+          {
             "name": "extensionResourceName",
             "type": "Microsoft.Common.TextBox",
             "label": "Extension resource name",
