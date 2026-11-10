@@ -1,0 +1,80 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "extensionResourceName": {
+      "type": "string",
+      "metadata": { "description": "Name of the cluster extension resource" }
+    },
+    "clusterResourceName": {
+      "type": "string",
+      "metadata": { "description": "Name of the existing AKS cluster" }
+    },
+    "baseDomain": {
+      "type": "string",
+      "defaultValue": "windmill",
+      "metadata": { "description": "Domain users open Windmill at" }
+    },
+    "baseProtocol": {
+      "type": "string",
+      "defaultValue": "http",
+      "allowedValues": [ "http", "https" ]
+    },
+    "useBundledPostgres": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": { "description": "Deploy the bundled evaluation PostgreSQL" }
+    },
+    "databaseUrl": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": { "description": "PostgreSQL connection URL when not using the bundled database" }
+    },
+    "ingressEnabled": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "ingressClassName": {
+      "type": "string",
+      "defaultValue": "webapprouting.kubernetes.azure.com"
+    }
+  },
+  "variables": {
+    "plan-name": "DONOTMODIFY",
+    "plan-publisher": "DONOTMODIFY",
+    "plan-offerID": "DONOTMODIFY",
+    "releaseTrain": "DONOTMODIFY",
+    "clusterExtensionTypeName": "DONOTMODIFY",
+    "baseSettings": {
+      "windmill.windmill.baseDomain": "[parameters('baseDomain')]",
+      "windmill.windmill.baseProtocol": "[parameters('baseProtocol')]",
+      "windmill.postgresql.enabled": "[string(parameters('useBundledPostgres'))]",
+      "windmill.ingress.enabled": "[string(parameters('ingressEnabled'))]",
+      "windmill.ingress.className": "[parameters('ingressClassName')]"
+    },
+    "externalDbProtectedSettings": {
+      "windmill.windmill.databaseUrl": "[parameters('databaseUrl')]"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.KubernetesConfiguration/extensions",
+      "apiVersion": "2024-11-01",
+      "name": "[parameters('extensionResourceName')]",
+      "properties": {
+        "extensionType": "[variables('clusterExtensionTypeName')]",
+        "autoUpgradeMinorVersion": true,
+        "releaseTrain": "[variables('releaseTrain')]",
+        "configurationSettings": "[variables('baseSettings')]",
+        "configurationProtectedSettings": "[if(parameters('useBundledPostgres'), json('{}'), variables('externalDbProtectedSettings'))]"
+      },
+      "plan": {
+        "name": "[variables('plan-name')]",
+        "publisher": "[variables('plan-publisher')]",
+        "product": "[variables('plan-offerID')]"
+      },
+      "scope": "[concat('Microsoft.ContainerService/managedClusters/', parameters('clusterResourceName'))]"
+    }
+  ],
+  "outputs": {}
+}

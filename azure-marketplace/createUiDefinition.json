@@ -1,0 +1,121 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+  "handler": "Microsoft.Azure.CreateUIDef",
+  "version": "0.1.2-preview",
+  "parameters": {
+    "config": {
+      "isWizard": false,
+      "basics": {
+        "description": "Deploys Windmill Enterprise Edition to an existing AKS cluster. A licence key is required to unlock Enterprise features and is entered in Windmill's instance settings after installation; request a trial key at https://www.windmill.dev/pricing.",
+        "location": { "visible": false },
+        "resourceGroup": { "allowExisting": true }
+      }
+    },
+    "basics": [],
+    "steps": [
+      {
+        "name": "clusterDetails",
+        "label": "Cluster",
+        "elements": [
+          {
+            "name": "clusterLookupControl",
+            "type": "Microsoft.Solutions.ArmApiControl",
+            "request": {
+              "method": "GET",
+              "path": "[concat(subscription().id, '/resourcegroups/', resourceGroup().name, '/providers/Microsoft.ContainerService/managedClusters?api-version=2024-09-01')]"
+            }
+          },
+          {
+            "name": "existingClusterResourceName",
+            "type": "Microsoft.Common.DropDown",
+            "label": "AKS cluster",
+            "toolTip": "Existing AKS cluster in the selected resource group. Linux AMD64 node pools are required.",
+            "constraints": {
+              "allowedValues": "[map(steps('clusterDetails').clusterLookupControl.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+              "required": true
+            }
+          }
+        ]
+      },
+      {
+        "name": "applicationDetails",
+        "label": "Windmill",
+        "elements": [
+          {
+            "name": "extensionResourceName",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Extension resource name",
+            "defaultValue": "windmill",
+            "toolTip": "Lowercase letters, numbers and hyphens, 6-30 characters.",
+            "constraints": {
+              "required": true,
+              "regex": "^[a-z0-9][a-z0-9-]{4,28}[a-z0-9]$",
+              "validationMessage": "Use 6-30 lowercase letters, numbers or hyphens, starting and ending with a letter or number."
+            }
+          },
+          {
+            "name": "useBundledPostgres",
+            "type": "Microsoft.Common.OptionsGroup",
+            "label": "Database",
+            "defaultValue": "Bundled PostgreSQL (evaluation only)",
+            "toolTip": "For production, use Azure Database for PostgreSQL flexible server and provide its connection URL.",
+            "constraints": {
+              "allowedValues": [
+                { "label": "Bundled PostgreSQL (evaluation only)", "value": true },
+                { "label": "External PostgreSQL (recommended for production)", "value": false }
+              ],
+              "required": true
+            }
+          },
+          {
+            "name": "databaseUrl",
+            "type": "Microsoft.Common.PasswordBox",
+            "label": { "password": "PostgreSQL connection URL", "confirmPassword": "Confirm connection URL" },
+            "toolTip": "Example: postgres://user:password@myserver.postgres.database.azure.com:5432/windmill?sslmode=require",
+            "constraints": {
+              "required": true,
+              "regex": "^postgres(ql)?://.{8,2000}$",
+              "validationMessage": "Must start with postgres:// or postgresql://"
+            },
+            "options": { "hideConfirmation": true },
+            "visible": "[equals(steps('applicationDetails').useBundledPostgres, false)]"
+          },
+          {
+            "name": "baseDomain",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Domain",
+            "defaultValue": "windmill",
+            "toolTip": "The host name users will open Windmill at, for example windmill.example.com.",
+            "constraints": { "required": true, "regex": "^[a-zA-Z0-9.-]{1,253}$", "validationMessage": "Enter a host name." }
+          },
+          {
+            "name": "baseProtocol",
+            "type": "Microsoft.Common.DropDown",
+            "label": "Protocol",
+            "defaultValue": "http",
+            "toolTip": "Use https when TLS terminates at your ingress or gateway.",
+            "constraints": {
+              "allowedValues": [ { "label": "http", "value": "http" }, { "label": "https", "value": "https" } ],
+              "required": true
+            }
+          },
+          {
+            "name": "ingressEnabled",
+            "type": "Microsoft.Common.CheckBox",
+            "label": "Create an Ingress using the AKS application routing add-on",
+            "toolTip": "Requires the application routing add-on to be enabled on the cluster. Leave unchecked to expose Windmill yourself."
+          }
+        ]
+      }
+    ],
+    "outputs": {
+      "clusterResourceName": "[steps('clusterDetails').existingClusterResourceName]",
+      "extensionResourceName": "[steps('applicationDetails').extensionResourceName]",
+      "useBundledPostgres": "[steps('applicationDetails').useBundledPostgres]",
+      "databaseUrl": "[coalesce(steps('applicationDetails').databaseUrl, '')]",
+      "baseDomain": "[steps('applicationDetails').baseDomain]",
+      "baseProtocol": "[steps('applicationDetails').baseProtocol]",
+      "ingressEnabled": "[steps('applicationDetails').ingressEnabled]"
+    }
+  }
+}

@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: postgres:18
+        image: {{ include "windmill.imageRef" (dict "ctx" $ "name" "postgres" "default" "postgres:18") }}
         env:
         - name: POSTGRES_USER
           value: {{ .Values.postgresql.auth.postgresUser }}
@@ -65,7 +65,7 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: postgres:18
+        image: {{ include "windmill.imageRef" (dict "ctx" $ "name" "postgres" "default" "postgres:18") }}
         env:
         - name: POSTGRES_USER
           value: {{ .Values.postgresql.auth.postgresUser }}
