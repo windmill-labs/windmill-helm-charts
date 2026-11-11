@@ -2,7 +2,7 @@
 
 ![Version: 4.0.274](https://img.shields.io/badge/Version-4.0.274-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.824.1](https://img.shields.io/badge/AppVersion-1.824.1-informational?style=flat-square)
 
-Windmill - Turn scripts into endpoints, workflows and UIs in minutes
+Windmill - Code-first platform for workflows, apps and AI agents
 
 **Homepage:** <https://www.windmill.dev/>
 
