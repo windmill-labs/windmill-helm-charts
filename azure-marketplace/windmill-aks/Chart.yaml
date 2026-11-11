@@ -1,0 +1,9 @@
+apiVersion: v2
+name: windmill-aks
+type: application
+description: Azure Marketplace (AKS Kubernetes application) packaging of the Windmill chart
+version: __BUNDLE_VERSION__
+appVersion: __APP_VERSION__
+dependencies:
+  - name: windmill
+    version: __CHART_VERSION__

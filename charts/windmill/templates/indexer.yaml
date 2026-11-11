@@ -66,7 +66,7 @@ spec:
         securityContext:
         {{- toYaml . | nindent 10 }}
       {{- end }}
-        image: {{ default "ghcr.io/windmill-labs/windmill-ee" .Values.windmill.image }}:{{ default .Chart.AppVersion .Values.windmill.tag }}
+        image: {{ include "windmill.imageRef" (dict "ctx" $ "name" "windmill" "default" (printf "%s:%s" (default "ghcr.io/windmill-labs/windmill-ee" .Values.windmill.image) (default .Chart.AppVersion .Values.windmill.tag))) }}
         imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
         {{ if or .Values.windmill.indexer.volumeMounts .Values.windmill.databaseUrlAsFile }}
         volumeMounts:

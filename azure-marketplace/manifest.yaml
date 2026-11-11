@@ -1,0 +1,11 @@
+applicationName: dev.windmill.enterprise
+publisher: "Windmill Labs"
+description: "Windmill Enterprise Edition (self-hosted): scripts, workflows and internal apps on your own AKS cluster."
+version: __BUNDLE_VERSION__ # must be #.#.#; bump for every bundle submitted to Partner Center
+helmChart: "./windmill-aks"
+clusterArmTemplate: "./mainTemplate.json"
+uiDefinition: "./createUiDefinition.json"
+registryServer: "windmillmarketplace.azurecr.io"
+extensionRegistrationParameters:
+  defaultScope: "cluster" # one Windmill instance per cluster
+  namespace: "windmill"
