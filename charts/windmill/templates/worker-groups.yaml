@@ -138,9 +138,9 @@ spec:
         {{ end }}
         {{ end }}
         {{ if $.Values.enterprise.enabled }}
-        image: {{ default (default "ghcr.io/windmill-labs/windmill-ee" $.Values.windmill.image) $v.image }}:{{ default (default $.Chart.AppVersion $.Values.windmill.tag) $v.tag }}
+        image: {{ include "windmill.imageRef" (dict "ctx" $ "name" (ternary "" "windmill" (not (empty $v.image))) "default" (printf "%s:%s" (default (default "ghcr.io/windmill-labs/windmill-ee" $.Values.windmill.image) $v.image) (default (default $.Chart.AppVersion $.Values.windmill.tag) $v.tag))) }}
         {{ else }}
-        image: {{ default (default "ghcr.io/windmill-labs/windmill" $.Values.windmill.image) $v.image }}:{{ default (default $.Chart.AppVersion $.Values.windmill.tag) $v.tag }}
+        image: {{ include "windmill.imageRef" (dict "ctx" $ "name" (ternary "" "windmill" (not (empty $v.image))) "default" (printf "%s:%s" (default (default "ghcr.io/windmill-labs/windmill" $.Values.windmill.image) $v.image) (default (default $.Chart.AppVersion $.Values.windmill.tag) $v.tag))) }}
         {{ end }}
         imagePullPolicy: {{ default "Always" $.Values.windmill.imagePullPolicy }}
         {{ if $v.command }}

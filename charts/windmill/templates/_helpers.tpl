@@ -282,3 +282,27 @@ blocks nsjail. Keys of the group's own security contexts replace the generated o
 {{- if and .Values.httproute.enabled .Values.ingress.enabled }}
 {{- fail "Both ingress.enabled and httproute.enabled are true. Disable one to avoid conflicts." }}
 {{- end }}
+{{/*
+Resolve a container image reference.
+When `global.azure.images.<name>` is set (Azure Marketplace Kubernetes application
+bundles require every image to be declared there so the marketplace can rewrite the
+registry), that reference wins. Otherwise the chart's regular default is used, so
+this is a no-op for every other installation.
+Usage: include "windmill.imageRef" (dict "ctx" $ "name" "windmill" "default" "repo:tag")
+*/}}
+{{- define "windmill.imageRef" -}}
+{{- $global := .ctx.Values.global | default dict -}}
+{{- $az := dict -}}
+{{- if .name -}}
+{{- $az = dig "azure" "images" .name dict $global -}}
+{{- end -}}
+{{- if $az.image -}}
+{{- if $az.digest -}}
+{{- printf "%s/%s@%s" $az.registry $az.image $az.digest -}}
+{{- else -}}
+{{- printf "%s/%s:%s" $az.registry $az.image (toString $az.tag) -}}
+{{- end -}}
+{{- else -}}
+{{- .default -}}
+{{- end -}}
+{{- end }}
