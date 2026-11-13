@@ -2,7 +2,7 @@
   <img src="https://media.licdn.com/dms/image/D4E0BAQFh9M8zrNFjQw/company-logo_200_200/0/1665352677142?e=2147483647&v=beta&t=iI4YPPusisIuK3I-VjYnt7WVuIA4jsSQpglIwfr9X2U" alt="windmill" width="100">
 </h1>
 
-<h4 align="center">Turn scripts into workflows and UIs in minutes</h4>
+<h4 align="center">Code-first platform for workflows, apps and AI agents</h4>
 
 <p align="center">
 <img src="https://github.com/windmill-labs/windmill-helm-charts/actions/workflows/helm_test.yml/badge.svg" alt="drawing"/>
