@@ -6,7 +6,7 @@
     "config": {
       "isWizard": false,
       "basics": {
-        "description": "Deploys Windmill Enterprise Edition to an existing AKS cluster. A licence key is required to unlock Enterprise features and is entered in Windmill's instance settings after installation; request a trial key at https://www.windmill.dev/pricing.",
+        "description": "Deploys Windmill Enterprise Edition to an existing AKS cluster. Cluster size: with the default settings the Windmill pods request 17 GiB of memory in total, so use at least 2 nodes with 16 GiB of memory each (tested with 2 x Standard_D4as_v5); on smaller clusters pods stay Pending and the installation does not complete. Licence: jobs do not run until a licence key is entered in Windmill's instance settings after installation; request a trial key at https://www.windmill.dev/pricing.",
         "location": { "visible": false },
         "resourceGroup": { "allowExisting": true }
       }
@@ -17,6 +17,15 @@
         "name": "clusterDetails",
         "label": "Cluster",
         "elements": [
+          {
+            "name": "clusterSizeInfo",
+            "type": "Microsoft.Common.InfoBox",
+            "visible": true,
+            "options": {
+              "icon": "Warning",
+              "text": "Minimum cluster size: 2 nodes with 16 GiB of memory each (tested with 2 x Standard_D4as_v5). With the default settings the Windmill pods request 17 GiB of memory in total; on smaller clusters pods stay Pending and the installation does not complete."
+            }
+          },
           {
             "name": "clusterLookupControl",
             "type": "Microsoft.Solutions.ArmApiControl",
@@ -47,7 +56,7 @@
             "visible": true,
             "options": {
               "icon": "Info",
-              "text": "Windmill Enterprise needs a licence key. Don't have one yet? Start a free trial.",
+              "text": "Windmill Enterprise needs a licence key: jobs do not run until one is entered in Instance settings after installation. Don't have one yet? Start a free trial.",
               "uri": "https://portal.windmill.dev/trial?from=Microsoft%20Marketplace"
             }
           },

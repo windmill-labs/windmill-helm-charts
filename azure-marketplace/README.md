@@ -49,9 +49,32 @@ Marketplace customers only receive a new Windmill version when a new bundle is s
 4. In Partner Center, select the new bundle tag on the offer's technical configuration and
    submit.
 
-## Unreleased changes after bundle 1.0.0
+## Bundle versions
 
-- `createUiDefinition.json` gained a `Microsoft.Common.InfoBox` (licence key needed, link to the free trial) at the top of the Windmill step. It was added after bundle 1.0.0 and ships with the next bundle version; re-run `cpa verify` on the build machine (step 3 above) before that bundle is published, as it has not been validated by the packaging tool yet.
+| Bundle | Windmill | Status |
+| --- | --- | --- |
+| 1.0.0 | 1.866.0 | Submitted 10 November 2026. |
+| 1.0.1 | chart `appVersion` at build time | Not built yet: build with `./build.sh 1.0.1`. |
+
+Changes in 1.0.1, from the preview install test of 1.0.0 on 12 November 2026:
+
+- The bundled PostgreSQL gets a persistent volume (`windmill.postgresql.persistence.enabled: true`
+  in `windmill-aks/values.yaml`): a StatefulSet with a 50Gi PVC on the cluster's default storage
+  class. In 1.0.0 it was a Deployment without a volume, so its data was lost on every pod restart.
+  Upgrading an install from 1.0.0 replaces that Deployment, so the 1.0.0 evaluation data is not
+  carried over. Uninstalling does not delete the PVC (StatefulSet claims are retained); delete it
+  to release the disk.
+- The portal form states the minimum cluster size and that jobs do not run until a licence key is
+  entered. With the default settings the pods request 17 GiB of memory in total (the chart sets
+  memory limits only, which Kubernetes also uses as requests): app 2 x 2Gi, default workers
+  3 x 2Gi, native worker 2Gi, indexer 2Gi, bundled PostgreSQL 2Gi, windmill-extra 1Gi. On
+  2 x Standard_D2as_v5 (8 GiB each) five pods stayed Pending and the extension never left
+  "Creating"; on 2 x Standard_D4as_v5 (16 GiB each) it installed in 6m26s with 9/9 pods Running.
+  The requests are unchanged: the chart gives no guidance that would justify lower values.
+- The licence InfoBox at the top of the Windmill step (added after 1.0.0) ships for the first time.
+
+`cpa verify` has not been run on these changes yet; run it on the build machine (step 3 above)
+before the bundle is submitted.
 
 ## One-time registry setup (already done for `windmillmarketplace`)
 
