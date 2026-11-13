@@ -54,7 +54,7 @@ Marketplace customers only receive a new Windmill version when a new bundle is s
 | Bundle | Windmill | Status |
 | --- | --- | --- |
 | 1.0.0 | 1.866.0 | Submitted 10 November 2026. |
-| 1.0.1 | chart `appVersion` at build time | Not built yet: build with `./build.sh 1.0.1`. |
+| 1.0.1 | 1.873.0 (chart 4.0.320) | Built 13 November 2026 as `windmillmarketplace.azurecr.io/dev.windmill.enterprise:1.0.1` (`sha256:4242d41c33a1b2e0e75057f57f98bbe8586b4db688767e70008de9770484a616`) and submitted to Microsoft Partner Center the same day; in certification, not yet live. Changes vs 1.0.0: PostgreSQL persistence (50Gi on the cluster's default storage class); cluster-size warning and licence note in `createUiDefinition.json` (details below). |
 
 Changes in 1.0.1, from the preview install test of 1.0.0 on 12 November 2026:
 
@@ -73,8 +73,7 @@ Changes in 1.0.1, from the preview install test of 1.0.0 on 12 November 2026:
   The requests are unchanged: the chart gives no guidance that would justify lower values.
 - The licence InfoBox at the top of the Windmill step (added after 1.0.0) ships for the first time.
 
-`cpa verify` has not been run on these changes yet; run it on the build machine (step 3 above)
-before the bundle is submitted.
+`cpa verify` passed on these changes when 1.0.1 was built on 13 November 2026.
 
 ## One-time registry setup (already done for `windmillmarketplace`)
 
