@@ -23,8 +23,13 @@ windmill:
     licenseKey: ""
   # Bundled PostgreSQL is for evaluation only; production installs point databaseUrl at
   # Azure Database for PostgreSQL and set postgresql.enabled=false.
+  # Persistence renders it as a StatefulSet with a 50Gi PVC (chart defaults) on the cluster's
+  # default storage class, which on AKS is managed-csi (Azure Standard SSD managed disk), so
+  # its data survives pod restarts. Bundle 1.0.0 had no volume.
   postgresql:
     enabled: true
+    persistence:
+      enabled: true
   ingress:
     enabled: false
   windmill:
