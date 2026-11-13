@@ -73,8 +73,7 @@ Changes in 1.0.1, from the preview install test of 1.0.0 on 12 November 2026:
   The requests are unchanged: the chart gives no guidance that would justify lower values.
 - The licence InfoBox at the top of the Windmill step (added after 1.0.0) ships for the first time.
 
-`cpa verify` has not been run on these changes yet; run it on the build machine (step 3 above)
-before the bundle is submitted.
+`cpa verify` passed on these changes when 1.0.1 was built on 13 November 2026.
 
 ## One-time registry setup (already done for `windmillmarketplace`)
 
