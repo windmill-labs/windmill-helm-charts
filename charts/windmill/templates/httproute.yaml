@@ -33,6 +33,7 @@ spec:
       name: windmill-extra
       port: 3000
       weight: 1
+    {{- include "windmill.httprouteSessionPersistence" . }}
   {{- end }}
   {{ if .Values.enterprise.enabled }}
   {{ if .Values.windmill.indexer.enabled }}
@@ -46,6 +47,7 @@ spec:
       name: windmill-indexer
       port: 8000
       weight: 1
+    {{- include "windmill.httprouteSessionPersistence" . }}
   {{ end }}
   {{ end }}
   - matches:
@@ -58,6 +60,7 @@ spec:
       name: windmill-app
       port: 8000
       weight: 1
+    {{- include "windmill.httprouteSessionPersistence" . }}
 
 {{ if .Values.windmill.secondaryBaseDomain }}
 ---
@@ -95,6 +98,7 @@ spec:
       name: windmill-extra
       port: 3000
       weight: 1
+    {{- include "windmill.httprouteSessionPersistence" . }}
   {{- end }}
   {{ if .Values.enterprise.enabled }}
   {{ if .Values.windmill.indexer.enabled }}
@@ -108,6 +112,7 @@ spec:
       name: windmill-indexer
       port: 8000
       weight: 1
+    {{- include "windmill.httprouteSessionPersistence" . }}
   {{ end }}
   {{ end }}
   - matches:
@@ -120,6 +125,7 @@ spec:
       name: windmill-app
       port: 8000
       weight: 1
+    {{- include "windmill.httprouteSessionPersistence" . }}
 {{- end }}
 
 {{ if .Values.windmill.secondaryApiDomain }}
@@ -147,6 +153,7 @@ spec:
       name: windmill-app
       port: 8000
       weight: 1
+    {{- include "windmill.httprouteSessionPersistence" . }}
 {{- end }}
 {{ if .Values.hub.enabled }}
 ---
@@ -173,6 +180,7 @@ spec:
       name: windmill-hub
       port: 3003
       weight: 1
+    {{- include "windmill.httprouteSessionPersistence" . }}
 {{- end }}
 {{ if .Values.windmill.publicAppDomain }}
 ---
@@ -199,5 +207,6 @@ spec:
       name: windmill-app
       port: 8000
       weight: 1
+    {{- include "windmill.httprouteSessionPersistence" . }}
 {{- end }}
 {{- end }}

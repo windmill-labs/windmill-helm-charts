@@ -306,3 +306,13 @@ Usage: include "windmill.imageRef" (dict "ctx" $ "name" "windmill" "default" "re
 {{- .default -}}
 {{- end -}}
 {{- end }}
+
+{{/*
+sessionPersistence block for every HTTPRoute rule, rendered at rule level when httproute.sessionPersistence is set.
+*/}}
+{{- define "windmill.httprouteSessionPersistence" -}}
+{{- with .Values.httproute.sessionPersistence }}
+    sessionPersistence:
+{{ toYaml . | indent 6 }}
+{{- end }}
+{{- end }}
