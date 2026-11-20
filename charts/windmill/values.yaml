@@ -815,6 +815,8 @@ httproute:
   secondaryApiDomainParentRefs: []
   # -- override parentRefs for the publicAppDomain httproute (falls back to parentRefs)
   publicAppDomainParentRefs: []
+  # -- Gateway API `sessionPersistence` added to every httproute rule, e.g. `{type: Cookie, cookie: {name: route, lifetimeType: Permanent}}` for sticky sessions to the app pods (the Gateway API equivalent of ingress-nginx `affinity: cookie`). Requires the Gateway API experimental CRDs and a Gateway controller that implements it. Empty (default) renders nothing.
+  sessionPersistence: {}
 
 enterprise:
   # -- enable Windmill Enterprise, requires license key.
