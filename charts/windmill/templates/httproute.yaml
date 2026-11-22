@@ -33,7 +33,6 @@ spec:
       name: windmill-extra
       port: 3000
       weight: 1
-    {{- include "windmill.httprouteSessionPersistence" . }}
   {{- end }}
   {{ if .Values.enterprise.enabled }}
   {{ if .Values.windmill.indexer.enabled }}
@@ -47,7 +46,6 @@ spec:
       name: windmill-indexer
       port: 8000
       weight: 1
-    {{- include "windmill.httprouteSessionPersistence" . }}
   {{ end }}
   {{ end }}
   - matches:
@@ -98,7 +96,6 @@ spec:
       name: windmill-extra
       port: 3000
       weight: 1
-    {{- include "windmill.httprouteSessionPersistence" . }}
   {{- end }}
   {{ if .Values.enterprise.enabled }}
   {{ if .Values.windmill.indexer.enabled }}
@@ -112,7 +109,6 @@ spec:
       name: windmill-indexer
       port: 8000
       weight: 1
-    {{- include "windmill.httprouteSessionPersistence" . }}
   {{ end }}
   {{ end }}
   - matches:

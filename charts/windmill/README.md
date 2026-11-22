@@ -46,7 +46,7 @@ Windmill - Code-first platform for workflows, apps and AI agents
 | httproute.publicAppDomainParentRefs | list | `[]` | override parentRefs for the publicAppDomain httproute (falls back to parentRefs) |
 | httproute.secondaryApiDomainParentRefs | list | `[]` | override parentRefs for the secondaryApiDomain httproute (falls back to parentRefs) |
 | httproute.secondaryBaseDomainParentRefs | list | `[]` | override parentRefs for the secondaryBaseDomain httproute (falls back to parentRefs) |
-| httproute.sessionPersistence | object | `{}` | Gateway API `sessionPersistence` added to every httproute rule, e.g. `{type: Cookie, cookie: {name: route, lifetimeType: Permanent}}` for sticky sessions to the app pods (the Gateway API equivalent of ingress-nginx `affinity: cookie`). Requires the Gateway API experimental CRDs and a Gateway controller that implements it. Empty (default) renders nothing. |
+| httproute.sessionPersistence | object | `{}` | Gateway API `sessionPersistence` for the httproute rules backed by the app and hub, e.g. `{type: Cookie, cookie: {name: route}}` for sticky sessions. Not applied to windmill-extra or the indexer, whose cookie would overwrite the app's on the same hostname. `lifetimeType: Permanent` also requires `absoluteTimeout`. Requires the Gateway API experimental CRDs and a Gateway controller that implements it. Empty (default) renders nothing. |
 | hub-postgresql.auth.database | string | `"windmillhub"` |  |
 | hub-postgresql.auth.postgresPassword | string | `"windmill"` |  |
 | hub-postgresql.auth.postgresUser | string | `"postgres"` |  |
