@@ -308,7 +308,8 @@ Usage: include "windmill.imageRef" (dict "ctx" $ "name" "windmill" "default" "re
 {{- end }}
 
 {{/*
-sessionPersistence block for every HTTPRoute rule, rendered at rule level when httproute.sessionPersistence is set.
+sessionPersistence block for HTTPRoute rules backed by windmill-app or windmill-hub. Do not add it to the windmill-extra
+or windmill-indexer rules: they share the app's hostname, so their cookie would overwrite the app's.
 */}}
 {{- define "windmill.httprouteSessionPersistence" -}}
 {{- with .Values.httproute.sessionPersistence }}
